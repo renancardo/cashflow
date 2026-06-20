@@ -6,8 +6,8 @@ todos:
     content: User reviews and confirms organized feature map + terminology
     status: completed
   - id: data-schema
-    content: Draft concrete data model (entities, fields, relationships) — foundation for PRD
-    status: pending
+    content: Draft concrete data model (entities, fields, relationships) — see docs/specs/data-model.md
+    status: completed
   - id: write-prd
     content: Draft PRD with v1 scope, user stories, and acceptance criteria
     status: pending
@@ -379,7 +379,7 @@ This replaces your manual sync between **Estudo de Gastos** and **Lançamentos**
 
 Ideas are organized and the key design decisions are resolved (§9). Recommended order:
 
-1. **Data model / schema** — concrete entities, fields, and relationships (Account, Transaction, RecurringRule + overrides, InstallmentPlan, CreditCardStatement, Category + budget, Snapshot). Foundation for everything below.
+1. ✅ **Data model / schema** — concrete entities, fields, and relationships. Done: `docs/specs/data-model.md`.
 2. **PRD** — goals, user stories, acceptance criteria, v1 scope
 3. **Style guide** — linear calendar aesthetic (minimal, weekday columns, weekend bands, red-dot semantics, typography/color tokens)
 4. **Screen-by-screen spec** — fields, actions, empty states for each screen above
