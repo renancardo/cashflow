@@ -161,7 +161,7 @@ This implies the data model needs a `RecurringRule` plus per-occurrence **overri
 ### 3.9 Money & Currency Precision
 
 - All monetary values stored as **integer cents (BRL)** to avoid floating-point rounding errors.
-- **v1 is BRL-only** — foreign-currency amounts (e.g. Deel USD advance) are converted to BRL manually before entry. Multi-currency is deferred (Phase 3).
+- **BRL-only in Phase 1** — foreign-currency amounts (e.g. Deel USD advance) are converted to BRL manually before entry. Multi-currency is deferred (Phase 2).
 
 ---
 
@@ -172,7 +172,7 @@ This implies the data model needs a `RecurringRule` plus per-occurrence **overri
 - Maintain **daily running balance** for aggregate working accounts from each account's anchor date over a **rolling 24-month** horizon.
 - Inputs: account anchors (opening balances) + actual transactions + planned/recurring/installment-generated items + **credit card statement payments** (computed from each card's closing/due cycle).
 - Output per day: `{ balance, inflows, outflows, belowBuffer, items[] }`, plus a global **next negative date** for proactive alerts.
-- Money in integer cents; BRL-only in v1 (multi-currency deferred to Phase 3).
+- Money in integer cents; BRL-only in Phase 1 (multi-currency deferred to Phase 2).
 
 ### B. Linear Calendar — Year View (primary UI)
 
@@ -229,7 +229,7 @@ Inspired by the clean horizontal year grid (months as rows, weekdays as columns)
 
 - Planned investment outflows (e.g. “Sinal ap 2207 — R$ 5,000”).
 - Optional: track investment account balances separately from working cash.
-- v1 scope: treat as planned expenses/transfers, not portfolio analytics.
+- Phase 1 scope: treat as planned expenses/transfers, not portfolio analytics.
 
 ### I. Baseline Snapshots (new capability)
 
@@ -237,7 +237,7 @@ Inspired by the clean horizontal year grid (months as rows, weekdays as columns)
 - **Compare views**: snapshot vs current actuals — highlight over/under spend by category or by month.
 - Use cases: “At start of June, I thought I’d have R$ X; today I have R$ Y.”
 
-### J. AI Insights (later phase — nice to have)
+### J. AI Insights (Phase 2)
 
 - Summarize cash flow risk: “3 negative-balance days in August driven by financing + pension payments.”
 - Suggest actions: “Delay X payment” / “You’re averaging R$ Y over budget on food.”
@@ -291,9 +291,9 @@ Inspired by the clean horizontal year grid (months as rows, weekdays as columns)
 | **Investments** | Planned capital allocations |
 | **Snapshots** | Create & compare baselines |
 | **Settings** | Language, currency, working-account rules, card payment logic |
-| **Insights** (v2) | AI summaries |
+| **Insights** (Phase 2) | AI summaries |
 
-**Dashboard** as a separate screen is optional for v1 — the **Working balance + next negative date** can live in the calendar header.
+**Dashboard** as a separate screen is optional for Phase 1 — the **Working balance + next negative date** can live in the calendar header.
 
 ---
 
@@ -324,9 +324,9 @@ This replaces your manual sync between **Estudo de Gastos** and **Lançamentos**
 
 ---
 
-## 8. Suggested Phasing (Personal Use v1 → v2)
+## 8. Suggested Phasing (Two phases)
 
-### Phase 1 — Core loop (MVP for you)
+### Phase 1 — Complete cash flow app
 - Local-first storage with export/backup; money stored as integer cents (BRL)
 - Accounts with working-account flag + balance anchoring (opening balance)
 - Transaction ledger (income, expense, transfer)
@@ -335,18 +335,16 @@ This replaces your manual sync between **Estudo de Gastos** and **Lançamentos**
 - Category budgets (monthly targets)
 - Daily projection engine over rolling 24 months (aggregate working balance)
 - **Year linear calendar** with red dots (configurable buffer) + day detail
+- **Month view** (detailed month editing/review)
 - Proactive "next negative date" + lead-time alert
+- Installment plans + subscriptions + payoff dates
+- Baseline snapshots (full clone) + variance view (incl. budget vs actual by category)
+- Envelope / sinking-fund accounts (food/leisure pattern)
 - Lightweight bulk-entry + CSV import for onboarding
 - pt-BR + en UI
 
-### Phase 2 — Debt & comparison
-- Installment plans + subscriptions + payoff dates
-- Month view
-- Baseline snapshots (full clone) + variance view (incl. budget vs actual by category)
-- Envelope / sinking-fund accounts (food/leisure pattern)
+### Phase 2 — Advanced & platform
 - **What-if simulation** ("Can I afford R$ X on date Y?")
-
-### Phase 3 — Intelligence & polish
 - AI insights
 - Full spreadsheet import from your Google Sheets structure
 - PWA offline support
@@ -365,13 +363,13 @@ This replaces your manual sync between **Estudo de Gastos** and **Lançamentos**
 | **Negative detection scope** | **Aggregate working balance** | Sum of all working accounts |
 | **Envelope accounts** | **Count as working balance** | Set-aside money is still spendable |
 | **Recurrence editing** | **This / This+future** | Per-occurrence overrides + rule split at edit date (see §3.8) |
-| **Category budgets** | **In v1** | Monthly target per category; feeds variance views |
-| **Currency** | **BRL-only in v1** | Cents as integers; multi-currency deferred to Phase 3 |
-| **What-if simulation** | **Named now, built in v2** | Forward-looking "can I afford X?", distinct from snapshots |
+| **Category budgets** | **In Phase 1** | Monthly target per category; feeds variance views |
+| **Currency** | **BRL-only in Phase 1** | Cents as integers; multi-currency deferred to Phase 2 |
+| **What-if simulation** | **Phase 2** | Forward-looking "can I afford X?", distinct from snapshots |
 | **Alerts** | **Proactive** | Surface "next negative date" + lead-time warning |
 | **Storage / architecture** | **Local-first with export/backup** | Personal use, full data ownership |
 | **Snapshot granularity** | **Full forecast clone** | Enables true baseline-vs-actual variance |
-| **Onboarding / import** | **Bulk-entry + lightweight CSV import in Phase 1** | Avoids painful manual first-use entry |
+| **Onboarding / import** | **Bulk-entry + lightweight CSV import in Phase 1** | Full Google Sheets import in Phase 2 |
 
 ---
 

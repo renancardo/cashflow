@@ -17,7 +17,7 @@ isProject: false
 |---|---|
 | **IDs** | String UUID (v4) or CUID, generated client-side (local-first). Field name `id`. Foreign keys named `<entity>Id`. |
 | **Money** | Integer **cents** (BRL). Field suffix `Cents`. Never floats. → *Money & currency precision* |
-| **Currency** | `BRL` only in v1; a `currency` field exists for forward-compat but is always `"BRL"`. → *Currency* |
+| **Currency** | `BRL` only in Phase 1; a `currency` field exists for forward-compat but is always `"BRL"`. → *Currency* |
 | **Dates** | Calendar dates stored as ISO `YYYY-MM-DD` (no time, no timezone) for anything cash-flow-affecting (`effectiveDate`, `dueDate`, anchors). Audit timestamps (`createdAt`/`updatedAt`) are full ISO‑8601 UTC datetimes. |
 | **Soft delete** | Entities the user can retire use `archivedAt` (nullable datetime) instead of hard delete, to preserve historical projections/snapshots. |
 | **Audit** | All persisted entities carry `createdAt` and `updatedAt`. Omitted from field tables below for brevity unless meaningful. |
@@ -69,7 +69,7 @@ A financial container with a balance anchor. Covers banks, wallets, credit cards
 | `id` | string | PK |
 | `name` | string | "Cora", "Cartão Cora", "Alimentação/Lazer" |
 | `type` | enum `AccountType` | `checking`, `savings`, `wallet`, `credit_card`, `investment` |
-| `currency` | string | Always `"BRL"` in v1 |
+| `currency` | string | Always `"BRL"` in Phase 1 |
 | `isWorking` | boolean | Counted toward aggregate working balance. → *Negative detection scope*, *Envelope accounts* |
 | `isEnvelope` | boolean | Sinking-fund sub-account (food/leisure). Usually `isWorking = true`. → *Envelope accounts* |
 | `envelopeCategoryId` | string? | If envelope, the category its spending maps to |
@@ -113,7 +113,7 @@ Classification for reporting and budgets. **One level of nesting only** — a ch
 
 ### 3.3 CategoryBudget
 
-Monthly target per category. → *Category budgets (in v1)*. Modeled with an effective month so a budget can change over time without losing history.
+Monthly target per category. → *Category budgets (Phase 1)*. Modeled with an effective month so a budget can change over time without losing history.
 
 | Field | Type | Notes |
 |---|---|---|
@@ -423,13 +423,14 @@ interface ProjectionResult {
 | Aggregate working balance | §4.1, `ProjectionDay` (single aggregate series) |
 | Envelope counts as working | `Account.isEnvelope` + `isWorking`, food example §7 |
 | Recurrence: this / this+future | `PlannedItemOverride` + rule split via `endDate`, §3.5 |
-| Category budgets in v1 | `CategoryBudget` |
+| Category budgets in Phase 1 | `CategoryBudget` |
 | BRL-only, cents | Conventions §1, all `*Cents` fields |
-| What-if (v2) | Not persisted; future read-only engine run over a draft overlay |
+| What-if (Phase 2) | Not persisted; future read-only engine run over a draft overlay |
 | Proactive alerts | `Settings.alertLeadTimeDays`, `ProjectionResult.nextNegativeDate` |
 | Local-first + backup | Conventions §1; client-generated IDs, JSON export of all tables |
 | Snapshot full clone | `Snapshot` + `SnapshotPayload.payloadJson` |
 | Bulk-entry + CSV import (Phase 1) | Import maps CSV rows → `Transaction`/`PlannedItem`; no schema impact |
+| Full spreadsheet import (Phase 2) | Google Sheets structure → bulk entity import |
 | Credit-card balance: positive = owed | `Account.anchorBalanceCents` when `type = credit_card`, §3.1, §8.1 |
 | Eager installment rows | `Installment` created at plan save, §3.9, §8.2 |
 | Single-row transfers | `Transaction.toAccountId`, §3.4, §8.3 |
