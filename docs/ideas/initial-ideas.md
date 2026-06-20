@@ -8,14 +8,17 @@ todos:
   - id: data-schema
     content: Draft concrete data model (entities, fields, relationships) — see docs/specs/data-model.md
     status: completed
-  - id: write-prd
-    content: Draft PRD with v1 scope, user stories, and acceptance criteria
-    status: pending
+  - id: phase1-scope
+    content: Phase 1 scope lock — see docs/specs/phase-1-scope.md
+    status: completed
   - id: style-guide
     content: Create style guide based on linear calendar aesthetic (minimal grid, weekend bands, red-dot semantics)
     status: pending
   - id: screen-specs
     content: Write per-screen summaries (fields, actions, navigation flow)
+    status: pending
+  - id: write-prd
+    content: Draft PRD with Phase 1 scope, user stories, and acceptance criteria
     status: pending
 isProject: false
 ---
@@ -377,10 +380,11 @@ This replaces your manual sync between **Estudo de Gastos** and **Lançamentos**
 
 Ideas are organized and the key design decisions are resolved (§9). Recommended order:
 
-1. ✅ **Data model / schema** — concrete entities, fields, and relationships. Done: `docs/specs/data-model.md`.
-2. **PRD** — goals, user stories, acceptance criteria, v1 scope
+1. ✅ **Data model / schema** — `docs/specs/data-model.md`
+2. ✅ **Phase 1 scope lock** — `docs/specs/phase-1-scope.md`
 3. **Style guide** — linear calendar aesthetic (minimal, weekday columns, weekend bands, red-dot semantics, typography/color tokens)
-4. **Screen-by-screen spec** — fields, actions, empty states for each screen above
+4. **Screen-by-screen spec** — fields, actions, empty states for Phase 1 screens
+5. **PRD** — goals, user stories, acceptance criteria (ratification doc)
 
 ---
 
