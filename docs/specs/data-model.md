@@ -80,7 +80,6 @@ A financial container with a balance anchor. Covers banks, wallets, credit cards
 | `institution` | string? | Optional metadata (bank name) |
 | `agency` | string? | Optional metadata |
 | `pixKey` | string? | Optional metadata |
-| `sortOrder` | integer | Display ordering |
 | `archivedAt` | datetime? | Soft delete |
 
 **Invariants**
@@ -100,7 +99,6 @@ Classification for reporting and budgets. **One level of nesting only** — a ch
 | `kind` | enum `CategoryKind` | `income`, `expense` |
 | `parentId` | string? | Optional **root** parent only (parent's own `parentId` must be null) |
 | `color` | string? | Hex, for calendar/report accents |
-| `sortOrder` | integer | |
 | `archivedAt` | datetime? | Soft delete |
 
 > Transfers are **not** categorized (net worth unchanged); `categoryId` is null for transfers.
