@@ -43,7 +43,6 @@ Answer one question every day:
 |---|---|
 | Account types | `checking`, `savings`, `wallet`, `credit_card`, `investment` |
 | Working-account flag | Toggle per account; drives aggregate projection |
-| Envelope accounts | `isEnvelope` + `isWorking`; food/leisure sinking-fund pattern |
 | Credit card config | `closingDay`, `dueDay`, `defaultPayFromAccountId`; balance = positive amount owed |
 
 ### 2.3 Transactions (ledger)
@@ -83,13 +82,15 @@ Answer one question every day:
 | Subscriptions | Indefinite recurring (via `PlannedItem`) or tagged subscription |
 | Dormant debt | Tracked, `isActive = false`, excluded until activated |
 
-### 2.7 Budgets & snapshots
+### 2.7 Categories, budgets & snapshots
 
 | Feature | Detail |
 |---|---|
-| Category budgets | Monthly target per category (`CategoryBudget`) |
+| Category management | Create/edit/archive expense and income categories; one-level parent/child hierarchy |
+| Category budgets | Monthly target per category (`CategoryBudget`); set amount + `effectiveFromMonth` on **Categories & Budgets** screen |
+| Budget tracking | Current-month actual vs target per category (and parent roll-up); progress bars and over/under on **Categories & Budgets** |
 | Snapshots | Full forecast clone at a point in time |
-| Variance view | Snapshot vs current actuals; over/under by category and month |
+| Variance view | Snapshot vs current actuals; over/under by category and month (also surfaced on **Categories & Budgets** when a snapshot is selected) |
 
 ### 2.8 Projection engine
 
@@ -122,7 +123,7 @@ Answer one question every day:
 
 ## 3. Screens in scope
 
-Phase 1 ships **9 screens/panels**. No separate Dashboard or Investments screen.
+Phase 1 ships **10 screens/panels**. No separate Dashboard or Investments screen.
 
 | # | Screen / panel | Phase 1 scope summary |
 |---|---|---|
@@ -130,11 +131,12 @@ Phase 1 ships **9 screens/panels**. No separate Dashboard or Investments screen.
 | 2 | **Month Calendar** | Month grid/list; same projection data, denser editing |
 | 3 | **Day Detail Panel** | Slide-over from calendar; projected balance, items, quick-add |
 | 4 | **Transactions** | Chronological ledger with filters and running balance |
-| 5 | **Accounts** | List, balances, working flag, envelope flag, card cycle config, re-anchor |
+| 5 | **Accounts** | List, balances, working flag, card cycle config, re-anchor |
 | 6 | **Forecast Items** | Planned income/expense/transfer, recurrence, subscriptions, **investment outflows** |
 | 7 | **Installments & Subscriptions** | Plans, payoff dates, per-installment paid status, dormant debt |
-| 8 | **Snapshots** | Create baseline, compare variance by category/month |
-| 9 | **Settings** | Language, buffer, horizon, alert lead time, export/backup, card defaults |
+| 8 | **Categories & Budgets** | Category CRUD; set monthly budget per category; track current-month actual vs target (child + parent roll-up) |
+| 9 | **Snapshots** | Create baseline, compare variance by category/month |
+| 10 | **Settings** | Language, buffer, horizon, alert lead time, export/backup, card defaults |
 
 ### Screen decisions (locked)
 
@@ -155,6 +157,7 @@ flowchart TB
   Acct["Accounts"]
   Forecast["Forecast Items"]
   Install["Installments"]
+  Budgets["Categories & Budgets"]
   Snap["Snapshots"]
   Settings["Settings"]
 
@@ -165,6 +168,7 @@ flowchart TB
   YearCal --> Acct
   YearCal --> Forecast
   YearCal --> Install
+  YearCal --> Budgets
   YearCal --> Snap
   YearCal --> Settings
 ```
@@ -228,7 +232,7 @@ Copied from [initial-ideas.md §9](../ideas/initial-ideas.md) and [data-model.md
 | Horizon | Rolling 24 months |
 | Red-dot threshold | Configurable buffer, default R$ 0 |
 | Negative detection | Aggregate working balance |
-| Envelope accounts | Count as working |
+| Category budgets | Monthly target per category; actual vs target on **Categories & Budgets** |
 | Recurrence edit | This / This+future |
 | Card balance sign | Positive = amount owed |
 | Installments | Eager row generation |
@@ -249,7 +253,6 @@ These do not block the style guide; resolve during screen-spec writing.
 | Snapshot compare UI | Side-by-side month table + category breakdown |
 | CSV import format | Document a minimal 4-column template (date, description, amount, account) |
 | Bulk-entry mode | Multi-row inline form on Transactions screen |
-| Envelope funding UX | Monthly transfer `PlannedItem` created from Accounts screen shortcut |
 
 ---
 
@@ -265,8 +268,7 @@ These do not block the style guide; resolve during screen-spec writing.
 - [ ] Day panel shows balance breakdown and supports quick-add
 - [ ] Calendar header shows working balance, next negative date, and lead-time alert
 - [ ] User can create a snapshot and view variance vs actuals by category/month
-- [ ] Category budgets display actual vs target
-- [ ] Envelope accounts work without false red dots on funding transfers
+- [ ] User can set monthly category budgets on **Categories & Budgets** and see current-month actual vs target (with parent roll-up)
 - [ ] CSV import loads initial data
 - [ ] UI works in pt-BR and en
 - [ ] Full data export/backup works
@@ -278,5 +280,5 @@ These do not block the style guide; resolve during screen-spec writing.
 | Order | Document | Uses this scope for |
 |---|---|---|
 | 1 | [style-guide.md](./style-guide.md) | Calendar components, tokens, semantic colors |
-| 2 | [screen-specs.md](./screen-specs.md) | Per-screen fields, actions, states (9 screens above) |
+| 2 | [screen-specs.md](./screen-specs.md) | Per-screen fields, actions, states (10 screens above) |
 | 3 | [prd.md](./prd.md) | User stories + acceptance criteria synthesized from specs |

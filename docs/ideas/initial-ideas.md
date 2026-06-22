@@ -139,7 +139,7 @@ Split into three distinct concepts:
 
 | Pattern | Proper name | App behavior |
 |---|---|---|
-| Food/leisure envelope | **Allocated sub-balance / sinking fund** | Transfer from working account → dedicated “Alimentação/Lazer” account; daily small expenses deduct from that account. **Envelope accounts still count as working balance** (money set aside is still spendable), so transfers into them do not trigger red dots |
+| Food/leisure spending cap | **Category budget** | Monthly target on an expense category (e.g. Alimentação, Lazer); actual expenses tagged to that category roll up for budget vs actual on **Categories & Budgets**. No separate sub-account required |
 | “Paid” note on forecast cell | **Mark planned item as settled** | Converts or links forecast entry to actual ledger transaction |
 | Green cell on installment | **Installment status: paid** | Paid installments stop projecting; unpaid ones continue |
 | Investment down payment | **Planned capital outflow** | One-time or scheduled expense from working → investment account |
@@ -219,7 +219,7 @@ Inspired by the clean horizontal year grid (months as rows, weekdays as columns)
 - **Planned expenses** with due day-of-month.
 - **Recurrence**: none, weekly, monthly, yearly, custom.
 - Status: `projected` → `paid/settled` → optionally linked to ledger entry.
-- Envelope accounts (food/leisure): show allocated vs spent.
+- Category budgets (food, leisure, etc.): monthly target vs actual on **Categories & Budgets** screen.
 
 ### G. Installments & Subscriptions (replaces Estudo de Contas parceladas)
 
@@ -342,7 +342,6 @@ This replaces your manual sync between **Estudo de Gastos** and **Lançamentos**
 - Proactive "next negative date" + lead-time alert
 - Installment plans + subscriptions + payoff dates
 - Baseline snapshots (full clone) + variance view (incl. budget vs actual by category)
-- Envelope / sinking-fund accounts (food/leisure pattern)
 - Lightweight bulk-entry + CSV import for onboarding
 - pt-BR + en UI
 
@@ -364,7 +363,6 @@ This replaces your manual sync between **Estudo de Gastos** and **Lançamentos**
 | **Card payment cycle** | **Closing day + due day per card** | Purchase date → statement → due-date outflow (see §3.4) |
 | **Card payment amount** | **Full statement balance, auto-computed** | Editable per occurrence for partial payments |
 | **Negative detection scope** | **Aggregate working balance** | Sum of all working accounts |
-| **Envelope accounts** | **Count as working balance** | Set-aside money is still spendable |
 | **Recurrence editing** | **This / This+future** | Per-occurrence overrides + rule split at edit date (see §3.8) |
 | **Category budgets** | **In Phase 1** | Monthly target per category; feeds variance views |
 | **Currency** | **BRL-only in Phase 1** | Cents as integers; multi-currency deferred to Phase 2 |

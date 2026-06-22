@@ -62,17 +62,15 @@ erDiagram
 
 ### 3.1 Account
 
-A financial container with a balance anchor. Covers banks, wallets, credit cards, investment, and envelope sub-accounts.
+A financial container with a balance anchor. Covers banks, wallets, credit cards, and investment accounts.
 
 | Field | Type | Notes |
 |---|---|---|
 | `id` | string | PK |
-| `name` | string | "Cora", "Cartão Cora", "Alimentação/Lazer" |
+| `name` | string | "Cora", "Cartão Cora", "Nubank Poupança" |
 | `type` | enum `AccountType` | `checking`, `savings`, `wallet`, `credit_card`, `investment` |
 | `currency` | string | Always `"BRL"` in Phase 1 |
-| `isWorking` | boolean | Counted toward aggregate working balance. → *Negative detection scope*, *Envelope accounts* |
-| `isEnvelope` | boolean | Sinking-fund sub-account (food/leisure). Usually `isWorking = true`. → *Envelope accounts* |
-| `envelopeCategoryId` | string? | If envelope, the category its spending maps to |
+| `isWorking` | boolean | Counted toward aggregate working balance. → *Negative detection scope* |
 | `anchorBalanceCents` | integer | Opening balance at `anchorDate`. → *Account anchoring* |
 | `anchorDate` | date | Origin date for forward projection. Re-anchorable. → *Account anchoring* |
 | `creditLimitCents` | integer? | Credit cards only |
@@ -148,7 +146,7 @@ A confirmed money event. Income, expense, or transfer. **Single-row transfer mod
 **Effect on working balance (engine rule):**
 - `expense`/`income` on a **working** account → hits aggregate working balance on `effectiveDate`.
 - `expense` on a **credit card** account → accrues to a statement; does **not** hit working balance directly (see §3.7).
-- `transfer` between two working accounts (incl. envelopes) → net working balance unchanged.
+- `transfer` between two working accounts → net working balance unchanged.
 - `transfer` working → non-working (investment/card payment) → working balance decreases.
 
 ### 3.5 PlannedItem (forecast template — replaces *Estudo de Gastos*, subscriptions)
@@ -392,7 +390,7 @@ interface ProjectionResult {
 
 **Installment "Ipanema", 36×, first due 10/08/2025** → `InstallmentPlan { installmentCount: 36, installmentAmountCents, firstDueDate: 2025-08-10, dayOfMonth: 10 }`. `payoffDate` auto = #36. Each paid installment: `Installment { status: paid, settledTransactionId }`.
 
-**Food/leisure envelope** → `Account { isEnvelope: true, isWorking: true, envelopeCategoryId: food }`. Monthly funding = `PlannedItem { type: transfer, accountId: <main working>, toAccountId: <envelope> }`; daily spending = expenses on the envelope account. Because both accounts are working, funding transfers don't move aggregate balance (no false red dots).
+**Food budget (Alimentação)** → `Category { name: "Alimentação", kind: expense }` + `CategoryBudget { categoryId: food, amountCents: 150000, effectiveFromMonth: "2026-06" }`. Daily groceries = `Transaction { type: expense, categoryId: food, accountId: <working> }`. Variance on **Categories & Budgets** = budget − Σ expenses in that category that month.
 
 **Investment down payment ("Sinal ap 2207 — R$ 5.000")** → `PlannedItem { type: transfer, recurrence: once, startDate, accountId: <working>, toAccountId: <investment> }`. Working balance drops on that date (destination is non-working).
 
@@ -421,7 +419,6 @@ interface ProjectionResult {
 | Card closing + due day per card | `Account.closingDay/dueDay`, `CreditCardStatement` |
 | Full statement balance, editable | `CreditCardStatement.computedTotalCents` + `plannedPaymentCents` |
 | Aggregate working balance | §4.1, `ProjectionDay` (single aggregate series) |
-| Envelope counts as working | `Account.isEnvelope` + `isWorking`, food example §7 |
 | Recurrence: this / this+future | `PlannedItemOverride` + rule split via `endDate`, §3.5 |
 | Category budgets in Phase 1 | `CategoryBudget` |
 | BRL-only, cents | Conventions §1, all `*Cents` fields |
