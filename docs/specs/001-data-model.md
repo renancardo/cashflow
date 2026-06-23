@@ -7,7 +7,7 @@ isProject: false
 
 # Data Model / Schema
 
-> Companion to `docs/ideas/initial-ideas.md`. Every decision in §9 of that doc is reflected here. Where a field encodes a decision, it is annotated with `→ decision`.
+> Companion to [`docs/ideas/000-initial-ideas.md`](../ideas/000-initial-ideas.md). Every decision in §9 of that doc is reflected here. Where a field encodes a decision, it is annotated with `→ decision`.
 
 ---
 
@@ -86,6 +86,8 @@ A financial container with a balance anchor. Covers banks, wallets, credit cards
 - `type = credit_card` ⇒ `isWorking = false`, `closingDay` and `dueDay` required. **`anchorBalanceCents` is always positive = amount owed** (e.g. R$ 1.500 fatura → `150000`). The engine treats cards as liabilities via `account.type`, not via negative numbers. → *§8.1*
 - `type = investment` ⇒ typically `isWorking = false` (configurable).
 
+**Re-anchoring:** Updating `anchorBalanceCents` and/or `anchorDate` replaces the account origin. Per-account balance is recomputed forward from the new anchor using only ledger events with `effectiveDate >= anchorDate`. Transactions dated before the new anchor remain in the ledger for history but no longer affect that account's balance or projection. For credit cards, re-anchoring also re-applies the opening-debt seeding rule (§3.7).
+
 > **Day-of-month edge case:** `closingDay`/`dueDay`/any `dayOfMonth` of 29–31 must clamp to the last valid day in shorter months (e.g. 31 → 28/29 Feb). Engine rule, applies everywhere a day-of-month is used.
 
 ### 3.2 Category
@@ -105,21 +107,24 @@ Classification for reporting and budgets. **One level of nesting only** — a ch
 
 **Invariants**
 - If `parentId` is set, the referenced category must have `parentId = null` (no grandchildren).
-- Budgets attach to any category (root or child); variance rolls up to parent in reports.
+- Budgets attach to **expense** categories only (root or child); variance rolls up to parent in reports.
 
 ### 3.3 CategoryBudget
 
-Monthly target per category. → *Category budgets (Phase 1)*. Modeled with an effective month so a budget can change over time without losing history.
+Monthly spending target per **expense** category. → *Category budgets (Phase 1)*. Modeled with an effective month so a budget can change over time without losing history.
 
 | Field | Type | Notes |
 |---|---|---|
 | `id` | string | PK |
-| `categoryId` | string | FK → Category |
+| `categoryId` | string | FK → Category (`kind = expense`) |
 | `amountCents` | integer | Monthly target |
 | `effectiveFromMonth` | string | `YYYY-MM`; applies from this month onward until superseded |
 | `archivedAt` | datetime? | |
 
-**Resolution:** the active budget for a category in month *M* is the row with the latest `effectiveFromMonth <= M`. Variance = budget − Σ actual expenses in that category that month.
+**Invariants**
+- `categoryId` must reference a category with `kind = expense`.
+
+**Resolution:** the active budget for a category in month *M* is the non-archived row (`archivedAt IS NULL`) with the latest `effectiveFromMonth <= M`. Variance = budget − Σ actual expenses in that category that month.
 
 ### 3.4 Transaction (actual ledger — replaces *Lançamentos*)
 
@@ -145,7 +150,11 @@ A confirmed money event. Income, expense, or transfer. **Single-row transfer mod
 - `expense`/`income` on a **working** account → hits aggregate working balance on `effectiveDate`.
 - `expense` on a **credit card** account → accrues to a statement; does **not** hit working balance directly (see §3.7).
 - `transfer` between two working accounts → net working balance unchanged.
-- `transfer` working → non-working (investment/card payment) → working balance decreases.
+- `transfer` working → non-working investment → working balance decreases.
+- `transfer` working → credit card → **only** when `paysStatementId` is set (statement payment). Ad-hoc transfers to a card account without `paysStatementId` are rejected at validation.
+
+**Invariants**
+- `type = transfer` and destination is a credit card ⇒ `paysStatementId` required.
 
 ### 3.5 PlannedItem (forecast template — replaces *Estudo de Gastos*, subscriptions)
 
@@ -163,7 +172,7 @@ Unified entity for **one-off planned** items and **recurring** rules (recurring 
 | `recurrence` | enum `Recurrence` | `once`, `weekly`, `monthly`, `yearly` |
 | `interval` | integer | Every N periods (default 1); e.g. monthly interval 2 = every other month |
 | `dayOfMonth` | integer? | For monthly/yearly: due day (1–31, clamped) |
-| `weekday` | integer? | For weekly: 0–6 |
+| `weekday` | integer? | For weekly: 0 = Sunday … 6 = Saturday (matches JavaScript `Date.getDay()`) |
 | `monthOfYear` | integer? | For yearly: 1–12 |
 | `startDate` | date | First occurrence date. For `once`, the single date |
 | `endDate` | date? | Last possible occurrence (null = indefinite). Set when splitting "this and future" |
@@ -171,8 +180,11 @@ Unified entity for **one-off planned** items and **recurring** rules (recurring 
 | `isActive` | boolean | Paused subscriptions/dormant items excluded from projection when false. → *Dormant debt* |
 | `archivedAt` | datetime? | |
 
+**Invariants**
+- `type = transfer` ⇒ `toAccountId` must **not** be a credit card account. Paying a card is modeled only via `CreditCardStatement` due-date payments (actual: `Transaction.paysStatementId`; projected: statement outflow). Prevents double-counting against auto-generated statement payments.
+
 **Recurrence editing → decision *This / This+future*:**
-- **This occurrence only** → write a `PlannedItemOverride` (§3.6) for that date (modified amount, skip, or settled link).
+- **This occurrence only** → write a `PlannedItemOverride` (§3.6) for that date (modified amount or skip).
 - **This and future** → set `endDate` on the existing rule to the day before the edit date, and create a **new** PlannedItem starting at the edit date with the new values. (No whole-series "all" edit.)
 
 ### 3.6 PlannedItemOverride (per-occurrence exception)
@@ -182,13 +194,14 @@ Unified entity for **one-off planned** items and **recurring** rules (recurring 
 | `id` | string | PK |
 | `plannedItemId` | string | FK → PlannedItem |
 | `occurrenceDate` | date | The original scheduled date this override targets |
-| `status` | enum `OverrideStatus` | `modified`, `skipped`, `settled` |
+| `status` | enum `OverrideStatus` | `modified`, `skipped` |
 | `amountCentsOverride` | integer? | New amount if `modified` |
 | `dateOverride` | date? | Moved to a different date |
-| `settledTransactionId` | string? | Set when `settled` (links to the actual that fulfilled it) |
 | `note` | string? | |
 
 > Uniqueness: one override per (`plannedItemId`, `occurrenceDate`).
+>
+> **Settlement is not stored here.** Occurrence settlement is recorded on `Transaction.settlesPlannedItemId` + `settlesPlannedOccurrenceDate` (§4.3). Overrides cover amount/date exceptions and skips only.
 
 ### 3.7 CreditCardStatement (materialized billing cycle)
 
@@ -201,7 +214,7 @@ One row per card per billing cycle, maintained by the engine from the card's `cl
 | `periodStart` | date | Day after previous closing date |
 | `closingDate` | date | This cycle's closing date |
 | `dueDate` | date | First due day after `closingDate` |
-| `computedTotalCents` | integer | Σ of charges (actual + projected) with `effectiveDate` in `(periodStart..closingDate]` |
+| `computedTotalCents` | integer | Statement total owed at due date (see engine rules below) |
 | `plannedPaymentCents` | integer? | Override of payment amount; null ⇒ pay full `computedTotalCents`. → partial payment |
 | `payFromAccountId` | string? | Override of which working account pays; null ⇒ card's `defaultPayFromAccountId` |
 | `status` | enum `StatementStatus` | `open`, `closed`, `paid` |
@@ -209,6 +222,7 @@ One row per card per billing cycle, maintained by the engine from the card's `cl
 
 **Engine rules**
 - **Materialization:** all statements within the projection horizon (`Settings.horizonMonths`, default 24) are pre-created per card when the card is created or its cycle config changes. → *§8.4*
+- **Opening debt seeding:** when a card is created or re-anchored with `anchorBalanceCents > 0`, the **first statement with `dueDate >= anchorDate`** includes that balance as an opening component. For that statement only: `computedTotalCents = anchorBalanceCents + Σ charges with effectiveDate > anchorDate in (periodStart..closingDate]`. All other statements: `computedTotalCents = Σ charges in (periodStart..closingDate]`. Ensures pre-existing fatura enters the projection on the next due date. → *§8.6*
 - A charge (actual `Transaction` or projected `PlannedItem`/`Installment` occurrence) whose `accountId` is a credit card is assigned to the statement whose `(periodStart..closingDate]` window contains its `effectiveDate`.
 - The statement creates a **projected working-account outflow** of `plannedPaymentCents ?? computedTotalCents` on `dueDate`, drawn from `payFromAccountId ?? card.defaultPayFromAccountId`.
 - This outflow is what affects aggregate working balance — individual card charges never do.
@@ -233,6 +247,8 @@ Finite series with an auto-computed payoff date. Distinct from PlannedItem becau
 **Derived:** `payoffDate` = date of installment #`installmentCount`; `remainingCount` = unpaid installments from today.
 
 **On save:** creating or updating a plan eagerly generates all `Installment` rows (1..`installmentCount`). Regenerating preserves rows with `status = paid` or `amountCentsOverride` set.
+
+**Count reduction:** if the new `installmentCount` is less than the highest `index` among rows with `status = paid`, the save is rejected. Paid installments are never deleted or demoted.
 
 ### 3.9 Installment (single scheduled payment)
 
@@ -280,7 +296,7 @@ Frozen full clone of the forecast state for baseline-vs-actual variance. → *Sn
 | `defaultCurrency` | string | `BRL` |
 | `negativeBufferCents` | integer | Red-dot threshold; default `0`. → *Negative threshold (configurable buffer)* |
 | `horizonMonths` | integer | Default `24`. → *Horizon length (rolling 24 months)* |
-| `alertLeadTimeDays` | integer | Days before next-negative-date to warn. → *Alerts: proactive* |
+| `alertLeadTimeDays` | integer | Days before next-negative-date to warn. → *Alerts: proactive*. Delivery is in-app only (calendar header badge/banner); no push notifications in Phase 1 |
 | `defaultWorkingForType` | json | Map of `AccountType` → default `isWorking` for new accounts |
 | `dateFormat` | string | Locale formatting (e.g. `DD/MM/YYYY`) |
 
@@ -315,13 +331,21 @@ The engine expands generative entities into dated occurrences within `[today, to
 1. `PlannedItem` (where `isActive`) → occurrences by `recurrence`/`interval`/`startDate`/`endDate`, minus `skipped` overrides, with `modified`/`dateOverride` applied.
 2. `InstallmentPlan` (where `isActive`) → its `Installment` rows with `status = scheduled` (paid ones excluded).
 3. Credit-card statements → due-date payment outflows.
-Occurrences with a matching settlement (override `settled` or a `Transaction.settles*`) are replaced by the actual to avoid double counting.
+Occurrences with a matching settlement (`Transaction.settles*` or `Installment.status = paid`) are replaced by the actual to avoid double counting.
 
 ### 4.3 Settlement / linking (planned ↔ actual — replaces manual sheet sync)
 
-A projected item becomes real in one of two ways:
-- **Mark settled**: create an actual `Transaction` and set its `settlesPlannedItemId` + `settlesPlannedOccurrenceDate` (or `settlesInstallmentId`, or `paysStatementId`). The engine then suppresses the projected occurrence and uses the actual.
-- **Override settled**: a `PlannedItemOverride(status = settled, settledTransactionId)` records the link without changing the rule.
+Settlement is recorded on the **actual ledger row** — the engine's single source of truth:
+
+| Forecast source | Canonical link fields |
+|---|---|
+| `PlannedItem` occurrence | `Transaction.settlesPlannedItemId` + `settlesPlannedOccurrenceDate` |
+| `Installment` | `Installment.settledTransactionId` (+ `status = paid`) |
+| `CreditCardStatement` payment | `Transaction.paysStatementId` (+ `CreditCardStatement.paymentTransactionId`) |
+
+**Engine rule:** a projected occurrence is suppressed iff its canonical link exists. `PlannedItemOverride` rows (`modified`, `skipped`) affect amount/date/skip only — they never settle an occurrence.
+
+**UI flow:** "Mark settled" always creates (or links) an actual `Transaction` with the appropriate `settles*` / `paysStatementId` fields. The projected occurrence is then suppressed automatically.
 
 This is the structural replacement for the manual sync between *Estudo de Gastos* and *Lançamentos*.
 
@@ -335,7 +359,7 @@ This is the structural replacement for the manual sync between *Estudo de Gastos
 | `CategoryKind` | `income`, `expense` |
 | `TxType` | `income`, `expense`, `transfer` |
 | `Recurrence` | `once`, `weekly`, `monthly`, `yearly` |
-| `OverrideStatus` | `modified`, `skipped`, `settled` |
+| `OverrideStatus` | `modified`, `skipped` |
 | `StatementStatus` | `open`, `closed`, `paid` |
 | `InstallmentStatus` | `scheduled`, `paid` |
 | `Language` | `pt-BR`, `en` |
@@ -386,6 +410,8 @@ interface ProjectionResult {
 
 **Credit-card cycle (closing 26 / due 01)** → card `Account { closingDay: 26, dueDay: 1 }`. A purchase on 27/06 lands on the statement closing 26/07, paid 01/08 from `defaultPayFromAccountId`. Modeled as `CreditCardStatement { closingDate: 2026-07-26, dueDate: 2026-08-01, computedTotalCents }` → projected outflow on 01/08.
 
+**Existing card debt at onboarding** → card `Account { anchorBalanceCents: 150000, anchorDate: 2026-06-15 }` (R$ 1.500 owed today). First statement with `dueDate >= 2026-06-15` seeds `computedTotalCents` with `150000` plus any charges after 15/06 in that cycle → projected working-account outflow on that statement's `dueDate`.
+
 **Installment "Ipanema", 36×, first due 10/08/2025** → `InstallmentPlan { installmentCount: 36, installmentAmountCents, firstDueDate: 2025-08-10, dayOfMonth: 10 }`. `payoffDate` auto = #36. Each paid installment: `Installment { status: paid, settledTransactionId }`.
 
 **Food budget (Alimentação)** → `Category { name: "Alimentação", kind: expense }` + `CategoryBudget { categoryId: food, amountCents: 150000, effectiveFromMonth: "2026-06" }`. Daily groceries = `Transaction { type: expense, categoryId: food, accountId: <working> }`. Variance on **Categories & Budgets** = budget − Σ expenses in that category that month.
@@ -405,6 +431,9 @@ interface ProjectionResult {
 | 8.3 | **Transfer modeling** | **Single row** with `toAccountId` | One yellow "Transferência" row like the spreadsheet; engine applies source debit + destination credit. |
 | 8.4 | **Statement materialization** | **Whole 24-month horizon** per card | ~24 rows/card; overrides on any future due date work immediately; storage cost is negligible. |
 | 8.5 | **Category hierarchy** | **One level only** | Parent + child max (e.g. Alimentação → Restaurante). Matches current flat categories; simple budgets and UI. |
+| 8.6 | **Opening card debt** | **Seed first due statement** | `anchorBalanceCents` on a credit card seeds the first statement with `dueDate >= anchorDate`, so pre-existing fatura enters the working-balance projection. |
+| 8.7 | **Settlement canonical link** | **Transaction / Installment fields** | `Transaction.settles*` and `Installment.settledTransactionId` are the source of truth; overrides handle exceptions only. |
+| 8.8 | **Card payment via transfer** | **Statement flow only** | Planned transfers cannot target credit cards; prevents double-counting with auto-generated statement payments. |
 
 ---
 
@@ -431,3 +460,10 @@ interface ProjectionResult {
 | Single-row transfers | `Transaction.toAccountId`, §3.4, §8.3 |
 | Statement horizon materialization | Pre-create all statements in horizon, §3.7, §8.4 |
 | One-level category hierarchy | `Category.parentId` invariant, §3.2, §8.5 |
+| Opening card debt in projection | `CreditCardStatement` opening-debt seeding, §3.7, §8.6 |
+| Settlement source of truth | `Transaction.settles*`, `Installment.settledTransactionId`, §4.3, §8.7 |
+| Card payments not via planned transfer | `PlannedItem` transfer invariant, §3.5, §8.8 |
+| Re-anchoring cutoff | `Account` re-anchoring rule, §3.1 |
+| Budgets expense-only | `CategoryBudget` invariants, §3.3 |
+| Weekly recurrence weekday | `PlannedItem.weekday` (0 = Sunday), §3.5 |
+| In-app alert delivery | `Settings.alertLeadTimeDays`, §3.11 |

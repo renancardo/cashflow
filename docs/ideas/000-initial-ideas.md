@@ -6,10 +6,10 @@ todos:
     content: User reviews and confirms organized feature map + terminology
     status: completed
   - id: data-schema
-    content: Draft concrete data model (entities, fields, relationships) — see docs/specs/data-model.md
+    content: Draft concrete data model (entities, fields, relationships) — see docs/specs/001-data-model.md
     status: completed
   - id: phase1-scope
-    content: Phase 1 scope lock — see docs/specs/phase-1-scope.md
+    content: Phase 1 scope lock — see docs/specs/002-phase-1-scope.md
     status: completed
   - id: style-guide
     content: Create style guide based on linear calendar aesthetic (minimal grid, weekend bands, red-dot semantics)
@@ -57,7 +57,7 @@ Today you manage finances across **6 disconnected spreadsheet tabs** with manual
 | **Account** | A financial container with a balance | Cora, Santander, Banco do Brasil |
 | **Account type** | Determines how it affects cash flow | `checking`, `savings`, `credit_card`, `investment`, `wallet` |
 | **Working account** | Subset of accounts counted toward “money I can spend now” | Cora, Infinity Pay, Santander — not Cartão Cora |
-| **Credit card account** | Liability account; balance is typically negative (debt) | Cartão Cora, Cartão C6 |
+| **Credit card account** | Liability account; balance stored as **positive = amount owed** (see [001-data-model.md §8.1](../specs/001-data-model.md)) | Cartão Cora, Cartão C6 |
 | **Investment account** | Tracked separately; outflows affect working accounts when you transfer/pay | Clear, Modal, Santander Corretora |
 
 **Working balance** = Σ balances of accounts marked as `working`.
@@ -121,6 +121,7 @@ flowchart LR
 
 - **Card purchases** = expenses on the **credit card account** (accrue to a statement, not to working cash).
 - **Statement payment** = one **planned outflow** from a **working account** on the statement's **due date**, equal to the statement total (full balance auto-computed; editable per occurrence to handle partial payment).
+- **Opening debt** = when onboarding a card with an existing balance, that amount seeds the **first statement due on or after the anchor date**, so the next fatura payment appears in the projection. See [001-data-model.md §3.7](../specs/001-data-model.md).
 - **Red-dot logic** uses **aggregate working-account projection only**, but each statement's due date creates a dated working-account outflow.
 
 ### 3.5 Obligations (replaces mixed “Estudo de Contas parceladas” content)
@@ -140,7 +141,7 @@ Split into three distinct concepts:
 | Pattern | Proper name | App behavior |
 |---|---|---|
 | Food/leisure spending cap | **Category budget** | Monthly target on an expense category (e.g. Alimentação, Lazer); actual expenses tagged to that category roll up for budget vs actual on **Categories & Budgets**. No separate sub-account required |
-| “Paid” note on forecast cell | **Mark planned item as settled** | Converts or links forecast entry to actual ledger transaction |
+| “Paid” note on forecast cell | **Mark planned item as settled** | Creates/links an actual `Transaction` with `settlesPlannedItemId` + `settlesPlannedOccurrenceDate`; engine suppresses the projected occurrence |
 | Green cell on installment | **Installment status: paid** | Paid installments stop projecting; unpaid ones continue |
 | Investment down payment | **Planned capital outflow** | One-time or scheduled expense from working → investment account |
 
@@ -150,7 +151,7 @@ The projection engine needs a defined origin. Each account stores a **balance an
 
 - **Anchor balance** + **anchor date** = "Cora was R$ X as of YYYY-MM-DD".
 - The daily running balance is computed *forward* from the anchor using actuals + planned items.
-- **Reconciliation**: the user can re-anchor any account at any time (e.g. "Cora is actually R$ Y today"); the engine recomputes from the new anchor. This replaces the spreadsheet's running-balance column with an explicit, correctable origin.
+- **Reconciliation**: the user can re-anchor any account at any time (e.g. "Cora is actually R$ Y today"); the engine recomputes from the new anchor using only events on or after the new `anchorDate`. Older transactions remain in the ledger for history but no longer affect balance or projection. See [001-data-model.md §3.1](../specs/001-data-model.md) for credit-card re-anchoring.
 
 ### 3.8 Recurrence Edit Scopes
 
@@ -218,8 +219,8 @@ Inspired by the clean horizontal year grid (months as rows, weekdays as columns)
 - **Planned income** (missing from your current forecast sheet — new capability).
 - **Planned expenses** with due day-of-month.
 - **Recurrence**: none, weekly, monthly, yearly, custom.
-- Status: `projected` → `paid/settled` → optionally linked to ledger entry.
-- Category budgets (food, leisure, etc.): monthly target vs actual on **Categories & Budgets** screen.
+- Status: `projected` → settled via canonical `Transaction` link (see [001-data-model.md §4.3](../specs/001-data-model.md))
+- Category budgets (food, leisure, etc.): monthly **expense** target vs actual on **Categories & Budgets** screen
 
 ### G. Installments & Subscriptions (replaces Estudo de Contas parceladas)
 
@@ -282,6 +283,8 @@ Inspired by the clean horizontal year grid (months as rows, weekdays as columns)
 
 ## 6. Screen Map (High-Level — detail in next step)
 
+> **Superseded by [002-phase-1-scope.md §3](../specs/002-phase-1-scope.md)** for the locked Phase 1 screen list (10 screens; no separate Investments or Dashboard). Kept here for historical context.
+
 | Screen | Primary purpose |
 |---|---|
 | **Year Calendar** | Main hub — projection + red-dot warnings |
@@ -291,7 +294,7 @@ Inspired by the clean horizontal year grid (months as rows, weekdays as columns)
 | **Accounts** | Balances + working-account config |
 | **Forecast Items** | Manage recurring, planned income/expense |
 | **Installments & Subscriptions** | Debt schedules + payoff dates |
-| **Investments** | Planned capital allocations |
+| ~~**Investments**~~ | ~~Planned capital allocations~~ → handled in **Forecast Items** (Phase 1) |
 | **Snapshots** | Create & compare baselines |
 | **Settings** | Language, currency, working-account rules, card payment logic |
 | **Insights** (Phase 2) | AI summaries |
@@ -367,10 +370,12 @@ This replaces your manual sync between **Estudo de Gastos** and **Lançamentos**
 | **Category budgets** | **In Phase 1** | Monthly target per category; feeds variance views |
 | **Currency** | **BRL-only in Phase 1** | Cents as integers; multi-currency deferred to Phase 2 |
 | **What-if simulation** | **Phase 2** | Forward-looking "can I afford X?", distinct from snapshots |
-| **Alerts** | **Proactive** | Surface "next negative date" + lead-time warning |
+| **Alerts** | **Proactive, in-app** | Surface "next negative date" + lead-time warning in calendar header (no push in Phase 1) |
 | **Storage / architecture** | **Local-first with export/backup** | Personal use, full data ownership |
 | **Snapshot granularity** | **Full forecast clone** | Enables true baseline-vs-actual variance |
 | **Onboarding / import** | **Bulk-entry + lightweight CSV import in Phase 1** | Full Google Sheets import in Phase 2 |
+| **Opening card debt** | **Seed first due statement** | Pre-existing fatura at anchor date enters projection on next due date |
+| **Settlement link** | **Canonical on Transaction / Installment** | `Transaction.settles*` and `Installment.settledTransactionId`; overrides are for amount/date/skip only |
 
 ---
 
@@ -378,11 +383,11 @@ This replaces your manual sync between **Estudo de Gastos** and **Lançamentos**
 
 Ideas are organized and the key design decisions are resolved (§9). Recommended order:
 
-1. ✅ **Data model / schema** — `docs/specs/data-model.md`
-2. ✅ **Phase 1 scope lock** — `docs/specs/phase-1-scope.md`
-3. **Style guide** — linear calendar aesthetic (minimal, weekday columns, weekend bands, red-dot semantics, typography/color tokens)
-4. **Screen-by-screen spec** — fields, actions, empty states for Phase 1 screens
-5. **PRD** — goals, user stories, acceptance criteria (ratification doc)
+1. ✅ **Data model / schema** — [`docs/specs/001-data-model.md`](../specs/001-data-model.md)
+2. ✅ **Phase 1 scope lock** — [`docs/specs/002-phase-1-scope.md`](../specs/002-phase-1-scope.md)
+3. **Style guide** — [`docs/specs/003-style-guide.md`](../specs/003-style-guide.md) — linear calendar aesthetic (minimal, weekday columns, weekend bands, red-dot semantics, typography/color tokens)
+4. **Screen-by-screen spec** — [`docs/specs/004-screen-specs.md`](../specs/004-screen-specs.md) — fields, actions, empty states for Phase 1 screens
+5. **PRD** — [`docs/specs/005-prd.md`](../specs/005-prd.md) — goals, user stories, acceptance criteria (ratification doc)
 
 ---
 

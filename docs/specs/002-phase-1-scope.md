@@ -9,7 +9,7 @@ isProject: false
 
 > **Purpose:** Prevent scope creep during design and spec work. Everything listed here ships in Phase 1. Everything in [Out of scope](#out-of-scope-phase-2) waits for Phase 2.
 >
-> **Sources:** [initial-ideas.md §8–9](../ideas/initial-ideas.md), [data-model.md](./data-model.md)
+> **Sources:** [000-initial-ideas.md §8–9](../ideas/000-initial-ideas.md), [001-data-model.md](./001-data-model.md)
 
 ---
 
@@ -22,7 +22,7 @@ Answer one question every day:
 **North-star metrics (calendar header, not a separate dashboard):**
 - Current **working balance** (sum of accounts marked `isWorking`)
 - **Next negative date** (first day projected balance &lt; buffer)
-- Proactive alert when next negative date is within lead time (`Settings.alertLeadTimeDays`)
+- Proactive **in-app** alert (calendar header badge/banner) when next negative date is within lead time (`Settings.alertLeadTimeDays`); no push notifications in Phase 1
 
 ---
 
@@ -43,16 +43,16 @@ Answer one question every day:
 |---|---|
 | Account types | `checking`, `savings`, `wallet`, `credit_card`, `investment` |
 | Working-account flag | Toggle per account; drives aggregate projection |
-| Credit card config | `closingDay`, `dueDay`, `defaultPayFromAccountId`; balance = positive amount owed |
+| Credit card config | `closingDay`, `dueDay`, `defaultPayFromAccountId`; balance = positive amount owed; opening debt seeds first due statement |
 
 ### 2.3 Transactions (ledger)
 
 | Feature | Detail |
 |---|---|
-| Types | Income, expense, transfer (single-row + `toAccountId`) |
+| Types | Income, expense, transfer (single-row + `toAccountId`); card payments require `paysStatementId` |
 | Filters | Account, category, date range, type |
 | Running balance | Per-account column (derived from anchor + transactions) |
-| Settlement linking | Actual settles planned item, installment, or statement payment |
+| Settlement linking | Actual settles planned item, installment, or statement payment (canonical link on `Transaction` / `Installment`) |
 
 ### 2.4 Forecast & recurrence
 
@@ -78,7 +78,7 @@ Answer one question every day:
 |---|---|
 | Installment plans | Finite series with payoff date |
 | Eager installment rows | All `Installment` rows created at plan save |
-| Per-installment status | `scheduled` / `paid`; paid stops projecting |
+| Per-installment status | `scheduled` / `paid`; paid stops projecting; count cannot be reduced below highest paid index |
 | Subscriptions | Indefinite recurring (via `PlannedItem`) or tagged subscription |
 | Dormant debt | Tracked, `isActive = false`, excluded until activated |
 
@@ -87,7 +87,7 @@ Answer one question every day:
 | Feature | Detail |
 |---|---|
 | Category management | Create/edit/archive expense and income categories; one-level parent/child hierarchy |
-| Category budgets | Monthly target per category (`CategoryBudget`); set amount + `effectiveFromMonth` on **Categories & Budgets** screen |
+| Category budgets | Monthly target per **expense** category (`CategoryBudget`); set amount + `effectiveFromMonth` on **Categories & Budgets** screen |
 | Budget tracking | Current-month actual vs target per category (and parent roll-up); progress bars and over/under on **Categories & Budgets** |
 | Snapshots | Full forecast clone at a point in time |
 | Variance view | Snapshot vs current actuals; over/under by category and month (also surfaced on **Categories & Budgets** when a snapshot is selected) |
@@ -98,6 +98,7 @@ Answer one question every day:
 |---|---|
 | Horizon | Rolling 24 months from today |
 | Detection | Aggregate working balance vs configurable buffer (default R$ 0) |
+| Alert delivery | In-app only — calendar header badge/banner when `nextNegativeDate` is within `alertLeadTimeDays` |
 | Output | Daily balance, inflows/outflows, items[], `belowBuffer`, `nextNegativeDate` |
 | Sources | Anchors + actuals + planned + installments + statement due payments |
 
@@ -143,7 +144,7 @@ Phase 1 ships **10 screens/panels**. No separate Dashboard or Investments screen
 | Question | Decision |
 |---|---|
 | Separate Dashboard? | **No** — metrics in calendar header |
-| Separate Investments screen? | **No** — investment outflows are one-off transfers in **Forecast Items** (see [initial-ideas.md §4.H](../ideas/initial-ideas.md)) |
+| Separate Investments screen? | **No** — investment outflows are one-off transfers in **Forecast Items** (see [000-initial-ideas.md §4.H](../ideas/000-initial-ideas.md)) |
 | Insights screen? | **Phase 2** — stub only in screen specs |
 
 ### Navigation (high level)
@@ -179,7 +180,7 @@ Primary entry: **Year Calendar**. Other screens reachable from header/nav; Month
 
 ## 4. Data model entities (Phase 1)
 
-All entities in [data-model.md](./data-model.md) are in Phase 1 except nothing is deferred at the schema level — Phase 2 features (what-if, AI) use engine overlays, not new persisted entities.
+All entities in [001-data-model.md](./001-data-model.md) are in Phase 1 — nothing is deferred at the schema level. Phase 2 features (what-if, AI) use engine overlays, not new persisted entities.
 
 | Entity | Phase 1 use |
 |---|---|
@@ -225,7 +226,7 @@ Explicitly **not** built in Phase 1. Screen specs get one-line deferred stubs on
 
 ## 7. Resolved decisions (inherited — do not re-litigate)
 
-Copied from [initial-ideas.md §9](../ideas/initial-ideas.md) and [data-model.md §8](./data-model.md). Screen specs and style guide must conform.
+Copied from [000-initial-ideas.md §9](../ideas/000-initial-ideas.md) and [001-data-model.md §8](./001-data-model.md). Screen specs and style guide must conform.
 
 | Area | Decision |
 |---|---|
@@ -235,6 +236,8 @@ Copied from [initial-ideas.md §9](../ideas/initial-ideas.md) and [data-model.md
 | Category budgets | Monthly target per category; actual vs target on **Categories & Budgets** |
 | Recurrence edit | This / This+future |
 | Card balance sign | Positive = amount owed |
+| Opening card debt | Seeds first due statement in projection |
+| Settlement link | Canonical on `Transaction` / `Installment` |
 | Installments | Eager row generation |
 | Transfers | Single row + `toAccountId` |
 | Statements | Pre-create full horizon per card |
@@ -261,12 +264,12 @@ These do not block the style guide; resolve during screen-spec writing.
 - [ ] User can set up accounts with anchors and working flags
 - [ ] User can log income, expense, and transfer transactions
 - [ ] User can create recurring planned items and edit with this / this+future scopes
-- [ ] Credit card purchases accrue to statements; due-date payments appear in projection
+- [ ] Credit card purchases accrue to statements; due-date payments appear in projection (including pre-existing debt at anchor)
 - [ ] Installment plans project correctly; marking paid stops future projection
 - [ ] Year calendar shows red dots on days below buffer
 - [ ] Month view shows same data with denser detail
 - [ ] Day panel shows balance breakdown and supports quick-add
-- [ ] Calendar header shows working balance, next negative date, and lead-time alert
+- [ ] Calendar header shows working balance, next negative date, and in-app lead-time alert badge
 - [ ] User can create a snapshot and view variance vs actuals by category/month
 - [ ] User can set monthly category budgets on **Categories & Budgets** and see current-month actual vs target (with parent roll-up)
 - [ ] CSV import loads initial data
@@ -279,6 +282,6 @@ These do not block the style guide; resolve during screen-spec writing.
 
 | Order | Document | Uses this scope for |
 |---|---|---|
-| 1 | [style-guide.md](./style-guide.md) | Calendar components, tokens, semantic colors |
-| 2 | [screen-specs.md](./screen-specs.md) | Per-screen fields, actions, states (10 screens above) |
-| 3 | [prd.md](./prd.md) | User stories + acceptance criteria synthesized from specs |
+| 1 | [003-style-guide.md](./003-style-guide.md) | Calendar components, tokens, semantic colors |
+| 2 | [004-screen-specs.md](./004-screen-specs.md) | Per-screen fields, actions, states (10 screens above) |
+| 3 | [005-prd.md](./005-prd.md) | User stories + acceptance criteria synthesized from specs |
