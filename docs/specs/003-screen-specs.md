@@ -7,7 +7,7 @@ isProject: false
 
 # Screen Specs — Phase 1
 
-> **Sources:** [001-data-model.md](./001-data-model.md), [002-phase-1-scope.md §3](./002-phase-1-scope.md). Visual tokens, components, and semantic colors come from [003-style-guide.md](./003-style-guide.md) (pending).
+> **Sources:** [001-data-model.md](./001-data-model.md), [002-phase-1-scope.md §3](./002-phase-1-scope.md). Visual tokens, components, and semantic colors come from [004-style-guide.md](./004-style-guide.md) (pending).
 >
 > **Scope guard:** This doc specifies only the 10 locked Phase 1 screens plus a deferred **Insights** stub. No new entities are introduced — every field maps to [001-data-model.md](./001-data-model.md).
 
@@ -448,10 +448,11 @@ A single placeholder screen with a "coming in Phase 2" state. No data wiring. Pr
 
 ---
 
-## 17. Next document
+## 17. Next documents
 
 | Order | Document | Uses this spec for |
 |---|---|---|
-| 1 | [005-prd.md](./005-prd.md) | User stories + acceptance criteria synthesized from these screens |
+| 1 | [004-style-guide.md](./004-style-guide.md) | Calendar components, tokens, semantic colors for these screens |
+| 2 | [005-prd.md](./005-prd.md) | User stories + acceptance criteria synthesized from these screens |
 
-> **Note:** [003-style-guide.md](./003-style-guide.md) is referenced for tokens/components and should be authored alongside or before implementation; this spec is intentionally visual-token-agnostic.
+> This spec is intentionally visual-token-agnostic; semantic colors and layout tokens are defined in [004-style-guide.md](./004-style-guide.md).

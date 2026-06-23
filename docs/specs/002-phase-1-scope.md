@@ -246,16 +246,14 @@ Copied from [000-initial-ideas.md §9](../ideas/000-initial-ideas.md) and [001-d
 
 ---
 
-## 8. Open items for screen specs (minor)
+## 8. Screen spec decisions (resolved in [003-screen-specs.md](./003-screen-specs.md))
 
-These do not block the style guide; resolve during screen-spec writing.
-
-| Item | Default if undecided |
-|---|---|
-| Month view layout | Month grid (same weekday columns as year, single month) |
-| Snapshot compare UI | Side-by-side month table + category breakdown |
-| CSV import format | Document a minimal 4-column template (date, description, amount, account) |
-| Bulk-entry mode | Multi-row inline form on Transactions screen |
+| Item | Decision | Spec ref |
+|---|---|---|
+| Month view layout | Month grid (same weekday columns as year, single month) | [003 §4](./003-screen-specs.md#4-screen-2--month-calendar) |
+| Snapshot compare UI | Side-by-side month table + category breakdown | [003 §11](./003-screen-specs.md#11-screen-9--snapshots) |
+| CSV import format | Minimal 4-column template (date, description, amount, account) | [003 §13](./003-screen-specs.md#13-csv-import-onboarding) |
+| Bulk-entry mode | Multi-row inline form on Transactions screen | [003 §6](./003-screen-specs.md#6-screen-4--transactions) |
 
 ---
 
@@ -282,6 +280,6 @@ These do not block the style guide; resolve during screen-spec writing.
 
 | Order | Document | Uses this scope for |
 |---|---|---|
-| 1 | [003-style-guide.md](./003-style-guide.md) | Calendar components, tokens, semantic colors |
-| 2 | [004-screen-specs.md](./004-screen-specs.md) | Per-screen fields, actions, states (10 screens above) |
+| 1 | [003-screen-specs.md](./003-screen-specs.md) | Per-screen fields, actions, states (10 screens above) |
+| 2 | [004-style-guide.md](./004-style-guide.md) | Calendar components, tokens, semantic colors |
 | 3 | [005-prd.md](./005-prd.md) | User stories + acceptance criteria synthesized from specs |

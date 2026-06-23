@@ -11,14 +11,14 @@ todos:
   - id: phase1-scope
     content: Phase 1 scope lock — see docs/specs/002-phase-1-scope.md
     status: completed
-  - id: style-guide
-    content: Create style guide based on linear calendar aesthetic (minimal grid, weekend bands, red-dot semantics)
-    status: pending
   - id: screen-specs
-    content: Write per-screen summaries (fields, actions, navigation flow) — see docs/specs/004-screen-specs.md
+    content: Write per-screen summaries (fields, actions, navigation flow) — see docs/specs/003-screen-specs.md
     status: completed
+  - id: style-guide
+    content: Create style guide based on linear calendar aesthetic (minimal grid, weekend bands, red-dot semantics) — see docs/specs/004-style-guide.md
+    status: pending
   - id: write-prd
-    content: Draft PRD with Phase 1 scope, user stories, and acceptance criteria
+    content: Draft PRD with Phase 1 scope, user stories, and acceptance criteria — see docs/specs/005-prd.md
     status: pending
 isProject: false
 ---
@@ -385,8 +385,8 @@ Ideas are organized and the key design decisions are resolved (§9). Recommended
 
 1. ✅ **Data model / schema** — [`docs/specs/001-data-model.md`](../specs/001-data-model.md)
 2. ✅ **Phase 1 scope lock** — [`docs/specs/002-phase-1-scope.md`](../specs/002-phase-1-scope.md)
-3. **Style guide** — [`docs/specs/003-style-guide.md`](../specs/003-style-guide.md) — linear calendar aesthetic (minimal, weekday columns, weekend bands, red-dot semantics, typography/color tokens)
-4. **Screen-by-screen spec** — [`docs/specs/004-screen-specs.md`](../specs/004-screen-specs.md) — fields, actions, empty states for Phase 1 screens
+3. ✅ **Screen-by-screen spec** — [`docs/specs/003-screen-specs.md`](../specs/003-screen-specs.md) — fields, actions, empty states for Phase 1 screens
+4. **Style guide** — [`docs/specs/004-style-guide.md`](../specs/004-style-guide.md) — linear calendar aesthetic (minimal, weekday columns, weekend bands, red-dot semantics, typography/color tokens)
 5. **PRD** — [`docs/specs/005-prd.md`](../specs/005-prd.md) — goals, user stories, acceptance criteria (ratification doc)
 
 ---
