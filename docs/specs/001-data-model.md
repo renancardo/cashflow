@@ -295,6 +295,7 @@ Frozen full clone of the forecast state for baseline-vs-actual variance. → *Sn
 | `language` | enum | `pt-BR`, `en` |
 | `defaultCurrency` | string | `BRL` |
 | `negativeBufferCents` | integer | Red-dot threshold; default `0`. → *Negative threshold (configurable buffer)* |
+| `largeOutflowThresholdCents` | integer | Minimum single-day net outflow to flag the **amber "large outflow"** calendar indicator; default `50000` (R$ 500). `0` disables the indicator |
 | `horizonMonths` | integer | Default `24`. → *Horizon length (rolling 24 months)* |
 | `alertLeadTimeDays` | integer | Days before next-negative-date to warn. → *Alerts: proactive*. Delivery is in-app only (calendar header badge/banner); no push notifications in Phase 1 |
 | `defaultWorkingForType` | json | Map of `AccountType` → default `isWorking` for new accounts |
@@ -377,6 +378,7 @@ interface ProjectionDay {
   outflowsCents: number;
   closingBalanceCents: number;
   belowBuffer: boolean;         // closingBalanceCents < settings.negativeBufferCents
+  largeOutflow: boolean;        // settings.largeOutflowThresholdCents > 0 && outflowsCents >= it
   items: ProjectionItem[];      // actual + projected events affecting this day
 }
 

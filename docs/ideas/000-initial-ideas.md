@@ -15,8 +15,8 @@ todos:
     content: Create style guide based on linear calendar aesthetic (minimal grid, weekend bands, red-dot semantics)
     status: pending
   - id: screen-specs
-    content: Write per-screen summaries (fields, actions, navigation flow)
-    status: pending
+    content: Write per-screen summaries (fields, actions, navigation flow) — see docs/specs/004-screen-specs.md
+    status: completed
   - id: write-prd
     content: Draft PRD with Phase 1 scope, user stories, and acceptance criteria
     status: pending
@@ -186,7 +186,7 @@ Inspired by the clean horizontal year grid (months as rows, weekdays as columns)
 - Each day cell shows:
   - Day number
   - **Red dot** if projected aggregate working balance &lt; buffer (buffer configurable, default R$ 0)
-  - Optional subtle indicators: income (green), large outflow (amber), card statement due
+  - Optional subtle indicators: income (green), large outflow (amber, configurable threshold), card statement due
 - **Click day** → side panel / modal:
   - Projected balance that day
   - List of items affecting that day (actual + planned)

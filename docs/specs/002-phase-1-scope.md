@@ -108,7 +108,7 @@ Answer one question every day:
 |---|---|
 | Year view | Linear horizontal grid; months as rows, weekdays as columns |
 | Red dots | Days where projected balance &lt; buffer |
-| Indicators | Income (green), large outflow (amber), card statement due |
+| Indicators | Income (green), large outflow (amber, configurable threshold `largeOutflowThresholdCents`), card statement due |
 | Month view | Same data, denser layout for single-month editing |
 | Day detail panel | Balance breakdown, item list, quick-add |
 
@@ -137,7 +137,7 @@ Phase 1 ships **10 screens/panels**. No separate Dashboard or Investments screen
 | 7 | **Installments & Subscriptions** | Plans, payoff dates, per-installment paid status, dormant debt |
 | 8 | **Categories & Budgets** | Category CRUD; set monthly budget per category; track current-month actual vs target (child + parent roll-up) |
 | 9 | **Snapshots** | Create baseline, compare variance by category/month |
-| 10 | **Settings** | Language, buffer, horizon, alert lead time, export/backup, card defaults |
+| 10 | **Settings** | Language, buffer, large-outflow threshold, horizon, alert lead time, export/backup, card defaults |
 
 ### Screen decisions (locked)
 
