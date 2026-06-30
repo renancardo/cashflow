@@ -125,6 +125,34 @@ A day is flagged when `ProjectionDay.belowBuffer === true`, i.e. `closingBalance
 
 A day shows the amber indicator when `ProjectionDay.largeOutflow === true`, i.e. `Settings.largeOutflowThresholdCents > 0 && outflowsCents >= Settings.largeOutflowThresholdCents`. The threshold is user-configurable in Settings (default R$ 500); setting it to `0` disables the indicator entirely.
 
+### 2.6 Month calendar day-entry text colors
+
+Used on **Screen 2 — Month Calendar** only. Each day cell may show one or more **entry lines** (signed amounts for income/expense items affecting that day). Entry text color encodes whether the amount is **actual**, **projected**, or **past due** — distinct from the year-view dot indicators (§2.4, §2.5).
+
+| Entry state | Text color | Token (Paper) | When it applies |
+|---|---|---|---|
+| **Actual income** | Strong green | `#15803d` | `amountCents > 0` from a settled `Transaction` or confirmed inflow on that day |
+| **Projected income** | Light green | `#4ade80` | `amountCents > 0` from a projected `ProjectionItem` (`isProjected === true`) on a future date |
+| **Actual outflow** | Dark warning | `#b45309` | `amountCents < 0` from a settled `Transaction` or confirmed outflow on that day |
+| **Projected outflow** | Light warning | `#fbbf24` | `amountCents < 0` from a projected `ProjectionItem` on a future date |
+| **Past due payment** | Strong red | `#dc2626` | Projected payment whose due date is **before today** and is not yet settled (`isProjected === true`, `effectiveDate < today`, unsettled) |
+
+**Rules**
+- A day should show as many as entry as possible; additional items are reachable via the Day Detail Panel.
+- Closing balance in the cell remains neutral/muted; only entry amounts use the color rules above.
+- Legend (toolbar) documents day-entry colors alongside year-style dot indicators and month-total projection notes.
+
+**Derivation sketch** (per entry line, from `ProjectionDay.items[]`):
+
+```
+if item.isProjected && item.amountCents < 0 && item.effectiveDate < today && !item.isSettled:
+  color = past-due
+else if item.isProjected:
+  color = projected-income | projected-outflow  (by sign)
+else:
+  color = actual-income | actual-outflow  (by sign)
+```
+
 ---
 
 ## 3. Screen 1 — Year Calendar
@@ -160,10 +188,16 @@ A day shows the amber indicator when `ProjectionDay.largeOutflow === true`, i.e.
 - Month grid (same weekday columns as year, one month) **or** list-by-day (open item, default month grid per scope §8).
 - Month total strip: inflows, outflows, net, end-of-month projected balance.
 - Prev/next month navigation; link back to Year view.
+- **Legend:** year-style day indicators (§2.4, §2.5), **day-entry text colors** (§2.6), and month-total projection note.
+
+**Day cell contents**
+- Day number; optional today highlight.
+- Closing balance (neutral text).
+- Dot indicators (below buffer, income day, large outflow, card due) — same semantics as year view.
 
 | Concern | Spec |
 |---|---|
-| **Derived** | `ProjectionDay[]` for the month; per-day `inflowsCents`/`outflowsCents`/`closingBalanceCents` |
+| **Derived** | `ProjectionDay[]` for the month; per-day `inflowsCents`/`outflowsCents`/`closingBalanceCents`; entry lines from `ProjectionDay.items[]` with actual/projected/past-due styling (§2.6) |
 | **Writes** | — (edits via Day Panel / quick-add) |
 | **Actions** | Click day → Day Panel; prev/next month; switch to year; quick-add from a day |
 | **States** | Empty (no items this month → still show running balance from anchor); loading; error; populated |

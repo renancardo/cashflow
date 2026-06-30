@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Month Calendar — Cashflow Prototype</title>
+  <link rel="stylesheet" href="css/paper.css">
+  <link rel="stylesheet" href="css/year.css">
+  <link rel="stylesheet" href="css/month.css">
+  <link rel="stylesheet" href="css/day-panel.css">
+</head>
+<body>
+  <div class="app">
+    <nav class="nav">
+      <div class="nav__brand">Cashflow</div>
+      <div>
+        <div class="nav__label">Screens</div>
+        <ul class="nav__list">
+          <li><a class="nav__link" href="year.html">Year Calendar</a></li>
+          <li><a class="nav__link nav__link--active" href="month.html">Month Calendar</a></li>
+          <li><a class="nav__link" href="#">Transactions</a></li>
+          <li><a class="nav__link" href="accounts.html">Accounts</a></li>
+          <li><a class="nav__link" href="#">Forecast Items</a></li>
+          <li><a class="nav__link" href="#">Installments</a></li>
+          <li><a class="nav__link" href="#">Categories</a></li>
+          <li><a class="nav__link" href="#">Snapshots</a></li>
+          <li><a class="nav__link" href="#">Settings</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="main">
+      <header class="header-strip">
+        <div class="metric">
+          <span class="metric__label">Working balance</span>
+          <span class="metric__value">R$ 12.450,00</span>
+        </div>
+        <div class="metric">
+          <span class="metric__label">Next below buffer</span>
+          <span class="metric__value metric__value--danger">15 Aug 2026</span>
+        </div>
+        <div class="header-strip__spacer"></div>
+        <div class="badge badge--alert">
+          <span class="badge__dot"></span>
+          Alert — negative in 46 days
+        </div>
+      </header>
+
+      <div class="page">
+        <div class="month-view">
+          <div class="month-toolbar">
+            <div class="month-toolbar__actions">
+              <a class="btn btn--ghost" href="year.html">Year view</a>
+              <div class="month-toolbar__nav" role="group" aria-label="Month">
+                <button
+                  class="btn btn--ghost btn--icon"
+                  type="button"
+                  id="month-prev"
+                  aria-label="Previous month"
+                >←</button>
+                <span class="month-toolbar__label" id="month-toolbar-label">June 2026</span>
+                <button
+                  class="btn btn--ghost btn--icon"
+                  type="button"
+                  id="month-next"
+                  aria-label="Next month"
+                >→</button>
+              </div>
+              <button class="btn btn--ghost" type="button" id="month-jump-today">Jump to today</button>
+            </div>
+
+            <div class="help-tooltip">
+              <button
+                class="help-tooltip__trigger"
+                type="button"
+                aria-describedby="calendar-legend-tip"
+              >
+                <span class="help-tooltip__icon" aria-hidden="true">?</span>
+                <span class="help-tooltip__label">Legend</span>
+              </button>
+              <div class="help-tooltip__panel help-tooltip__panel--month" id="calendar-legend-tip" role="tooltip">
+                <p class="help-tooltip__title">Day indicators</p>
+                <ul class="help-tooltip__list">
+                  <li>
+                    <span class="help-tooltip__marker help-tooltip__marker--danger"></span>
+                    Below buffer — projected balance under your threshold
+                  </li>
+                  <li>
+                    <span class="help-tooltip__marker help-tooltip__marker--success"></span>
+                    Income day — net inflow on this date
+                  </li>
+                  <li>
+                    <span class="help-tooltip__marker help-tooltip__marker--warning"></span>
+                    Large outflow — net outflow above your limit
+                  </li>
+                  <li>
+                    <span class="help-tooltip__marker help-tooltip__marker--card"></span>
+                    Card statement due
+                  </li>
+                </ul>
+                <p class="help-tooltip__title help-tooltip__title--section">Day entry colors</p>
+                <ul class="help-tooltip__list">
+                  <li>
+                    <span class="help-tooltip__marker help-tooltip__marker--actual-income"></span>
+                    Actual income
+                  </li>
+                  <li>
+                    <span class="help-tooltip__marker help-tooltip__marker--projected-income"></span>
+                    Projected income
+                  </li>
+                  <li>
+                    <span class="help-tooltip__marker help-tooltip__marker--actual-outflow"></span>
+                    Actual outflow
+                  </li>
+                  <li>
+                    <span class="help-tooltip__marker help-tooltip__marker--projected-outflow"></span>
+                    Projected outflow
+                  </li>
+                  <li>
+                    <span class="help-tooltip__marker help-tooltip__marker--past-due"></span>
+                    Past due payment
+                  </li>
+                </ul>
+                <p class="help-tooltip__title help-tooltip__title--section">
+                  Month totals
+                  <span class="help-tooltip__badge">Projected</span>
+                </p>
+                <p class="help-tooltip__note" id="month-totals-note">
+                  Totals include projected inflows, outflows, and balances for future dates in this month.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="summary-strip" aria-label="Month totals">
+            <div class="summary-strip__item">
+              <span class="summary-strip__label">Inflows</span>
+              <span class="summary-strip__value summary-strip__value--income" id="month-total-inflows">—</span>
+            </div>
+            <div class="summary-strip__item">
+              <span class="summary-strip__label">Outflows</span>
+              <span class="summary-strip__value summary-strip__value--expense" id="month-total-outflows">—</span>
+            </div>
+            <div class="summary-strip__item">
+              <span class="summary-strip__label">Net</span>
+              <span class="summary-strip__value" id="month-total-net">—</span>
+            </div>
+            <div class="summary-strip__item">
+              <span class="summary-strip__label">End balance</span>
+              <span class="summary-strip__value" id="month-total-end-balance">—</span>
+            </div>
+          </div>
+
+          <div class="month-calendar">
+            <div class="month-grid__weekdays" aria-hidden="true">
+              <div class="month-grid__weekday">Sun</div>
+              <div class="month-grid__weekday">Mon</div>
+              <div class="month-grid__weekday">Tue</div>
+              <div class="month-grid__weekday">Wed</div>
+              <div class="month-grid__weekday">Thu</div>
+              <div class="month-grid__weekday">Fri</div>
+              <div class="month-grid__weekday">Sat</div>
+            </div>
+            <div class="month-grid" id="month-grid" role="grid" aria-label="Month calendar"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="day-overlay" id="day-overlay" aria-hidden="true">
+    <div class="day-overlay__backdrop"></div>
+    <aside class="day-panel" role="dialog" aria-labelledby="day-panel-title" aria-modal="true">
+      <header class="day-panel__header">
+        <div class="day-panel__header-top">
+          <div>
+            <h2 class="day-panel__title" id="day-panel-title">15 Aug 2026</h2>
+            <p class="day-panel__weekday" id="day-panel-weekday">Saturday</p>
+          </div>
+          <button class="day-panel__close" type="button" aria-label="Close day detail">×</button>
+        </div>
+
+        <div class="day-panel__balances">
+          <div class="day-panel__balance">
+            <span class="day-panel__balance-label">Opening</span>
+            <span class="day-panel__balance-value">R$ 3.200,00</span>
+          </div>
+          <div class="day-panel__balance">
+            <span class="day-panel__balance-label">Closing</span>
+            <span class="day-panel__balance-value day-panel__balance-value--danger">R$ 1.850,00</span>
+          </div>
+        </div>
+
+        <div class="day-panel__flag">
+          <span class="day-panel__flag-dot"></span>
+          Below buffer
+        </div>
+      </header>
+
+      <div class="day-panel__body">
+        <section class="day-items-group">
+          <h3 class="day-items-group__title">Transactions</h3>
+          <ul class="day-items-group__list">
+            <li>
+              <article class="day-item">
+                <div class="day-item__main">
+                  <div class="day-item__desc">Padaria do bairro</div>
+                  <div class="day-item__meta">
+                    <span class="chip chip--actual">Actual</span>
+                    <span>Food</span>
+                    <span>Cora Checking</span>
+                  </div>
+                </div>
+                <div class="day-item__amount day-item__amount--expense">− R$ 28,50</div>
+              </article>
+            </li>
+          </ul>
+        </section>
+
+        <section class="day-items-group">
+          <h3 class="day-items-group__title">Planned &amp; subscriptions</h3>
+          <ul class="day-items-group__list">
+            <li>
+              <article class="day-item day-item--projected">
+                <div class="day-item__main">
+                  <div class="day-item__desc">Netflix</div>
+                  <div class="day-item__meta">
+                    <span class="chip chip--subscription">Subscription</span>
+                    <span>Entertainment</span>
+                    <span>Cartão Cora</span>
+                  </div>
+                </div>
+                <div
+                  class="day-item__amount day-item__amount--expense day-item__amount--editable"
+                  data-amount-cents="5590"
+                  data-kind="expense"
+                  tabindex="0"
+                  role="button"
+                  aria-label="Edit amount"
+                >− R$ 55,90</div>
+                <button class="btn btn--success btn--sm day-item__confirm" type="button">Confirm payment</button>
+              </article>
+            </li>
+            <li>
+              <article class="day-item day-item--projected">
+                <div class="day-item__main">
+                  <div class="day-item__desc">Internet Vivo Fibra</div>
+                  <div class="day-item__meta">
+                    <span class="chip chip--planned">Planned</span>
+                    <span>Utilities</span>
+                    <span>Cora Checking</span>
+                  </div>
+                </div>
+                <div
+                  class="day-item__amount day-item__amount--expense day-item__amount--editable"
+                  data-amount-cents="11990"
+                  data-kind="expense"
+                  tabindex="0"
+                  role="button"
+                  aria-label="Edit amount"
+                >− R$ 119,90</div>
+                <button class="btn btn--success btn--sm day-item__confirm" type="button">Confirm payment</button>
+              </article>
+            </li>
+          </ul>
+        </section>
+
+        <section class="day-items-group">
+          <h3 class="day-items-group__title">Installments</h3>
+          <ul class="day-items-group__list">
+            <li>
+              <article class="day-item day-item--projected">
+                <div class="day-item__main">
+                  <div class="day-item__desc">MacBook Pro — parcel 8/12</div>
+                  <div class="day-item__meta">
+                    <span class="chip chip--installment">Installment</span>
+                    <span>Electronics</span>
+                    <span>Cartão Cora</span>
+                  </div>
+                </div>
+                <div
+                  class="day-item__amount day-item__amount--expense day-item__amount--editable"
+                  data-amount-cents="45000"
+                  data-kind="expense"
+                  tabindex="0"
+                  role="button"
+                  aria-label="Edit amount"
+                >− R$ 450,00</div>
+                <button class="btn btn--success btn--sm day-item__confirm" type="button">Confirm payment</button>
+              </article>
+            </li>
+          </ul>
+        </section>
+
+        <section class="day-items-group">
+          <h3 class="day-items-group__title">Statement payments</h3>
+          <ul class="day-items-group__list">
+            <li>
+              <article class="day-item day-item--projected">
+                <div class="day-item__main">
+                  <div class="day-item__desc">Cartão Cora — statement due</div>
+                  <div class="day-item__meta">
+                    <span class="chip chip--statement">Statement</span>
+                    <span>Cora Checking → Cartão Cora</span>
+                  </div>
+                </div>
+                <div
+                  class="day-item__amount day-item__amount--expense day-item__amount--editable"
+                  data-amount-cents="185000"
+                  data-kind="expense"
+                  tabindex="0"
+                  role="button"
+                  aria-label="Edit amount"
+                >− R$ 1.850,00</div>
+                <button class="btn btn--success btn--sm day-item__confirm" type="button">Confirm payment</button>
+              </article>
+            </li>
+          </ul>
+        </section>
+      </div>
+
+      <footer class="day-panel__quick-add">
+        <button class="btn btn--primary quick-add__toggle" type="button" id="quick-add-toggle">+ Quick add</button>
+
+        <form class="quick-add__form" id="quick-add-form">
+          <p class="quick-add__title">Quick add transaction</p>
+
+          <div class="quick-add__type" role="group" aria-label="Transaction type">
+            <button class="quick-add__type-btn quick-add__type-btn--active" type="button">Expense</button>
+            <button class="quick-add__type-btn" type="button">Income</button>
+            <button class="quick-add__type-btn" type="button">Transfer</button>
+          </div>
+
+          <div class="quick-add__field">
+            <label class="quick-add__label" for="qa-amount">Amount</label>
+            <input class="quick-add__input" id="qa-amount" type="text" placeholder="R$ 0,00">
+          </div>
+
+          <div class="quick-add__row">
+            <div class="quick-add__field">
+              <label class="quick-add__label" for="qa-account">Account</label>
+              <select class="quick-add__select" id="qa-account">
+                <option>Cora Checking</option>
+                <option>Carteira</option>
+                <option>Cartão Cora</option>
+              </select>
+            </div>
+            <div class="quick-add__field">
+              <label class="quick-add__label" for="qa-category">Category</label>
+              <select class="quick-add__select" id="qa-category">
+                <option>Food</option>
+                <option>Utilities</option>
+                <option>Entertainment</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="quick-add__field">
+            <label class="quick-add__label" for="qa-date">Date</label>
+            <input class="quick-add__input" id="qa-date" type="text" value="15/08/2026">
+          </div>
+
+          <div class="quick-add__field">
+            <label class="quick-add__label" for="qa-desc">Description</label>
+            <input class="quick-add__input" id="qa-desc" type="text" placeholder="Optional memo">
+          </div>
+
+          <div class="quick-add__actions">
+            <button class="btn btn--ghost quick-add__cancel" type="button">Cancel</button>
+            <button class="btn btn--primary" type="button">Add transaction</button>
+          </div>
+        </form>
+      </footer>
+    </aside>
+  </div>
+
+  <script src="js/month.js"></script>
+  <script src="js/day-panel.js"></script>
+</body>
+</html>

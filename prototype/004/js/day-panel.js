@@ -39,6 +39,54 @@
     return monthNames.indexOf(label.trim());
   }
 
+  function dayNumberFromCell(cell) {
+    if (cell.dataset.day) {
+      return Number.parseInt(cell.dataset.day, 10);
+    }
+
+    var numEl = cell.querySelector(".day-cell__num");
+    if (numEl) {
+      return Number.parseInt(numEl.textContent.trim(), 10);
+    }
+
+    var dayText = cell.textContent.trim().replace(/\s+/g, " ").split(" ")[0];
+    return Number.parseInt(dayText, 10);
+  }
+
+  function resolveDayContext(cell) {
+    var monthGrid = cell.closest(".month-grid");
+    if (monthGrid) {
+      var gridMonth = Number.parseInt(monthGrid.dataset.month || "", 10);
+      var gridYear = Number.parseInt(monthGrid.dataset.year || "", 10);
+      var dayNumber = dayNumberFromCell(cell);
+
+      if (Number.isNaN(gridMonth) || Number.isNaN(gridYear) || Number.isNaN(dayNumber)) {
+        return null;
+      }
+
+      return {
+        monthLabel: monthNames[gridMonth],
+        dayNumber: dayNumber,
+        year: gridYear,
+      };
+    }
+
+    var row = cell.closest(".month-row");
+    if (!row) return null;
+
+    var label = row.querySelector(".month-row__label");
+    if (!label) return null;
+
+    var dayNumberFromRow = dayNumberFromCell(cell);
+    if (Number.isNaN(dayNumberFromRow)) return null;
+
+    return {
+      monthLabel: label.textContent.trim(),
+      dayNumber: dayNumberFromRow,
+      year: Number.parseInt(row.dataset.year || "2026", 10),
+    };
+  }
+
   function openPanel(cell, monthLabel, dayNumber, year) {
     if (selectedCell) {
       selectedCell.classList.remove("day-cell--selected");
@@ -74,33 +122,48 @@
     }
   }
 
-  document.querySelectorAll(".month-row").forEach(function (row) {
-    var label = row.querySelector(".month-row__label");
-    if (!label) return;
+  function enhanceDayCell(cell) {
+    var context = resolveDayContext(cell);
+    if (!context) return;
 
-    var monthLabel = label.textContent;
-    var year = Number.parseInt(row.dataset.year || "2026", 10);
+    cell.setAttribute("role", "button");
+    cell.setAttribute("tabindex", "0");
+    cell.setAttribute(
+      "aria-label",
+      context.monthLabel + " " + context.dayNumber + ", " + context.year
+    );
+  }
 
-    row.querySelectorAll(".day-cell:not(.day-cell--empty)").forEach(function (cell) {
-      var dayText = cell.textContent.trim().replace(/\s+/g, " ").split(" ")[0];
-      var dayNumber = parseInt(dayText, 10);
-      if (Number.isNaN(dayNumber)) return;
+  function bindCalendarCells(root) {
+    (root || document).querySelectorAll(".day-cell:not(.day-cell--empty)").forEach(enhanceDayCell);
+  }
 
-      cell.setAttribute("role", "button");
-      cell.setAttribute("tabindex", "0");
-      cell.setAttribute("aria-label", monthLabel + " " + dayNumber + ", " + year);
+  function handleDayCellActivate(event) {
+    var cell = event.target.closest(".day-cell:not(.day-cell--empty)");
+    if (!cell) return;
 
-      cell.addEventListener("click", function () {
-        openPanel(cell, monthLabel, dayNumber, year);
-      });
+    var context = resolveDayContext(cell);
+    if (!context) return;
 
-      cell.addEventListener("keydown", function (event) {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          openPanel(cell, monthLabel, dayNumber, year);
-        }
-      });
-    });
+    openPanel(cell, context.monthLabel, context.dayNumber, context.year);
+  }
+
+  document.addEventListener("click", handleDayCellActivate);
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    var cell = event.target.closest(".day-cell:not(.day-cell--empty)");
+    if (!cell || cell !== event.target) return;
+
+    event.preventDefault();
+    handleDayCellActivate(event);
+  });
+
+  bindCalendarCells();
+
+  document.addEventListener("calendar:rendered", function () {
+    bindCalendarCells(document.getElementById("month-grid"));
   });
 
   closeBtn.addEventListener("click", closePanel);
@@ -137,17 +200,34 @@
   var params = new URLSearchParams(window.location.search);
   var demoDay = params.get("day");
 
-  if (demoDay === "2026-08-15") {
-    document.querySelectorAll('.month-row[data-year="2026"]').forEach(function (row) {
+  function openDemoDay(year, monthIndex, dayNumber) {
+    var monthLabel = monthNames[monthIndex];
+    var monthGrid = document.querySelector(
+      '.month-grid[data-year="' + year + '"][data-month="' + monthIndex + '"]'
+    );
+
+    if (monthGrid) {
+      var gridCell = monthGrid.querySelector('.day-cell[data-day="' + dayNumber + '"]');
+      if (gridCell) {
+        openPanel(gridCell, monthLabel, dayNumber, year);
+        return;
+      }
+    }
+
+    document.querySelectorAll('.month-row[data-year="' + year + '"]').forEach(function (row) {
       var label = row.querySelector(".month-row__label");
-      if (!label || label.textContent.trim() !== "Aug") return;
+      if (!label || monthIndex(label.textContent) !== monthIndex) return;
 
       row.querySelectorAll(".day-cell:not(.day-cell--empty)").forEach(function (cell) {
-        if (cell.textContent.trim().startsWith("15")) {
-          openPanel(cell, "Aug", 15, 2026);
+        if (dayNumberFromCell(cell) === dayNumber) {
+          openPanel(cell, monthLabel, dayNumber, year);
         }
       });
     });
+  }
+
+  if (demoDay === "2026-08-15") {
+    openDemoDay(2026, 7, 15);
   }
 
   var activeAmountEditor = null;
