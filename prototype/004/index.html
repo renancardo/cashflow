@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cashflow Prototype</title>
+  <link rel="stylesheet" href="css/paper.css">
+  <style>
+    .hub {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: var(--space-6);
+    }
+    .hub__title {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 0 0 var(--space-2);
+      color: var(--color-primary);
+    }
+    .hub__desc {
+      color: var(--color-text-muted);
+      margin: 0 0 var(--space-6);
+      line-height: 1.6;
+    }
+    .hub__links {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    .hub__link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-4) var(--space-5);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .hub__link:hover {
+      border-color: var(--color-secondary);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    .hub__link-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1.125rem;
+    }
+    .hub__link-desc {
+      font-size: 0.8125rem;
+      color: var(--color-text-muted);
+      margin-top: var(--space-1);
+    }
+    .hub__arrow {
+      color: var(--color-text-muted);
+      font-size: 1.25rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="hub">
+    <h1 class="hub__title">Cashflow Prototype</h1>
+    <p class="hub__desc">
+      Static HTML/CSS prototypes for Phase 1 screens, using the Paper design system
+      from <code>docs/specs/004-DESIGN.md</code>.
+    </p>
+    <nav class="hub__links">
+      <a class="hub__link" href="year.html">
+        <div>
+          <div class="hub__link-title">Year Calendar</div>
+          <div class="hub__link-desc">Linear grid hub with projection indicators — click a day to open the detail panel</div>
+        </div>
+        <span class="hub__arrow">→</span>
+      </a>
+      <a class="hub__link" href="year.html?day=2026-08-15">
+        <div>
+          <div class="hub__link-title">Day Detail Panel</div>
+          <div class="hub__link-desc">Slide-over breakdown with quick-add and confirm payment actions</div>
+        </div>
+        <span class="hub__arrow">→</span>
+      </a>
+      <a class="hub__link" href="accounts.html">
+        <div>
+          <div class="hub__link-title">Accounts</div>
+          <div class="hub__link-desc">Account list, working flags, and card editor</div>
+        </div>
+        <span class="hub__arrow">→</span>
+      </a>
+    </nav>
+  </div>
+</body>
+</html>
