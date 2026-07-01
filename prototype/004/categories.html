@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Categories & Budgets — Cashflow Prototype</title>
+  <link rel="stylesheet" href="css/paper.css">
+  <link rel="stylesheet" href="css/categories.css">
+</head>
+<body>
+  <div class="app">
+    <nav class="nav">
+      <div class="nav__brand">Cashflow</div>
+      <div>
+        <div class="nav__label">Screens</div>
+        <ul class="nav__list">
+          <li><a class="nav__link" href="year.html">Year Calendar</a></li>
+          <li><a class="nav__link" href="month.html">Month Calendar</a></li>
+          <li><a class="nav__link" href="transactions.html">Transactions</a></li>
+          <li><a class="nav__link" href="accounts.html">Accounts</a></li>
+          <li><a class="nav__link" href="forecast.html">Forecast Items</a></li>
+          <li><a class="nav__link nav__link--active" href="categories.html">Categories</a></li>
+          <li><a class="nav__link" href="#">Snapshots</a></li>
+          <li><a class="nav__link" href="#">Settings</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="main">
+      <header class="header-strip header-strip--condensed">
+        <div class="metric">
+          <span class="metric__label">Working balance</span>
+          <span class="metric__value">R$ 12.450,00</span>
+        </div>
+        <div class="header-strip__spacer"></div>
+        <button class="btn btn--primary" type="button" id="add-category-btn">+ Add category</button>
+      </header>
+
+      <div class="page" id="categories-page">
+        <div class="page__header">
+          <div>
+            <h1 class="page__title">Categories & Budgets</h1>
+            <p class="page__subtitle">Manage income and expense categories, set monthly budgets, and track actual vs target</p>
+          </div>
+        </div>
+
+        <div class="cat-empty" id="cat-empty">
+          <div class="cat-empty__icon">🏷</div>
+          <h2 class="cat-empty__title">No categories yet</h2>
+          <p class="cat-empty__desc">
+            Create your first income or expense category to classify transactions and set monthly spending targets.
+          </p>
+          <button class="btn btn--primary" type="button" id="empty-add-btn">+ Add category</button>
+        </div>
+
+        <div class="summary-strip" id="cat-summary">
+          <div class="summary-strip__item">
+            <span class="summary-strip__label">Expense categories</span>
+            <span class="summary-strip__value">7</span>
+          </div>
+          <div class="summary-strip__item">
+            <span class="summary-strip__label">Total budgeted</span>
+            <span class="summary-strip__value">R$ 5.050,00</span>
+          </div>
+          <div class="summary-strip__item">
+            <span class="summary-strip__label">Total spent</span>
+            <span class="summary-strip__value summary-strip__value--warning">R$ 5.280,60</span>
+          </div>
+          <div class="summary-strip__item">
+            <span class="summary-strip__label">Remaining</span>
+            <span class="summary-strip__value summary-strip__value--danger">− R$ 230,60</span>
+          </div>
+        </div>
+
+        <div class="cat-toolbar" id="cat-toolbar" aria-label="Category view controls">
+          <div class="cat-toolbar__group">
+            <label class="cat-toolbar__label" for="filter-month">Month</label>
+            <select class="cat-toolbar__select" id="filter-month">
+              <option value="2026-04">April 2026</option>
+              <option value="2026-05">May 2026</option>
+              <option value="2026-06" selected>June 2026</option>
+              <option value="2026-07">July 2026</option>
+            </select>
+          </div>
+          <div class="cat-toolbar__group">
+            <label class="cat-toolbar__label" for="filter-snapshot">Compare snapshot</label>
+            <select class="cat-toolbar__select" id="filter-snapshot">
+              <option value="">None</option>
+              <option value="baseline-jun">Baseline — Jun 2026</option>
+              <option value="pre-vacation">Pre-vacation — May 2026</option>
+            </select>
+          </div>
+          <div class="cat-toolbar__filters">
+            <button class="cat-toolbar__chip cat-toolbar__chip--active" type="button" data-kind="all">All</button>
+            <button class="cat-toolbar__chip" type="button" data-kind="expense">Expense</button>
+            <button class="cat-toolbar__chip" type="button" data-kind="income">Income</button>
+          </div>
+        </div>
+
+        <div class="snapshot-banner" id="snapshot-banner">
+          <span class="snapshot-banner__label">Snapshot compare</span>
+          <span class="snapshot-banner__name">Baseline — Jun 2026</span>
+          <span class="snapshot-banner__hint">Variance column shows snapshot baseline vs current actuals</span>
+        </div>
+
+        <section class="cat-section cat-section--expense" data-kind="expense" aria-label="Expense categories and budgets">
+          <h2 class="cat-section__title">Expense budgets</h2>
+
+          <div class="cat-list cat-list--budget">
+            <div class="cat-list__header">
+              <span>Category</span>
+              <span>Budget</span>
+              <span>Actual</span>
+              <span>Variance</span>
+              <span>Progress</span>
+              <span class="cat-list__snapshot-col">Snapshot Δ</span>
+              <span></span>
+            </div>
+
+            <article class="cat-row cat-row--parent" data-kind="expense" data-name="Food" data-parent="">
+              <div class="cat-row__info">
+                <div class="cat-row__name">Food</div>
+                <div class="cat-row__meta">
+                  <span class="chip chip--expense">Expense</span>
+                  <span class="cat-row__children">2 subcategories</span>
+                </div>
+              </div>
+              <div class="cat-row__budget">R$ 1.500,00</div>
+              <div class="cat-row__actual">R$ 1.680,00</div>
+              <div class="cat-row__variance cat-row__variance--over">− R$ 180,00</div>
+              <div class="cat-row__progress">
+                <div class="cat-row__progress-bar cat-row__progress-bar--over" style="--progress: 100%"></div>
+                <span class="cat-row__progress-label cat-row__progress-label--over">112% · over</span>
+              </div>
+              <div class="cat-row__snapshot cat-list__snapshot-col">
+                <span class="cat-row__snapshot-delta cat-row__snapshot-delta--under">+ R$ 120,00</span>
+              </div>
+              <div class="cat-row__actions">
+                <button class="icon-btn cat-row__edit" type="button" title="Edit">✎</button>
+              </div>
+            </article>
+
+            <article class="cat-row cat-row--child" data-kind="expense" data-name="Groceries" data-parent="Food">
+              <div class="cat-row__info">
+                <div class="cat-row__name">Groceries</div>
+                <div class="cat-row__meta">
+                  <span class="chip">Child</span>
+                </div>
+              </div>
+              <div class="cat-row__budget">R$ 1.000,00</div>
+              <div class="cat-row__actual">R$ 980,00</div>
+              <div class="cat-row__variance cat-row__variance--under">+ R$ 20,00</div>
+              <div class="cat-row__progress">
+                <div class="cat-row__progress-bar" style="--progress: 98%"></div>
+                <span class="cat-row__progress-label">98%</span>
+              </div>
+              <div class="cat-row__snapshot cat-list__snapshot-col">
+                <span class="cat-row__snapshot-delta cat-row__snapshot-delta--under">+ R$ 45,00</span>
+              </div>
+              <div class="cat-row__actions">
+                <button class="icon-btn cat-row__edit" type="button" title="Edit">✎</button>
+              </div>
+            </article>
+
+            <article class="cat-row cat-row--child" data-kind="expense" data-name="Restaurants" data-parent="Food">
+              <div class="cat-row__info">
+                <div class="cat-row__name">Restaurants</div>
+                <div class="cat-row__meta">
+                  <span class="chip">Child</span>
+                </div>
+              </div>
+              <div class="cat-row__budget">R$ 500,00</div>
+              <div class="cat-row__actual">R$ 700,00</div>
+              <div class="cat-row__variance cat-row__variance--over">− R$ 200,00</div>
+              <div class="cat-row__progress">
+                <div class="cat-row__progress-bar cat-row__progress-bar--over" style="--progress: 100%"></div>
+                <span class="cat-row__progress-label cat-row__progress-label--over">140% · over</span>
+              </div>
+              <div class="cat-row__snapshot cat-list__snapshot-col">
+                <span class="cat-row__snapshot-delta cat-row__snapshot-delta--over">− R$ 75,00</span>
+              </div>
+              <div class="cat-row__actions">
+                <button class="icon-btn cat-row__edit" type="button" title="Edit">✎</button>
+              </div>
+            </article>
+
+            <article class="cat-row" data-kind="expense" data-name="Housing" data-parent="">
+              <div class="cat-row__info">
+                <div class="cat-row__name">Housing</div>
+                <div class="cat-row__meta">
+                  <span class="chip chip--expense">Expense</span>
+                </div>
+              </div>
+              <div class="cat-row__budget">R$ 2.500,00</div>
+              <div class="cat-row__actual">R$ 2.400,00</div>
+              <div class="cat-row__variance cat-row__variance--under">+ R$ 100,00</div>
+              <div class="cat-row__progress">
+                <div class="cat-row__progress-bar" style="--progress: 96%"></div>
+                <span class="cat-row__progress-label">96%</span>
+              </div>
+              <div class="cat-row__snapshot cat-list__snapshot-col">
+                <span class="cat-row__snapshot-delta">R$ 0,00</span>
+              </div>
+              <div class="cat-row__actions">
+                <button class="icon-btn cat-row__edit" type="button" title="Edit">✎</button>
+              </div>
+            </article>
+
+            <article class="cat-row" data-kind="expense" data-name="Transport" data-parent="">
+              <div class="cat-row__info">
+                <div class="cat-row__name">Transport</div>
+                <div class="cat-row__meta">
+                  <span class="chip chip--expense">Expense</span>
+                </div>
+              </div>
+              <div class="cat-row__budget">R$ 400,00</div>
+              <div class="cat-row__actual">R$ 159,30</div>
+              <div class="cat-row__variance cat-row__variance--under">+ R$ 240,70</div>
+              <div class="cat-row__progress">
+                <div class="cat-row__progress-bar" style="--progress: 40%"></div>
+                <span class="cat-row__progress-label">40%</span>
+              </div>
+              <div class="cat-row__snapshot cat-list__snapshot-col">
+                <span class="cat-row__snapshot-delta cat-row__snapshot-delta--under">+ R$ 180,00</span>
+              </div>
+              <div class="cat-row__actions">
+                <button class="icon-btn cat-row__edit" type="button" title="Edit">✎</button>
+              </div>
+            </article>
+
+            <article class="cat-row" data-kind="expense" data-name="Entertainment" data-parent="">
+              <div class="cat-row__info">
+                <div class="cat-row__name">Entertainment</div>
+                <div class="cat-row__meta">
+                  <span class="chip chip--expense">Expense</span>
+                </div>
+              </div>
+              <div class="cat-row__budget">R$ 300,00</div>
+              <div class="cat-row__actual">R$ 55,90</div>
+              <div class="cat-row__variance cat-row__variance--under">+ R$ 244,10</div>
+              <div class="cat-row__progress">
+                <div class="cat-row__progress-bar" style="--progress: 19%"></div>
+                <span class="cat-row__progress-label">19%</span>
+              </div>
+              <div class="cat-row__snapshot cat-list__snapshot-col">
+                <span class="cat-row__snapshot-delta cat-row__snapshot-delta--under">+ R$ 244,10</span>
+              </div>
+              <div class="cat-row__actions">
+                <button class="icon-btn cat-row__edit" type="button" title="Edit">✎</button>
+              </div>
+            </article>
+
+            <article class="cat-row" data-kind="expense" data-name="Utilities" data-parent="">
+              <div class="cat-row__info">
+                <div class="cat-row__name">Utilities</div>
+                <div class="cat-row__meta">
+                  <span class="chip chip--expense">Expense</span>
+                </div>
+              </div>
+              <div class="cat-row__budget">R$ 350,00</div>
+              <div class="cat-row__actual">R$ 245,00</div>
+              <div class="cat-row__variance cat-row__variance--under">+ R$ 105,00</div>
+              <div class="cat-row__progress">
+                <div class="cat-row__progress-bar" style="--progress: 70%"></div>
+                <span class="cat-row__progress-label">70%</span>
+              </div>
+              <div class="cat-row__snapshot cat-list__snapshot-col">
+                <span class="cat-row__snapshot-delta cat-row__snapshot-delta--under">+ R$ 35,00</span>
+              </div>
+              <div class="cat-row__actions">
+                <button class="icon-btn cat-row__edit" type="button" title="Edit">✎</button>
+              </div>
+            </article>
+
+            <article class="cat-row" data-kind="expense" data-name="Debt" data-parent="">
+              <div class="cat-row__info">
+                <div class="cat-row__name">Debt</div>
+                <div class="cat-row__meta">
+                  <span class="chip chip--expense">Expense</span>
+                  <span class="cat-row__no-budget">No budget</span>
+                </div>
+              </div>
+              <div class="cat-row__budget cat-row__budget--empty">—</div>
+              <div class="cat-row__actual">R$ 475,00</div>
+              <div class="cat-row__variance cat-row__variance--empty">—</div>
+              <div class="cat-row__progress cat-row__progress--empty">—</div>
+              <div class="cat-row__snapshot cat-list__snapshot-col">
+                <span class="cat-row__snapshot-delta">—</span>
+              </div>
+              <div class="cat-row__actions">
+                <button class="icon-btn cat-row__edit" type="button" title="Edit">✎</button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="cat-section cat-section--income" data-kind="income" aria-label="Income categories">
+          <h2 class="cat-section__title">Income categories</h2>
+
+          <div class="cat-list cat-list--simple">
+            <div class="cat-list__header">
+              <span>Category</span>
+              <span>Actual (Jun)</span>
+              <span></span>
+            </div>
+
+            <article class="cat-row cat-row--income" data-kind="income" data-name="Salary" data-parent="">
+              <div class="cat-row__info">
+                <div class="cat-row__name">Salary</div>
+                <div class="cat-row__meta">
+                  <span class="chip chip--income">Income</span>
+                </div>
+              </div>
+              <div class="cat-row__actual cat-row__actual--income">R$ 8.500,00</div>
+              <div class="cat-row__actions">
+                <button class="icon-btn cat-row__edit" type="button" title="Edit">✎</button>
+              </div>
+            </article>
+
+            <article class="cat-row cat-row--income" data-kind="income" data-name="Freelance" data-parent="">
+              <div class="cat-row__info">
+                <div class="cat-row__name">Freelance</div>
+                <div class="cat-row__meta">
+                  <span class="chip chip--income">Income</span>
+                </div>
+              </div>
+              <div class="cat-row__actual cat-row__actual--empty">R$ 0,00</div>
+              <div class="cat-row__actions">
+                <button class="icon-btn cat-row__edit" type="button" title="Edit">✎</button>
+              </div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="category-overlay" id="category-overlay" aria-hidden="true">
+    <div class="category-overlay__backdrop"></div>
+    <aside class="editor-panel" role="dialog" aria-labelledby="editor-panel-title" aria-modal="true">
+      <div class="editor-panel__header">
+        <div class="editor-panel__header-top">
+          <div>
+            <h2 class="editor-panel__title" id="editor-panel-title">Edit category</h2>
+            <p class="editor-panel__subtitle" id="editor-panel-subtitle">Food · Expense · parent</p>
+          </div>
+          <button class="editor-panel__close" type="button" aria-label="Close editor">×</button>
+        </div>
+      </div>
+
+      <div class="editor-panel__body">
+        <div class="form-group">
+          <label class="form-group__label" for="cat-name">Name</label>
+          <input class="form-group__input" id="cat-name" type="text" value="Food">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-group__label" for="cat-kind">Kind</label>
+            <select class="form-group__select" id="cat-kind">
+              <option value="expense" selected>Expense</option>
+              <option value="income">Income</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-group__label" for="cat-color">Color</label>
+            <input class="form-group__input form-group__input--color" id="cat-color" type="text" value="#D97706">
+          </div>
+        </div>
+
+        <div class="form-group" id="cat-parent-group">
+          <label class="form-group__label" for="cat-parent">Parent category</label>
+          <select class="form-group__select" id="cat-parent">
+            <option value="" selected>None (root)</option>
+            <option value="food">Food</option>
+            <option value="housing">Housing</option>
+            <option value="transport">Transport</option>
+          </select>
+          <p class="form-group__hint" id="cat-parent-hint">Only root categories can be parents (one level max)</p>
+        </div>
+
+        <div class="form-section form-section--budget" id="cat-budget-section">
+          <h3 class="form-section__title">Monthly budget</h3>
+          <p class="form-section__desc">Budgets apply to expense categories only. Changes take effect from the chosen month onward.</p>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-group__label" for="cat-budget-amount">Amount</label>
+              <input class="form-group__input" id="cat-budget-amount" type="text" value="R$ 1.500,00">
+            </div>
+            <div class="form-group">
+              <label class="form-group__label" for="cat-budget-month">Effective from</label>
+              <input class="form-group__input" id="cat-budget-month" type="text" value="2026-06">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-panel__footer">
+        <button class="btn btn--ghost" type="button">Archive</button>
+        <button class="btn btn--primary" type="button">Save</button>
+      </div>
+    </aside>
+  </div>
+
+  <script src="js/categories.js"></script>
+</body>
+</html>
