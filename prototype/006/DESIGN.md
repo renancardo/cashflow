@@ -71,7 +71,7 @@ Sidebar `.nav` hidden on mobile; drawer opens from hamburger in header.
 ## Year Calendar (reference screen)
 
 - Header row: sticky **Month** column + day-of-month columns **1–31** (not weekday abbreviations)
-- Month rows: label + year + status chip (Historical / Current with blue dot / Projected)
+- Month rows: month name only — muted grey (historical), blue (current), dark (projected)
 - Grid is linear: column N = day N of the month (no weekday padding cells)
 - Zebra striping on alternate rows
 - Day cells: centered day number, status bars at bottom (green=income, orange=outflow), red dot top-right for below-buffer, card icon top-left
