@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Year Calendar — CashFlow Pro</title>
+  <link rel="stylesheet" href="css/analytical.css">
+  <link rel="stylesheet" href="css/year.css">
+  <link rel="stylesheet" href="css/day-panel.css">
+</head>
+<body>
+  <div class="app">
+    <div class="nav-overlay" id="nav-overlay"></div>
+
+    <nav class="nav" id="nav-drawer">
+      <div>
+        <div class="nav__brand">CashFlow Pro</div>
+        <div class="nav__mode">Analytical Mode</div>
+      </div>
+      <div>
+        <ul class="nav__list">
+          <li>
+            <a class="nav__link nav__link--active" href="year.html">
+              <span class="nav__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></span>
+              Year Calendar
+            </a>
+          </li>
+          <li>
+            <a class="nav__link" href="month.html">
+              <span class="nav__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14.01"/><line x1="12" y1="14" x2="12" y2="14.01"/><line x1="16" y1="14" x2="16" y2="14.01"/></svg></span>
+              Month Calendar
+            </a>
+          </li>
+          <li>
+            <a class="nav__link" href="transactions.html">
+              <span class="nav__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span>
+              Transactions
+            </a>
+          </li>
+          <li>
+            <a class="nav__link" href="accounts.html">
+              <span class="nav__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span>
+              Accounts
+            </a>
+          </li>
+          <li>
+            <a class="nav__link" href="forecast.html">
+              <span class="nav__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+              Forecast Items
+            </a>
+          </li>
+          <li>
+            <a class="nav__link" href="forecast.html?filter=subscription">
+              <span class="nav__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v4H4z"/><path d="M6 8v12"/><path d="M18 8v12"/><path d="M6 20h12"/></svg></span>
+              Subscriptions
+            </a>
+          </li>
+          <li>
+            <a class="nav__link" href="categories.html">
+              <span class="nav__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span>
+              Categories
+            </a>
+          </li>
+          <li>
+            <a class="nav__link" href="snapshots.html">
+              <span class="nav__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+              Snapshots
+            </a>
+          </li>
+          <li>
+            <a class="nav__link" href="settings.html">
+              <span class="nav__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></span>
+              Settings
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="main">
+      <header class="mobile-header">
+        <button
+          class="mobile-header__menu"
+          type="button"
+          id="nav-toggle"
+          aria-label="Open menu"
+        >☰</button>
+        <span class="mobile-header__title">Year Calendar</span>
+      </header>
+
+      <header class="header-strip">
+        <div class="metric">
+          <span class="metric__label">Working balance today</span>
+          <span class="metric__value">R$ 12.450,20</span>
+        </div>
+        <div class="metric">
+          <span class="metric__label">Next negative date</span>
+          <span class="metric__value metric__value--danger">14/09/2026</span>
+        </div>
+        <div class="header-strip__spacer"></div>
+        <div class="badge badge--alert">
+          <span class="badge__dot"></span>
+          Alert Lead Time
+        </div>
+        <div class="header-strip__actions">
+          <button class="btn btn--icon-only" type="button" aria-label="Filter calendar">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          </button>
+          <button class="btn btn--icon-only" type="button" aria-label="Download calendar">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="page">
+        <div class="year-view">
+          <div class="year-toolbar">
+            <div class="year-toolbar__actions">
+              <a class="btn btn--ghost" href="month.html">Month view</a>
+              <div class="year-toolbar__year-nav" role="group" aria-label="Year">
+                <button
+                  class="btn btn--ghost btn--icon"
+                  type="button"
+                  id="year-prev"
+                  aria-label="Previous year"
+                >←</button>
+                <span class="year-toolbar__year" id="year-toolbar-label">2026</span>
+                <button
+                  class="btn btn--ghost btn--icon"
+                  type="button"
+                  id="year-next"
+                  aria-label="Next year"
+                >→</button>
+              </div>
+              <button class="btn btn--ghost" type="button" id="year-jump-today">Jump to today</button>
+            </div>
+
+            <div class="help-tooltip">
+              <button
+                class="help-tooltip__trigger"
+                type="button"
+                aria-describedby="calendar-legend-tip"
+              >
+                <span class="help-tooltip__icon" aria-hidden="true">?</span>
+                <span class="help-tooltip__label">Legend</span>
+              </button>
+              <div class="help-tooltip__panel" id="calendar-legend-tip" role="tooltip">
+                <p class="help-tooltip__title">Day indicators</p>
+                <ul class="help-tooltip__list">
+                  <li>
+                    <span class="help-tooltip__marker help-tooltip__marker--danger"></span>
+                    Below buffer — projected balance under your threshold
+                  </li>
+                  <li>
+                    <span class="help-tooltip__marker help-tooltip__marker--success"></span>
+                    Income day — net inflow on this date
+                  </li>
+                  <li>
+                    <span class="help-tooltip__marker help-tooltip__marker--warning"></span>
+                    Large outflow — net outflow above your limit
+                  </li>
+                  <li>
+                    <span class="help-tooltip__marker help-tooltip__marker--card"></span>
+                    Card statement due
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="calendar-scroll card" id="calendar-scroll">
+            <div class="linear-calendar" id="linear-calendar">
+        <div class="day-band">
+          <div class="day-band__month-label">Month</div>
+          <div class="day-band__cell">1</div>
+          <div class="day-band__cell">2</div>
+          <div class="day-band__cell">3</div>
+          <div class="day-band__cell">4</div>
+          <div class="day-band__cell">5</div>
+          <div class="day-band__cell">6</div>
+          <div class="day-band__cell">7</div>
+          <div class="day-band__cell">8</div>
+          <div class="day-band__cell">9</div>
+          <div class="day-band__cell">10</div>
+          <div class="day-band__cell">11</div>
+          <div class="day-band__cell">12</div>
+          <div class="day-band__cell">13</div>
+          <div class="day-band__cell">14</div>
+          <div class="day-band__cell">15</div>
+          <div class="day-band__cell">16</div>
+          <div class="day-band__cell">17</div>
+          <div class="day-band__cell">18</div>
+          <div class="day-band__cell">19</div>
+          <div class="day-band__cell">20</div>
+          <div class="day-band__cell">21</div>
+          <div class="day-band__cell">22</div>
+          <div class="day-band__cell">23</div>
+          <div class="day-band__cell">24</div>
+          <div class="day-band__cell">25</div>
+          <div class="day-band__cell">26</div>
+          <div class="day-band__cell">27</div>
+          <div class="day-band__cell">28</div>
+          <div class="day-band__cell">29</div>
+          <div class="day-band__cell">30</div>
+          <div class="day-band__cell">31</div>
+        </div>
+        <div class="month-row month-row--odd" data-year="2026" data-month="0">
+          <div class="month-row__label month-row__label--sticky month-row__label--historical" data-year="2026">
+          <span class="month-row__name">Jan</span>
+          <span class="month-row__status">Historical</span>
+          </div>
+          <div class="month-row__days">
+          <div class="day-cell"><span class="day-cell__num">1</span></div>
+          <div class="day-cell"><span class="day-cell__num">2</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">3</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">4</span></div>
+          <div class="day-cell"><span class="day-cell__num">5</span><span class="day-cell__indicators"><span class="indicator indicator--success"></span></span></div>
+          <div class="day-cell"><span class="day-cell__num">6</span></div>
+          <div class="day-cell"><span class="day-cell__num">7</span></div>
+          <div class="day-cell"><span class="day-cell__num">8</span></div>
+          <div class="day-cell"><span class="day-cell__num">9</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">10</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">11</span></div>
+          <div class="day-cell"><span class="day-cell__num">12</span></div>
+          <div class="day-cell"><span class="day-cell__num">13</span></div>
+          <div class="day-cell"><span class="day-cell__num">14</span></div>
+          <div class="day-cell"><span class="day-cell__num">15</span><span class="day-cell__indicators"><span class="indicator indicator--danger"></span></span></div>
+          <div class="day-cell"><span class="day-cell__num">16</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">17</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">18</span></div>
+          <div class="day-cell"><span class="day-cell__num">19</span></div>
+          <div class="day-cell"><span class="day-cell__num">20</span></div>
+          <div class="day-cell"><span class="day-cell__num">21</span></div>
+          <div class="day-cell"><span class="day-cell__num">22</span></div>
+          <div class="day-cell"><span class="day-cell__num">23</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">24</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">25</span></div>
+          <div class="day-cell"><span class="day-cell__num">26</span></div>
+          <div class="day-cell"><span class="day-cell__num">27</span></div>
+          <div class="day-cell"><span class="day-cell__num">28</span></div>
+          <div class="day-cell"><span class="day-cell__num">29</span></div>
+          <div class="day-cell"><span class="day-cell__num">30</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">31</span></div>
+          </div>
+        </div>
+        <div class="month-row" data-year="2026" data-month="1">
+          <div class="month-row__label month-row__label--sticky month-row__label--historical" data-year="2026">
+          <span class="month-row__name">Feb</span>
+          <span class="month-row__status">Historical</span>
+          </div>
+          <div class="month-row__days">
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">1</span></div>
+          <div class="day-cell"><span class="day-cell__num">2</span></div>
+          <div class="day-cell"><span class="day-cell__num">3</span></div>
+          <div class="day-cell"><span class="day-cell__num">4</span></div>
+          <div class="day-cell"><span class="day-cell__num">5</span></div>
+          <div class="day-cell"><span class="day-cell__num">6</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">7</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">8</span></div>
+          <div class="day-cell"><span class="day-cell__num">9</span></div>
+          <div class="day-cell"><span class="day-cell__num">10</span><span class="day-cell__indicators"><span class="indicator indicator--warning"></span></span></div>
+          <div class="day-cell"><span class="day-cell__num">11</span></div>
+          <div class="day-cell"><span class="day-cell__num">12</span></div>
+          <div class="day-cell"><span class="day-cell__num">13</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">14</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">15</span></div>
+          <div class="day-cell"><span class="day-cell__num">16</span></div>
+          <div class="day-cell"><span class="day-cell__num">17</span></div>
+          <div class="day-cell"><span class="day-cell__num">18</span></div>
+          <div class="day-cell"><span class="day-cell__num">19</span></div>
+          <div class="day-cell"><span class="day-cell__num">20</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">21</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">22</span></div>
+          <div class="day-cell"><span class="day-cell__num">23</span></div>
+          <div class="day-cell"><span class="day-cell__num">24</span></div>
+          <div class="day-cell"><span class="day-cell__num">25</span></div>
+          <div class="day-cell"><span class="day-cell__num">26</span></div>
+          <div class="day-cell"><span class="day-cell__num">27</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">28</span></div>
+          <div class="day-cell day-cell--empty">&nbsp;</div>
+          <div class="day-cell day-cell--empty">&nbsp;</div>
+          <div class="day-cell day-cell--empty">&nbsp;</div>
+          </div>
+        </div>
+        <div class="month-row month-row--odd" data-year="2026" data-month="2">
+          <div class="month-row__label month-row__label--sticky month-row__label--historical" data-year="2026">
+          <span class="month-row__name">Mar</span>
+          <span class="month-row__status">Historical</span>
+          </div>
+          <div class="month-row__days">
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">1</span><span class="day-cell__indicators"><span class="indicator indicator--success"></span></span></div>
+          <div class="day-cell"><span class="day-cell__num">2</span></div>
+          <div class="day-cell"><span class="day-cell__num">3</span></div>
+          <div class="day-cell"><span class="day-cell__num">4</span></div>
+          <div class="day-cell"><span class="day-cell__num">5</span></div>
+          <div class="day-cell"><span class="day-cell__num">6</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">7</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">8</span></div>
+          <div class="day-cell"><span class="day-cell__num">9</span></div>
+          <div class="day-cell"><span class="day-cell__num">10</span></div>
+          <div class="day-cell"><span class="day-cell__num">11</span></div>
+          <div class="day-cell"><span class="day-cell__num">12</span></div>
+          <div class="day-cell"><span class="day-cell__num">13</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">14</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">15</span><span class="day-cell__indicators"><span class="indicator indicator--card"></span></span></div>
+          <div class="day-cell"><span class="day-cell__num">16</span></div>
+          <div class="day-cell"><span class="day-cell__num">17</span></div>
+          <div class="day-cell"><span class="day-cell__num">18</span></div>
+          <div class="day-cell"><span class="day-cell__num">19</span></div>
+          <div class="day-cell"><span class="day-cell__num">20</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">21</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">22</span></div>
+          <div class="day-cell"><span class="day-cell__num">23</span></div>
+          <div class="day-cell"><span class="day-cell__num">24</span></div>
+          <div class="day-cell"><span class="day-cell__num">25</span></div>
+          <div class="day-cell"><span class="day-cell__num">26</span></div>
+          <div class="day-cell"><span class="day-cell__num">27</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">28</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">29</span></div>
+          <div class="day-cell"><span class="day-cell__num">30</span></div>
+          <div class="day-cell"><span class="day-cell__num">31</span></div>
+          </div>
+        </div>
+        <div class="month-row" data-year="2026" data-month="3">
+          <div class="month-row__label month-row__label--sticky month-row__label--historical" data-year="2026">
+          <span class="month-row__name">Apr</span>
+          <span class="month-row__status">Historical</span>
+          </div>
+          <div class="month-row__days">
+          <div class="day-cell"><span class="day-cell__num">1</span></div>
+          <div class="day-cell"><span class="day-cell__num">2</span></div>
+          <div class="day-cell"><span class="day-cell__num">3</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">4</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">5</span><span class="day-cell__indicators"><span class="indicator indicator--danger"></span><span class="indicator indicator--warning"></span></span></div>
+          <div class="day-cell"><span class="day-cell__num">6</span></div>
+          <div class="day-cell"><span class="day-cell__num">7</span></div>
+          <div class="day-cell"><span class="day-cell__num">8</span></div>
+          <div class="day-cell"><span class="day-cell__num">9</span></div>
+          <div class="day-cell"><span class="day-cell__num">10</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">11</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">12</span></div>
+          <div class="day-cell"><span class="day-cell__num">13</span></div>
+          <div class="day-cell"><span class="day-cell__num">14</span></div>
+          <div class="day-cell"><span class="day-cell__num">15</span></div>
+          <div class="day-cell"><span class="day-cell__num">16</span></div>
+          <div class="day-cell"><span class="day-cell__num">17</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">18</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">19</span></div>
+          <div class="day-cell"><span class="day-cell__num">20</span></div>
+          <div class="day-cell"><span class="day-cell__num">21</span></div>
+          <div class="day-cell"><span class="day-cell__num">22</span></div>
+          <div class="day-cell"><span class="day-cell__num">23</span></div>
+          <div class="day-cell"><span class="day-cell__num">24</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">25</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">26</span></div>
+          <div class="day-cell"><span class="day-cell__num">27</span></div>
+          <div class="day-cell"><span class="day-cell__num">28</span></div>
+          <div class="day-cell"><span class="day-cell__num">29</span></div>
+          <div class="day-cell"><span class="day-cell__num">30</span></div>
+          <div class="day-cell day-cell--empty">&nbsp;</div>
+          </div>
+        </div>
+        <div class="month-row month-row--odd" data-year="2026" data-month="4">
+          <div class="month-row__label month-row__label--sticky month-row__label--historical" data-year="2026">
+          <span class="month-row__name">May</span>
+          <span class="month-row__status">Historical</span>
+          </div>
+          <div class="month-row__days">
+          <div class="day-cell"><span class="day-cell__num">1</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">2</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">3</span></div>
+          <div class="day-cell"><span class="day-cell__num">4</span></div>
+          <div class="day-cell"><span class="day-cell__num">5</span></div>
+          <div class="day-cell"><span class="day-cell__num">6</span></div>
+          <div class="day-cell"><span class="day-cell__num">7</span></div>
+          <div class="day-cell"><span class="day-cell__num">8</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">9</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">10</span></div>
+          <div class="day-cell"><span class="day-cell__num">11</span></div>
+          <div class="day-cell"><span class="day-cell__num">12</span></div>
+          <div class="day-cell"><span class="day-cell__num">13</span></div>
+          <div class="day-cell"><span class="day-cell__num">14</span></div>
+          <div class="day-cell"><span class="day-cell__num">15</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">16</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">17</span></div>
+          <div class="day-cell"><span class="day-cell__num">18</span></div>
+          <div class="day-cell"><span class="day-cell__num">19</span></div>
+          <div class="day-cell"><span class="day-cell__num">20</span><span class="day-cell__indicators"><span class="indicator indicator--success"></span></span></div>
+          <div class="day-cell"><span class="day-cell__num">21</span></div>
+          <div class="day-cell"><span class="day-cell__num">22</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">23</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">24</span></div>
+          <div class="day-cell"><span class="day-cell__num">25</span></div>
+          <div class="day-cell"><span class="day-cell__num">26</span></div>
+          <div class="day-cell"><span class="day-cell__num">27</span></div>
+          <div class="day-cell"><span class="day-cell__num">28</span></div>
+          <div class="day-cell"><span class="day-cell__num">29</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">30</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">31</span></div>
+          </div>
+        </div>
+        <div class="month-row" data-year="2026" data-month="5">
+          <div class="month-row__label month-row__label--sticky month-row__label--current" data-year="2026">
+          <span class="month-row__name">Jun</span>
+          <span class="month-row__status month-row__status--current">Current</span>
+          </div>
+          <div class="month-row__days">
+          <div class="day-cell"><span class="day-cell__num">1</span></div>
+          <div class="day-cell"><span class="day-cell__num">2</span></div>
+          <div class="day-cell"><span class="day-cell__num">3</span></div>
+          <div class="day-cell"><span class="day-cell__num">4</span></div>
+          <div class="day-cell"><span class="day-cell__num">5</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">6</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">7</span></div>
+          <div class="day-cell"><span class="day-cell__num">8</span></div>
+          <div class="day-cell"><span class="day-cell__num">9</span></div>
+          <div class="day-cell"><span class="day-cell__num">10</span></div>
+          <div class="day-cell"><span class="day-cell__num">11</span></div>
+          <div class="day-cell"><span class="day-cell__num">12</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">13</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">14</span></div>
+          <div class="day-cell"><span class="day-cell__num">15</span><span class="day-cell__indicators"><span class="indicator indicator--danger"></span></span></div>
+          <div class="day-cell"><span class="day-cell__num">16</span></div>
+          <div class="day-cell"><span class="day-cell__num">17</span></div>
+          <div class="day-cell"><span class="day-cell__num">18</span></div>
+          <div class="day-cell"><span class="day-cell__num">19</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">20</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">21</span></div>
+          <div class="day-cell"><span class="day-cell__num">22</span></div>
+          <div class="day-cell"><span class="day-cell__num">23</span></div>
+          <div class="day-cell"><span class="day-cell__num">24</span></div>
+          <div class="day-cell"><span class="day-cell__num">25</span></div>
+          <div class="day-cell"><span class="day-cell__num">26</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">27</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">28</span></div>
+          <div class="day-cell"><span class="day-cell__num">29</span></div>
+          <div class="day-cell day-cell--today"><span class="day-cell__num">30</span></div>
+          <div class="day-cell day-cell--empty">&nbsp;</div>
+          </div>
+        </div>
+        <div class="month-row month-row--odd" data-year="2026" data-month="6">
+          <div class="month-row__label month-row__label--sticky month-row__label--projected" data-year="2026">
+          <span class="month-row__name">Jul</span>
+          <span class="month-row__status">Projected</span>
+          </div>
+          <div class="month-row__days">
+          <div class="day-cell"><span class="day-cell__num">1</span></div>
+          <div class="day-cell"><span class="day-cell__num">2</span></div>
+          <div class="day-cell"><span class="day-cell__num">3</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">4</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">5</span></div>
+          <div class="day-cell"><span class="day-cell__num">6</span></div>
+          <div class="day-cell"><span class="day-cell__num">7</span></div>
+          <div class="day-cell"><span class="day-cell__num">8</span><span class="day-cell__indicators"><span class="indicator indicator--danger"></span></span></div>
+          <div class="day-cell"><span class="day-cell__num">9</span></div>
+          <div class="day-cell"><span class="day-cell__num">10</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">11</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">12</span></div>
+          <div class="day-cell"><span class="day-cell__num">13</span></div>
+          <div class="day-cell"><span class="day-cell__num">14</span></div>
+          <div class="day-cell"><span class="day-cell__num">15</span></div>
+          <div class="day-cell"><span class="day-cell__num">16</span></div>
+          <div class="day-cell"><span class="day-cell__num">17</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">18</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">19</span></div>
+          <div class="day-cell"><span class="day-cell__num">20</span></div>
+          <div class="day-cell"><span class="day-cell__num">21</span></div>
+          <div class="day-cell"><span class="day-cell__num">22</span></div>
+          <div class="day-cell"><span class="day-cell__num">23</span></div>
+          <div class="day-cell"><span class="day-cell__num">24</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">25</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">26</span></div>
+          <div class="day-cell"><span class="day-cell__num">27</span></div>
+          <div class="day-cell"><span class="day-cell__num">28</span></div>
+          <div class="day-cell"><span class="day-cell__num">29</span></div>
+          <div class="day-cell"><span class="day-cell__num">30</span></div>
+          <div class="day-cell"><span class="day-cell__num">31</span></div>
+          </div>
+        </div>
+        <div class="month-row" data-year="2026" data-month="7">
+          <div class="month-row__label month-row__label--sticky month-row__label--projected" data-year="2026">
+          <span class="month-row__name">Aug</span>
+          <span class="month-row__status">Projected</span>
+          </div>
+          <div class="month-row__days">
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">1</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">2</span></div>
+          <div class="day-cell"><span class="day-cell__num">3</span></div>
+          <div class="day-cell"><span class="day-cell__num">4</span></div>
+          <div class="day-cell"><span class="day-cell__num">5</span></div>
+          <div class="day-cell"><span class="day-cell__num">6</span></div>
+          <div class="day-cell"><span class="day-cell__num">7</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">8</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">9</span></div>
+          <div class="day-cell"><span class="day-cell__num">10</span></div>
+          <div class="day-cell"><span class="day-cell__num">11</span></div>
+          <div class="day-cell"><span class="day-cell__num">12</span></div>
+          <div class="day-cell"><span class="day-cell__num">13</span></div>
+          <div class="day-cell"><span class="day-cell__num">14</span></div>
+          <div class="day-cell day-cell--weekend day-cell--selected"><span class="day-cell__num">15</span><span class="day-cell__indicators"><span class="indicator indicator--card"></span><span class="indicator indicator--warning"></span></span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">16</span></div>
+          <div class="day-cell"><span class="day-cell__num">17</span></div>
+          <div class="day-cell"><span class="day-cell__num">18</span></div>
+          <div class="day-cell"><span class="day-cell__num">19</span></div>
+          <div class="day-cell"><span class="day-cell__num">20</span></div>
+          <div class="day-cell"><span class="day-cell__num">21</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">22</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">23</span></div>
+          <div class="day-cell"><span class="day-cell__num">24</span></div>
+          <div class="day-cell"><span class="day-cell__num">25</span></div>
+          <div class="day-cell"><span class="day-cell__num">26</span></div>
+          <div class="day-cell"><span class="day-cell__num">27</span></div>
+          <div class="day-cell"><span class="day-cell__num">28</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">29</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">30</span></div>
+          <div class="day-cell"><span class="day-cell__num">31</span></div>
+          </div>
+        </div>
+        <div class="month-row month-row--odd" data-year="2026" data-month="8">
+          <div class="month-row__label month-row__label--sticky month-row__label--projected" data-year="2026">
+          <span class="month-row__name">Sep</span>
+          <span class="month-row__status">Projected</span>
+          </div>
+          <div class="month-row__days">
+          <div class="day-cell"><span class="day-cell__num">1</span><span class="day-cell__indicators"><span class="indicator indicator--success"></span></span></div>
+          <div class="day-cell"><span class="day-cell__num">2</span></div>
+          <div class="day-cell"><span class="day-cell__num">3</span></div>
+          <div class="day-cell"><span class="day-cell__num">4</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">5</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">6</span></div>
+          <div class="day-cell"><span class="day-cell__num">7</span></div>
+          <div class="day-cell"><span class="day-cell__num">8</span></div>
+          <div class="day-cell"><span class="day-cell__num">9</span></div>
+          <div class="day-cell"><span class="day-cell__num">10</span></div>
+          <div class="day-cell"><span class="day-cell__num">11</span><span class="day-cell__indicators"><span class="indicator indicator--danger"></span></span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">12</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">13</span></div>
+          <div class="day-cell"><span class="day-cell__num">14</span></div>
+          <div class="day-cell"><span class="day-cell__num">15</span></div>
+          <div class="day-cell"><span class="day-cell__num">16</span></div>
+          <div class="day-cell"><span class="day-cell__num">17</span></div>
+          <div class="day-cell"><span class="day-cell__num">18</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">19</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">20</span></div>
+          <div class="day-cell"><span class="day-cell__num">21</span></div>
+          <div class="day-cell"><span class="day-cell__num">22</span></div>
+          <div class="day-cell"><span class="day-cell__num">23</span></div>
+          <div class="day-cell"><span class="day-cell__num">24</span></div>
+          <div class="day-cell"><span class="day-cell__num">25</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">26</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">27</span></div>
+          <div class="day-cell"><span class="day-cell__num">28</span></div>
+          <div class="day-cell"><span class="day-cell__num">29</span></div>
+          <div class="day-cell"><span class="day-cell__num">30</span></div>
+          <div class="day-cell day-cell--empty">&nbsp;</div>
+          </div>
+        </div>
+        <div class="month-row" data-year="2026" data-month="9">
+          <div class="month-row__label month-row__label--sticky month-row__label--projected" data-year="2026">
+          <span class="month-row__name">Oct</span>
+          <span class="month-row__status">Projected</span>
+          </div>
+          <div class="month-row__days">
+          <div class="day-cell"><span class="day-cell__num">1</span></div>
+          <div class="day-cell"><span class="day-cell__num">2</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">3</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">4</span></div>
+          <div class="day-cell"><span class="day-cell__num">5</span></div>
+          <div class="day-cell"><span class="day-cell__num">6</span></div>
+          <div class="day-cell"><span class="day-cell__num">7</span></div>
+          <div class="day-cell"><span class="day-cell__num">8</span></div>
+          <div class="day-cell"><span class="day-cell__num">9</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">10</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">11</span><span class="day-cell__indicators"><span class="indicator indicator--danger"></span></span></div>
+          <div class="day-cell"><span class="day-cell__num">12</span></div>
+          <div class="day-cell"><span class="day-cell__num">13</span></div>
+          <div class="day-cell"><span class="day-cell__num">14</span></div>
+          <div class="day-cell"><span class="day-cell__num">15</span></div>
+          <div class="day-cell"><span class="day-cell__num">16</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">17</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">18</span></div>
+          <div class="day-cell"><span class="day-cell__num">19</span></div>
+          <div class="day-cell"><span class="day-cell__num">20</span></div>
+          <div class="day-cell"><span class="day-cell__num">21</span></div>
+          <div class="day-cell"><span class="day-cell__num">22</span></div>
+          <div class="day-cell"><span class="day-cell__num">23</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">24</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">25</span></div>
+          <div class="day-cell"><span class="day-cell__num">26</span></div>
+          <div class="day-cell"><span class="day-cell__num">27</span></div>
+          <div class="day-cell"><span class="day-cell__num">28</span></div>
+          <div class="day-cell"><span class="day-cell__num">29</span></div>
+          <div class="day-cell"><span class="day-cell__num">30</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">31</span></div>
+          </div>
+        </div>
+        <div class="month-row month-row--odd" data-year="2026" data-month="10">
+          <div class="month-row__label month-row__label--sticky month-row__label--projected" data-year="2026">
+          <span class="month-row__name">Nov</span>
+          <span class="month-row__status">Projected</span>
+          </div>
+          <div class="month-row__days">
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">1</span></div>
+          <div class="day-cell"><span class="day-cell__num">2</span></div>
+          <div class="day-cell"><span class="day-cell__num">3</span></div>
+          <div class="day-cell"><span class="day-cell__num">4</span></div>
+          <div class="day-cell"><span class="day-cell__num">5</span></div>
+          <div class="day-cell"><span class="day-cell__num">6</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">7</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">8</span></div>
+          <div class="day-cell"><span class="day-cell__num">9</span></div>
+          <div class="day-cell"><span class="day-cell__num">10</span></div>
+          <div class="day-cell"><span class="day-cell__num">11</span></div>
+          <div class="day-cell"><span class="day-cell__num">12</span></div>
+          <div class="day-cell"><span class="day-cell__num">13</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">14</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">15</span></div>
+          <div class="day-cell"><span class="day-cell__num">16</span></div>
+          <div class="day-cell"><span class="day-cell__num">17</span></div>
+          <div class="day-cell"><span class="day-cell__num">18</span></div>
+          <div class="day-cell"><span class="day-cell__num">19</span></div>
+          <div class="day-cell"><span class="day-cell__num">20</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">21</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">22</span></div>
+          <div class="day-cell"><span class="day-cell__num">23</span></div>
+          <div class="day-cell"><span class="day-cell__num">24</span></div>
+          <div class="day-cell"><span class="day-cell__num">25</span><span class="day-cell__indicators"><span class="indicator indicator--warning"></span></span></div>
+          <div class="day-cell"><span class="day-cell__num">26</span></div>
+          <div class="day-cell"><span class="day-cell__num">27</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">28</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">29</span></div>
+          <div class="day-cell"><span class="day-cell__num">30</span></div>
+          <div class="day-cell day-cell--empty">&nbsp;</div>
+          </div>
+        </div>
+        <div class="month-row" data-year="2026" data-month="11">
+          <div class="month-row__label month-row__label--sticky month-row__label--projected" data-year="2026">
+          <span class="month-row__name">Dec</span>
+          <span class="month-row__status">Projected</span>
+          </div>
+          <div class="month-row__days">
+          <div class="day-cell"><span class="day-cell__num">1</span></div>
+          <div class="day-cell"><span class="day-cell__num">2</span></div>
+          <div class="day-cell"><span class="day-cell__num">3</span></div>
+          <div class="day-cell"><span class="day-cell__num">4</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">5</span><span class="day-cell__indicators"><span class="indicator indicator--card"></span></span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">6</span></div>
+          <div class="day-cell"><span class="day-cell__num">7</span></div>
+          <div class="day-cell"><span class="day-cell__num">8</span></div>
+          <div class="day-cell"><span class="day-cell__num">9</span></div>
+          <div class="day-cell"><span class="day-cell__num">10</span></div>
+          <div class="day-cell"><span class="day-cell__num">11</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">12</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">13</span></div>
+          <div class="day-cell"><span class="day-cell__num">14</span></div>
+          <div class="day-cell"><span class="day-cell__num">15</span></div>
+          <div class="day-cell"><span class="day-cell__num">16</span></div>
+          <div class="day-cell"><span class="day-cell__num">17</span></div>
+          <div class="day-cell"><span class="day-cell__num">18</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">19</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">20</span></div>
+          <div class="day-cell"><span class="day-cell__num">21</span></div>
+          <div class="day-cell"><span class="day-cell__num">22</span></div>
+          <div class="day-cell"><span class="day-cell__num">23</span></div>
+          <div class="day-cell"><span class="day-cell__num">24</span></div>
+          <div class="day-cell"><span class="day-cell__num">25</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">26</span></div>
+          <div class="day-cell day-cell--weekend"><span class="day-cell__num">27</span></div>
+          <div class="day-cell"><span class="day-cell__num">28</span></div>
+          <div class="day-cell"><span class="day-cell__num">29</span></div>
+          <div class="day-cell"><span class="day-cell__num">30</span></div>
+          <div class="day-cell"><span class="day-cell__num">31</span></div>
+          </div>
+        </div>
+        <div id="calendar-anchor" hidden></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="bottom-nav" aria-label="Main">
+      <a class="bottom-nav__item bottom-nav__item--active" href="year.html">
+        <span class="bottom-nav__icon" aria-hidden="true">📅</span>
+        Calendar
+      </a>
+      <a class="bottom-nav__item" href="transactions.html">
+        <span class="bottom-nav__icon" aria-hidden="true">↕</span>
+        Transactions
+      </a>
+      <a class="bottom-nav__item" href="forecast.html">
+        <span class="bottom-nav__icon" aria-hidden="true">◎</span>
+        Forecast
+      </a>
+      <a class="bottom-nav__item" href="categories.html">
+        <span class="bottom-nav__icon" aria-hidden="true">▦</span>
+        Categories
+      </a>
+      <a class="bottom-nav__item" href="settings.html">
+        <span class="bottom-nav__icon" aria-hidden="true">⋯</span>
+        More
+      </a>
+    </nav>
+  </div>
+
+  <div class="day-overlay" id="day-overlay" aria-hidden="true">
+    <div class="day-overlay__backdrop"></div>
+    <aside class="day-panel" role="dialog" aria-labelledby="day-panel-title" aria-modal="true">
+      <header class="day-panel__header">
+        <div class="day-panel__header-top">
+          <div>
+            <h2 class="day-panel__title" id="day-panel-title">15 Aug 2026</h2>
+            <p class="day-panel__weekday" id="day-panel-weekday">Saturday</p>
+          </div>
+          <button class="day-panel__close" type="button" aria-label="Close day detail">×</button>
+        </div>
+
+        <div class="day-panel__balances">
+          <div class="day-panel__balance">
+            <span class="day-panel__balance-label">Opening</span>
+            <span class="day-panel__balance-value">R$ 3.200,00</span>
+          </div>
+          <div class="day-panel__balance">
+            <span class="day-panel__balance-label">Closing</span>
+            <span class="day-panel__balance-value day-panel__balance-value--danger">R$ 1.850,00</span>
+          </div>
+        </div>
+
+        <div class="day-panel__flag">
+          <span class="day-panel__flag-dot"></span>
+          Below buffer
+        </div>
+      </header>
+
+      <div class="day-panel__body">
+        <section class="day-items-group">
+          <h3 class="day-items-group__title">Transactions</h3>
+          <ul class="day-items-group__list">
+            <li>
+              <article class="day-item">
+                <div class="day-item__main">
+                  <div class="day-item__desc">Padaria do bairro</div>
+                  <div class="day-item__meta">
+                    <span class="chip chip--actual">Actual</span>
+                    <span>Food</span>
+                    <span>Cora Checking</span>
+                  </div>
+                </div>
+                <div class="day-item__amount day-item__amount--expense">− R$ 28,50</div>
+              </article>
+            </li>
+          </ul>
+        </section>
+
+        <section class="day-items-group">
+          <h3 class="day-items-group__title">Planned &amp; subscriptions</h3>
+          <ul class="day-items-group__list">
+            <li>
+              <article class="day-item day-item--projected">
+                <div class="day-item__main">
+                  <div class="day-item__desc">Netflix</div>
+                  <div class="day-item__meta">
+                    <span class="chip chip--subscription">Subscription</span>
+                    <span>Entertainment</span>
+                    <span>Cartão Cora</span>
+                  </div>
+                </div>
+                <div
+                  class="day-item__amount day-item__amount--expense day-item__amount--editable"
+                  data-amount-cents="5590"
+                  data-kind="expense"
+                  tabindex="0"
+                  role="button"
+                  aria-label="Edit amount"
+                >− R$ 55,90</div>
+                <button class="btn btn--success btn--sm day-item__confirm" type="button">Confirm payment</button>
+              </article>
+            </li>
+            <li>
+              <article class="day-item day-item--projected">
+                <div class="day-item__main">
+                  <div class="day-item__desc">Internet Vivo Fibra</div>
+                  <div class="day-item__meta">
+                    <span class="chip chip--planned">Planned</span>
+                    <span>Utilities</span>
+                    <span>Cora Checking</span>
+                  </div>
+                </div>
+                <div
+                  class="day-item__amount day-item__amount--expense day-item__amount--editable"
+                  data-amount-cents="11990"
+                  data-kind="expense"
+                  tabindex="0"
+                  role="button"
+                  aria-label="Edit amount"
+                >− R$ 119,90</div>
+                <button class="btn btn--success btn--sm day-item__confirm" type="button">Confirm payment</button>
+              </article>
+            </li>
+          </ul>
+        </section>
+
+        <section class="day-items-group">
+          <h3 class="day-items-group__title">Installments</h3>
+          <ul class="day-items-group__list">
+            <li>
+              <article class="day-item day-item--projected">
+                <div class="day-item__main">
+                  <div class="day-item__desc">MacBook Pro — parcel 8/12</div>
+                  <div class="day-item__meta">
+                    <span class="chip chip--installment">Installment</span>
+                    <span>Electronics</span>
+                    <span>Cartão Cora</span>
+                  </div>
+                </div>
+                <div
+                  class="day-item__amount day-item__amount--expense day-item__amount--editable"
+                  data-amount-cents="45000"
+                  data-kind="expense"
+                  tabindex="0"
+                  role="button"
+                  aria-label="Edit amount"
+                >− R$ 450,00</div>
+                <button class="btn btn--success btn--sm day-item__confirm" type="button">Confirm payment</button>
+              </article>
+            </li>
+          </ul>
+        </section>
+
+        <section class="day-items-group">
+          <h3 class="day-items-group__title">Statement payments</h3>
+          <ul class="day-items-group__list">
+            <li>
+              <article class="day-item day-item--projected">
+                <div class="day-item__main">
+                  <div class="day-item__desc">Cartão Cora — statement due</div>
+                  <div class="day-item__meta">
+                    <span class="chip chip--statement">Statement</span>
+                    <span>Cora Checking → Cartão Cora</span>
+                  </div>
+                </div>
+                <div
+                  class="day-item__amount day-item__amount--expense day-item__amount--editable"
+                  data-amount-cents="185000"
+                  data-kind="expense"
+                  tabindex="0"
+                  role="button"
+                  aria-label="Edit amount"
+                >− R$ 1.850,00</div>
+                <button class="btn btn--success btn--sm day-item__confirm" type="button">Confirm payment</button>
+              </article>
+            </li>
+          </ul>
+        </section>
+      </div>
+
+      <footer class="day-panel__quick-add">
+        <button class="btn btn--primary quick-add__toggle" type="button" id="quick-add-toggle">+ Quick add</button>
+
+        <form class="quick-add__form" id="quick-add-form">
+          <p class="quick-add__title">Quick add transaction</p>
+
+          <div class="quick-add__type" role="group" aria-label="Transaction type">
+            <button class="quick-add__type-btn quick-add__type-btn--active" type="button">Expense</button>
+            <button class="quick-add__type-btn" type="button">Income</button>
+            <button class="quick-add__type-btn" type="button">Transfer</button>
+          </div>
+
+          <div class="quick-add__field">
+            <label class="quick-add__label" for="qa-amount">Amount</label>
+            <input class="quick-add__input" id="qa-amount" type="text" placeholder="R$ 0,00">
+          </div>
+
+          <div class="quick-add__row">
+            <div class="quick-add__field">
+              <label class="quick-add__label" for="qa-account">Account</label>
+              <select class="quick-add__select" id="qa-account">
+                <option>Cora Checking</option>
+                <option>Carteira</option>
+                <option>Cartão Cora</option>
+              </select>
+            </div>
+            <div class="quick-add__field">
+              <label class="quick-add__label" for="qa-category">Category</label>
+              <select class="quick-add__select" id="qa-category">
+                <option>Food</option>
+                <option>Utilities</option>
+                <option>Entertainment</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="quick-add__field">
+            <label class="quick-add__label" for="qa-date">Date</label>
+            <input class="quick-add__input" id="qa-date" type="text" value="15/08/2026">
+          </div>
+
+          <div class="quick-add__field">
+            <label class="quick-add__label" for="qa-desc">Description</label>
+            <input class="quick-add__input" id="qa-desc" type="text" placeholder="Optional memo">
+          </div>
+
+          <div class="quick-add__actions">
+            <button class="btn btn--ghost quick-add__cancel" type="button">Cancel</button>
+            <button class="btn btn--primary" type="button">Add transaction</button>
+          </div>
+        </form>
+      </footer>
+    </aside>
+  </div>
+
+  <script>
+    (function () {
+      var toggle = document.getElementById("nav-toggle");
+      var nav = document.getElementById("nav-drawer");
+      var overlay = document.getElementById("nav-overlay");
+      if (!toggle || !nav || !overlay) return;
+
+      function openNav() {
+        nav.classList.add("nav--open");
+        overlay.classList.add("nav-overlay--visible");
+      }
+
+      function closeNav() {
+        nav.classList.remove("nav--open");
+        overlay.classList.remove("nav-overlay--visible");
+      }
+
+      toggle.addEventListener("click", function () {
+        if (nav.classList.contains("nav--open")) {
+          closeNav();
+        } else {
+          openNav();
+        }
+      });
+
+      overlay.addEventListener("click", closeNav);
+
+      nav.querySelectorAll(".nav__link").forEach(function (link) {
+        link.addEventListener("click", closeNav);
+      });
+    })();
+  </script>
+  <script src="js/year.js"></script>
+  <script src="js/day-panel.js"></script>
+</body>
+</html>

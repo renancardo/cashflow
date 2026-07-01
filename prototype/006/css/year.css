@@ -1,0 +1,514 @@
+/* Year Calendar — Screen 1 (Analytical, mobile-first) */
+
+.year-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  align-items: flex-start;
+  width: 100%;
+}
+
+@media (min-width: 769px) {
+  .year-view {
+    gap: var(--space-5);
+  }
+}
+
+.year-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.year-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.year-toolbar__year-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.year-toolbar__year {
+  min-width: 3.5rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--color-primary);
+  letter-spacing: -0.03em;
+}
+
+.year-toolbar .btn--ghost {
+  min-height: var(--touch-min);
+}
+
+.year-toolbar .btn--icon {
+  min-width: var(--touch-min);
+  padding: var(--space-2);
+  justify-content: center;
+}
+
+.year-toolbar .btn--icon:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Help tooltip */
+
+.help-tooltip {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.help-tooltip__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--touch-min);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.help-tooltip__trigger:hover,
+.help-tooltip__trigger:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  color: var(--color-text);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.help-tooltip__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 50%;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.help-tooltip__panel {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  z-index: 20;
+  width: min(17rem, calc(100vw - var(--space-8)));
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.15s, transform 0.15s, visibility 0.15s;
+  pointer-events: none;
+}
+
+.help-tooltip:hover .help-tooltip__panel,
+.help-tooltip:focus-within .help-tooltip__panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.help-tooltip__title {
+  margin: 0 0 var(--space-2);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.help-tooltip__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.help-tooltip__list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--color-text);
+}
+
+.help-tooltip__marker {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 0.3em;
+}
+
+.help-tooltip__marker--danger {
+  background: var(--color-danger);
+}
+
+.help-tooltip__marker--success {
+  background: var(--color-success);
+}
+
+.help-tooltip__marker--warning {
+  background: var(--color-warning);
+}
+
+.help-tooltip__marker--card {
+  width: 10px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--color-warning);
+}
+
+/* Calendar card + horizontal scroll */
+
+.calendar-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0;
+  width: fit-content;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+  background: var(--color-surface);
+}
+
+.calendar-scroll.card {
+  border-radius: var(--radius-lg);
+  display: block;
+}
+
+.calendar-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.calendar-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+}
+
+/* Linear calendar grid — day-of-month columns (1–31) */
+
+.linear-calendar {
+  width: max-content;
+  padding: 0;
+  --day-cell-size: 28px;
+  --month-label-width: 6.5rem;
+}
+
+@media (min-width: 769px) {
+  .linear-calendar {
+    --day-cell-size: 34px;
+    --month-label-width: 7.5rem;
+  }
+}
+
+/* Day-number header band */
+
+.day-band {
+  display: grid;
+  grid-template-columns: var(--month-label-width) repeat(31, var(--day-cell-size));
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.day-band__month-label {
+  display: flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  border-right: 1px solid var(--color-border);
+}
+
+.day-band__cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: var(--space-2) 0;
+  border-left: 1px solid var(--color-border);
+}
+
+@media (min-width: 769px) {
+  .day-band__cell {
+    font-size: 0.6875rem;
+  }
+}
+
+.day-band,
+.month-row {
+  width: max-content;
+}
+
+/* Month rows */
+
+.month-row {
+  display: grid;
+  grid-template-columns: var(--month-label-width) repeat(31, var(--day-cell-size));
+  align-items: stretch;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.month-row[hidden] {
+  display: none !important;
+}
+
+.month-row--odd {
+  background: #f8fafc;
+}
+
+.month-row--odd .month-row__label--sticky {
+  background: #f8fafc;
+}
+
+.month-row__label--sticky {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px var(--space-3);
+  text-align: left;
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  line-height: 1.2;
+}
+
+.month-row__name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.month-row__status {
+  font-size: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  line-height: 1.2;
+}
+
+.month-row__status--current {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  text-transform: none;
+  font-size: 0.5625rem;
+}
+
+.month-row__status--current::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.month-row__label--historical .month-row__name {
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.month-row__label--current .month-row__name {
+  color: var(--color-primary);
+}
+
+@media (min-width: 769px) {
+  .month-row__name {
+    font-size: 0.8125rem;
+  }
+
+  .month-row__status {
+    font-size: 0.5625rem;
+  }
+
+  .month-row__status--current {
+    font-size: 0.625rem;
+  }
+}
+
+.month-row__days {
+  display: contents;
+}
+
+/* Day cells */
+
+.day-cell {
+  position: relative;
+  width: var(--day-cell-size);
+  height: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 4px;
+  font-size: 0.625rem;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-text-muted);
+  border-left: 1px solid var(--color-border);
+  border-radius: 0;
+  transition: background 0.12s, box-shadow 0.12s;
+}
+
+.day-cell__num {
+  position: relative;
+  z-index: 1;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: 1;
+}
+
+@media (min-width: 769px) {
+  .day-cell {
+    padding-top: 5px;
+    font-size: 0.6875rem;
+  }
+}
+
+.day-cell--weekend {
+  background: rgba(219, 234, 254, 0.35);
+}
+
+.month-row--odd .day-cell--weekend {
+  background: rgba(219, 234, 254, 0.5);
+}
+
+.day-cell--empty {
+  color: transparent;
+  background: var(--color-bg) !important;
+  opacity: 0.5;
+}
+
+.day-cell--today .day-cell__num {
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.day-cell--today::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+}
+
+/* Day indicators — bars + icons */
+
+.day-cell__indicators {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.indicator--success,
+.indicator--warning {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  bottom: 3px;
+  height: 3px;
+  border-radius: 1px;
+}
+
+.indicator--warning:nth-of-type(2) {
+  bottom: 7px;
+}
+
+.indicator--danger {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-danger);
+}
+
+.indicator--success {
+  background: var(--color-success);
+}
+
+.indicator--warning {
+  background: var(--color-warning);
+}
+.indicator--card {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 10px;
+  height: 7px;
+  border-radius: 1px;
+  background: var(--color-warning);
+  border: 1px solid rgba(234, 88, 12, 0.35);
+}
+
+.indicator--card::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 1px;
+  right: 1px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 1px;
+}
+
+/* Card icon — no extra margin needed with absolute layout */
+
+.day-cell__indicators:has(.indicator--card) .indicator:not(.indicator--card):not(.indicator--danger) {
+  bottom: 3px;
+}

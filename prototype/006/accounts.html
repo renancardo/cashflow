@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accounts — CashFlow Pro</title>
+  <link rel="stylesheet" href="css/analytical.css">
+  <link rel="stylesheet" href="css/accounts.css">
+</head>
+<body>
+  <div class="app">
+    <div class="nav-overlay" aria-hidden="true"></div>
+
+    <nav class="nav" aria-label="Screens">
+      <div>
+        <div class="nav__brand">CashFlow Pro</div>
+        <div class="nav__mode">Analytical Mode</div>
+      </div>
+      <div>
+        <div class="nav__label">Screens</div>
+        <ul class="nav__list">
+          <li>
+            <a class="nav__link" href="year.html">
+              <span class="nav__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+              </span>
+              Year Calendar
+            </a>
+          </li>
+          <li>
+            <a class="nav__link" href="month.html">
+              <span class="nav__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+              </span>
+              Month Calendar
+            </a>
+          </li>
+          <li>
+            <a class="nav__link" href="transactions.html">
+              <span class="nav__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              </span>
+              Transactions
+            </a>
+          </li>
+          <li>
+            <a class="nav__link nav__link--active" href="accounts.html">
+              <span class="nav__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="17" cy="15" r="1"/></svg>
+              </span>
+              Accounts
+            </a>
+          </li>
+          <li>
+            <a class="nav__link" href="forecast.html">
+              <span class="nav__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              </span>
+              Forecast Items
+            </a>
+          </li>
+          <li>
+            <a class="nav__link" href="categories.html">
+              <span class="nav__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+              </span>
+              Categories
+            </a>
+          </li>
+          <li>
+            <a class="nav__link" href="snapshots.html">
+              <span class="nav__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </span>
+              Snapshots
+            </a>
+          </li>
+          <li>
+            <a class="nav__link" href="settings.html">
+              <span class="nav__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+              </span>
+              Settings
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="main">
+      <header class="mobile-header">
+        <button class="mobile-header__menu" type="button" aria-label="Open menu">☰</button>
+        <span class="mobile-header__title">Accounts</span>
+      </header>
+
+      <header class="header-strip header-strip--condensed">
+        <div class="metric">
+          <span class="metric__label">Working balance</span>
+          <span class="metric__value">R$ 12.450,00</span>
+        </div>
+        <div class="header-strip__spacer"></div>
+        <button class="btn btn--primary" type="button">+ Add account</button>
+      </header>
+
+      <div class="page">
+        <div class="page__header">
+          <div>
+            <h1 class="page__title">Accounts</h1>
+            <p class="page__subtitle">Manage balances, working flags, and credit card cycles</p>
+          </div>
+        </div>
+
+        <div class="summary-strip">
+          <div class="summary-strip__item">
+            <span class="summary-strip__label">Total accounts</span>
+            <span class="summary-strip__value">5</span>
+          </div>
+          <div class="summary-strip__item">
+            <span class="summary-strip__label">Working accounts</span>
+            <span class="summary-strip__value summary-strip__value--working">3</span>
+          </div>
+          <div class="summary-strip__item">
+            <span class="summary-strip__label">Aggregate working</span>
+            <span class="summary-strip__value">R$ 12.450,00</span>
+          </div>
+        </div>
+
+        <section class="account-list" aria-label="Account list">
+          <div class="account-list__header">
+            <span>Account</span>
+            <span>Working</span>
+            <span>Balance</span>
+            <span></span>
+          </div>
+
+          <article class="account-row">
+            <div class="account-row__info">
+              <div class="account-row__name">Cora Checking</div>
+              <div class="account-row__meta">
+                <span class="chip">Checking</span>
+              </div>
+            </div>
+            <div class="account-row__working">
+              <span class="toggle toggle--on" aria-label="Working account"></span>
+            </div>
+            <div class="account-row__balance">R$ 8.450,00</div>
+            <div class="account-row__actions">
+              <button class="icon-btn account-row__edit" type="button" title="Edit" aria-label="Edit account">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+            </div>
+          </article>
+
+          <article class="account-row">
+            <div class="account-row__info">
+              <div class="account-row__name">Nubank Savings</div>
+              <div class="account-row__meta">
+                <span class="chip">Savings</span>
+              </div>
+            </div>
+            <div class="account-row__working">
+              <span class="toggle" aria-label="Not working"></span>
+            </div>
+            <div class="account-row__balance">R$ 15.200,00</div>
+            <div class="account-row__actions">
+              <button class="icon-btn account-row__edit" type="button" title="Edit" aria-label="Edit account">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+            </div>
+          </article>
+
+          <article class="account-row">
+            <div class="account-row__info">
+              <div class="account-row__name">Cartão Cora</div>
+              <div class="account-row__meta">
+                <span class="chip chip--card">Credit card</span>
+              </div>
+            </div>
+            <div class="account-row__working">
+              <span class="toggle" aria-label="Not working (cards excluded)"></span>
+            </div>
+            <div class="account-row__balance account-row__balance--debt">
+              <span class="account-row__balance-label">Owed</span>
+              R$ 1.850,00
+            </div>
+            <div class="account-row__actions">
+              <button class="icon-btn account-row__edit" type="button" title="Edit" aria-label="Edit account">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+            </div>
+          </article>
+
+          <article class="account-row">
+            <div class="account-row__info">
+              <div class="account-row__name">Carteira</div>
+              <div class="account-row__meta">
+                <span class="chip">Wallet</span>
+              </div>
+            </div>
+            <div class="account-row__working">
+              <span class="toggle toggle--on" aria-label="Working account"></span>
+            </div>
+            <div class="account-row__balance">R$ 320,00</div>
+            <div class="account-row__actions">
+              <button class="icon-btn account-row__edit" type="button" title="Edit" aria-label="Edit account">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+            </div>
+          </article>
+
+          <article class="account-row">
+            <div class="account-row__info">
+              <div class="account-row__name">XP Investimentos</div>
+              <div class="account-row__meta">
+                <span class="chip">Investment</span>
+              </div>
+            </div>
+            <div class="account-row__working">
+              <span class="toggle" aria-label="Not working"></span>
+            </div>
+            <div class="account-row__balance">R$ 42.000,00</div>
+            <div class="account-row__actions">
+              <button class="icon-btn account-row__edit" type="button" title="Edit" aria-label="Edit account">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+            </div>
+          </article>
+        </section>
+      </div>
+    </div>
+
+    <nav class="bottom-nav" aria-label="Main">
+      <a class="bottom-nav__item" href="year.html">
+        <span class="bottom-nav__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+        </span>
+        Calendar
+      </a>
+      <a class="bottom-nav__item" href="transactions.html">
+        <span class="bottom-nav__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </span>
+        Transactions
+      </a>
+      <a class="bottom-nav__item" href="forecast.html">
+        <span class="bottom-nav__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </span>
+        Forecast
+      </a>
+      <a class="bottom-nav__item" href="categories.html">
+        <span class="bottom-nav__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </span>
+        Categories
+      </a>
+      <a class="bottom-nav__item bottom-nav__item--active" href="accounts.html">
+        <span class="bottom-nav__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        </span>
+        More
+      </a>
+    </nav>
+  </div>
+
+  <div class="account-overlay" id="account-overlay" aria-hidden="true">
+    <div class="account-overlay__backdrop"></div>
+    <aside class="editor-panel" role="dialog" aria-labelledby="editor-panel-title" aria-modal="true">
+      <div class="editor-panel__header">
+        <div class="editor-panel__header-top">
+          <div>
+            <h2 class="editor-panel__title" id="editor-panel-title">Edit account</h2>
+            <p class="editor-panel__subtitle" id="editor-panel-subtitle">Cartão Cora · Credit card</p>
+          </div>
+          <button class="editor-panel__close" type="button" aria-label="Close editor">×</button>
+        </div>
+      </div>
+
+      <div class="editor-panel__body">
+        <div class="form-group">
+          <label class="form-group__label" for="name">Name</label>
+          <input class="form-group__input" id="name" type="text" value="Cartão Cora">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-group__label" for="type">Type</label>
+            <select class="form-group__select" id="type">
+              <option>Checking</option>
+              <option>Savings</option>
+              <option>Wallet</option>
+              <option selected>Credit card</option>
+              <option>Investment</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-group__label" for="currency">Currency</label>
+            <input class="form-group__input" id="currency" type="text" value="BRL" readonly>
+          </div>
+        </div>
+
+        <div class="form-toggle-row">
+          <div>
+            <div class="form-toggle-row__label">Working account</div>
+            <div class="form-toggle-row__hint">Credit cards are always excluded</div>
+          </div>
+          <span class="toggle" aria-label="Not working"></span>
+        </div>
+
+        <div class="form-section">
+          <h3 class="form-section__title">Balance anchor</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-group__label" for="anchor-balance">Amount owed</label>
+              <input class="form-group__input" id="anchor-balance" type="text" value="R$ 1.850,00">
+            </div>
+            <div class="form-group">
+              <label class="form-group__label" for="anchor-date">Anchor date</label>
+              <input class="form-group__input" id="anchor-date" type="text" value="01/06/2026">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section form-section--card">
+          <h3 class="form-section__title">Credit card cycle</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-group__label" for="closing-day">Closing day</label>
+              <input class="form-group__input" id="closing-day" type="text" value="25">
+            </div>
+            <div class="form-group">
+              <label class="form-group__label" for="due-day">Due day</label>
+              <input class="form-group__input" id="due-day" type="text" value="3">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-group__label" for="credit-limit">Credit limit</label>
+            <input class="form-group__input" id="credit-limit" type="text" value="R$ 8.000,00">
+          </div>
+          <div class="form-group">
+            <label class="form-group__label" for="pay-from">Default pay from</label>
+            <select class="form-group__select" id="pay-from">
+              <option selected>Cora Checking</option>
+              <option>Carteira</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="form-section__title">Optional metadata</h3>
+          <div class="form-group">
+            <label class="form-group__label" for="institution">Institution</label>
+            <input class="form-group__input" id="institution" type="text" value="Cora">
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-panel__footer">
+        <button class="btn btn--ghost" type="button">Archive</button>
+        <button class="btn btn--primary" type="button">Save</button>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    (function () {
+      var menu = document.querySelector(".mobile-header__menu");
+      var nav = document.querySelector(".nav");
+      var overlay = document.querySelector(".nav-overlay");
+      if (!menu || !nav || !overlay) return;
+
+      function openNav() {
+        nav.classList.add("nav--open");
+        overlay.classList.add("nav-overlay--visible");
+        overlay.setAttribute("aria-hidden", "false");
+      }
+
+      function closeNav() {
+        nav.classList.remove("nav--open");
+        overlay.classList.remove("nav-overlay--visible");
+        overlay.setAttribute("aria-hidden", "true");
+      }
+
+      menu.addEventListener("click", openNav);
+      overlay.addEventListener("click", closeNav);
+      nav.querySelectorAll(".nav__link").forEach(function (link) {
+        link.addEventListener("click", closeNav);
+      });
+    })();
+  </script>
+  <script src="js/accounts.js"></script>
+</body>
+</html>

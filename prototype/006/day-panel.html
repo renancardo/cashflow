@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day Detail Panel — CashFlow Pro</title>
+  <link rel="stylesheet" href="css/analytical.css">
+  <link rel="stylesheet" href="css/day-panel.css">
+</head>
+<body class="day-panel-demo">
+  <a class="day-panel-demo__back" href="index.html">← Index</a>
+
+  <!-- Stub calendar cell for day-panel.js demo hook -->
+  <div class="day-panel-demo__stub" hidden aria-hidden="true">
+    <div class="month-row" data-year="2026">
+      <span class="month-row__label">Aug</span>
+      <div class="day-cell" data-day="15">15</div>
+    </div>
+  </div>
+
+  <div class="day-overlay day-overlay--open" id="day-overlay" aria-hidden="false">
+    <div class="day-overlay__backdrop"></div>
+    <aside class="day-panel" role="dialog" aria-labelledby="day-panel-title" aria-modal="true">
+      <div class="day-panel__handle" aria-hidden="true"></div>
+
+      <header class="day-panel__header">
+        <div class="day-panel__header-top">
+          <div>
+            <h2 class="day-panel__title" id="day-panel-title">15 Aug 2026</h2>
+            <p class="day-panel__weekday" id="day-panel-weekday">Saturday</p>
+          </div>
+          <button class="day-panel__close" type="button" aria-label="Close day detail">×</button>
+        </div>
+
+        <div class="day-panel__balances">
+          <div class="day-panel__balance">
+            <span class="day-panel__balance-label">Opening</span>
+            <span class="day-panel__balance-value">R$ 3.200,00</span>
+          </div>
+          <div class="day-panel__balance">
+            <span class="day-panel__balance-label">Closing</span>
+            <span class="day-panel__balance-value day-panel__balance-value--danger">R$ 1.850,00</span>
+          </div>
+        </div>
+
+        <div class="day-panel__flag">
+          <span class="day-panel__flag-dot"></span>
+          Below buffer
+        </div>
+      </header>
+
+      <div class="day-panel__body">
+        <section class="day-items-group">
+          <h3 class="day-items-group__title">Transactions</h3>
+          <ul class="day-items-group__list">
+            <li>
+              <article class="day-item">
+                <div class="day-item__main">
+                  <div class="day-item__desc">Padaria do bairro</div>
+                  <div class="day-item__meta">
+                    <span class="chip chip--actual">Actual</span>
+                    <span>Food</span>
+                    <span>Cora Checking</span>
+                  </div>
+                </div>
+                <div class="day-item__amount day-item__amount--expense">− R$ 28,50</div>
+              </article>
+            </li>
+          </ul>
+        </section>
+
+        <section class="day-items-group">
+          <h3 class="day-items-group__title">Planned &amp; subscriptions</h3>
+          <ul class="day-items-group__list">
+            <li>
+              <article class="day-item day-item--projected">
+                <div class="day-item__main">
+                  <div class="day-item__desc">Netflix</div>
+                  <div class="day-item__meta">
+                    <span class="chip chip--subscription">Subscription</span>
+                    <span>Entertainment</span>
+                    <span>Cartão Cora</span>
+                  </div>
+                </div>
+                <div
+                  class="day-item__amount day-item__amount--expense day-item__amount--editable"
+                  data-amount-cents="5590"
+                  data-kind="expense"
+                  tabindex="0"
+                  role="button"
+                  aria-label="Edit amount"
+                >− R$ 55,90</div>
+                <button class="btn btn--success btn--sm day-item__confirm" type="button">Confirm payment</button>
+              </article>
+            </li>
+            <li>
+              <article class="day-item day-item--projected">
+                <div class="day-item__main">
+                  <div class="day-item__desc">Internet Vivo Fibra</div>
+                  <div class="day-item__meta">
+                    <span class="chip chip--planned">Planned</span>
+                    <span>Utilities</span>
+                    <span>Cora Checking</span>
+                  </div>
+                </div>
+                <div
+                  class="day-item__amount day-item__amount--expense day-item__amount--editable"
+                  data-amount-cents="11990"
+                  data-kind="expense"
+                  tabindex="0"
+                  role="button"
+                  aria-label="Edit amount"
+                >− R$ 119,90</div>
+                <button class="btn btn--success btn--sm day-item__confirm" type="button">Confirm payment</button>
+              </article>
+            </li>
+          </ul>
+        </section>
+
+        <section class="day-items-group">
+          <h3 class="day-items-group__title">Installments</h3>
+          <ul class="day-items-group__list">
+            <li>
+              <article class="day-item day-item--projected">
+                <div class="day-item__main">
+                  <div class="day-item__desc">MacBook Pro — parcel 8/12</div>
+                  <div class="day-item__meta">
+                    <span class="chip chip--installment">Installment</span>
+                    <span>Electronics</span>
+                    <span>Cartão Cora</span>
+                  </div>
+                </div>
+                <div
+                  class="day-item__amount day-item__amount--expense day-item__amount--editable"
+                  data-amount-cents="45000"
+                  data-kind="expense"
+                  tabindex="0"
+                  role="button"
+                  aria-label="Edit amount"
+                >− R$ 450,00</div>
+                <button class="btn btn--success btn--sm day-item__confirm" type="button">Confirm payment</button>
+              </article>
+            </li>
+          </ul>
+        </section>
+
+        <section class="day-items-group">
+          <h3 class="day-items-group__title">Statement payments</h3>
+          <ul class="day-items-group__list">
+            <li>
+              <article class="day-item day-item--projected">
+                <div class="day-item__main">
+                  <div class="day-item__desc">Cartão Cora — statement due</div>
+                  <div class="day-item__meta">
+                    <span class="chip chip--statement">Statement</span>
+                    <span>Cora Checking → Cartão Cora</span>
+                  </div>
+                </div>
+                <div
+                  class="day-item__amount day-item__amount--expense day-item__amount--editable"
+                  data-amount-cents="185000"
+                  data-kind="expense"
+                  tabindex="0"
+                  role="button"
+                  aria-label="Edit amount"
+                >− R$ 1.850,00</div>
+                <button class="btn btn--success btn--sm day-item__confirm" type="button">Confirm payment</button>
+              </article>
+            </li>
+          </ul>
+        </section>
+      </div>
+
+      <footer class="day-panel__quick-add">
+        <button class="btn btn--primary quick-add__toggle" type="button" id="quick-add-toggle">+ Quick add</button>
+
+        <form class="quick-add__form" id="quick-add-form">
+          <p class="quick-add__title">Quick add transaction</p>
+
+          <div class="quick-add__type" role="group" aria-label="Transaction type">
+            <button class="quick-add__type-btn quick-add__type-btn--active" type="button">Expense</button>
+            <button class="quick-add__type-btn" type="button">Income</button>
+            <button class="quick-add__type-btn" type="button">Transfer</button>
+          </div>
+
+          <div class="quick-add__field">
+            <label class="quick-add__label" for="qa-amount">Amount</label>
+            <input class="quick-add__input" id="qa-amount" type="text" placeholder="R$ 0,00">
+          </div>
+
+          <div class="quick-add__row">
+            <div class="quick-add__field">
+              <label class="quick-add__label" for="qa-account">Account</label>
+              <select class="quick-add__select" id="qa-account">
+                <option>Cora Checking</option>
+                <option>Carteira</option>
+                <option>Cartão Cora</option>
+              </select>
+            </div>
+            <div class="quick-add__field">
+              <label class="quick-add__label" for="qa-category">Category</label>
+              <select class="quick-add__select" id="qa-category">
+                <option>Food</option>
+                <option>Utilities</option>
+                <option>Entertainment</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="quick-add__field">
+            <label class="quick-add__label" for="qa-date">Date</label>
+            <input class="quick-add__input" id="qa-date" type="text" value="15/08/2026">
+          </div>
+
+          <div class="quick-add__field">
+            <label class="quick-add__label" for="qa-desc">Description</label>
+            <input class="quick-add__input" id="qa-desc" type="text" placeholder="Optional memo">
+          </div>
+
+          <div class="quick-add__actions">
+            <button class="btn btn--ghost quick-add__cancel" type="button">Cancel</button>
+            <button class="btn btn--primary" type="button">Add transaction</button>
+          </div>
+        </form>
+      </footer>
+    </aside>
+  </div>
+
+  <script src="js/day-panel.js"></script>
+</body>
+</html>
