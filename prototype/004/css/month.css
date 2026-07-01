@@ -235,6 +235,42 @@
   height: 6px;
 }
 
+@media (max-width: 768px) {
+  .month-view {
+    gap: var(--space-4);
+  }
+
+  .month-toolbar {
+    gap: var(--space-3);
+  }
+
+  .month-toolbar .btn--ghost {
+    min-height: var(--touch-min);
+  }
+
+  .month-toolbar__label {
+    min-width: 7rem;
+    font-size: 1rem;
+  }
+
+  .summary-strip {
+    gap: var(--space-3);
+    padding: var(--space-3);
+  }
+
+  .month-grid {
+    --month-cell-min-height: 4.5rem;
+  }
+
+  .day-cell__balance {
+    display: none;
+  }
+
+  .help-tooltip__panel--month {
+    width: min(21rem, calc(100vw - var(--space-8)));
+  }
+}
+
 @media (max-width: 720px) {
   .month-grid {
     --month-cell-min-height: 4.5rem;

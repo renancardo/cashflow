@@ -336,6 +336,12 @@
   border-color: #bfdbfe;
 }
 
+@media (max-width: 768px) {
+  .page__header {
+    display: none;
+  }
+}
+
 @media (max-width: 960px) {
   .forecast-list__header {
     display: none;

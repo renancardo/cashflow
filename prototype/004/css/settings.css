@@ -7,6 +7,16 @@
   align-items: start;
 }
 
+@media (max-width: 768px) {
+  .settings-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .page__header {
+    display: none;
+  }
+}
+
 @media (max-width: 960px) {
   .settings-layout {
     grid-template-columns: 1fr;

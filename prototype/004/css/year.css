@@ -1,16 +1,22 @@
-/* Year Calendar — Screen 1 */
+/* Year Calendar — Screen 1 (Paper, mobile-first) */
 
 .year-view {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-4);
+}
+
+@media (min-width: 769px) {
+  .year-view {
+    gap: var(--space-5);
+  }
 }
 
 .year-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-4);
+  gap: var(--space-3);
   flex-wrap: wrap;
 }
 
@@ -19,6 +25,8 @@
   align-items: center;
   gap: var(--space-2);
   flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
 }
 
 .year-toolbar__year-nav {
@@ -28,17 +36,21 @@
 }
 
 .year-toolbar__year {
-  min-width: 3rem;
+  min-width: 3.5rem;
   font-family: var(--font-display);
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 700;
   text-align: center;
   color: var(--color-primary);
   letter-spacing: -0.03em;
 }
 
+.year-toolbar .btn--ghost {
+  min-height: var(--touch-min);
+}
+
 .btn--icon {
-  min-width: 2rem;
+  min-width: var(--touch-min);
   padding: var(--space-2);
   justify-content: center;
 }
@@ -53,12 +65,14 @@
 .help-tooltip {
   position: relative;
   display: inline-flex;
+  flex-shrink: 0;
 }
 
 .help-tooltip__trigger {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
+  min-height: var(--touch-min);
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
@@ -82,8 +96,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1rem;
-  height: 1rem;
+  width: 1.125rem;
+  height: 1.125rem;
   border-radius: 50%;
   background: var(--color-paper);
   border: 1px solid var(--color-border);
@@ -98,12 +112,12 @@
   top: calc(100% + var(--space-2));
   right: 0;
   z-index: 20;
-  width: 17rem;
+  width: min(17rem, calc(100vw - var(--space-8)));
   padding: var(--space-3) var(--space-4);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-lg);
   opacity: 0;
   visibility: hidden;
   transform: translateY(-4px);
@@ -177,41 +191,59 @@
 
 .calendar-scroll {
   overflow-x: auto;
-  padding-bottom: var(--space-2);
+  overflow-y: hidden;
+  padding: var(--space-2) 0;
   -webkit-overflow-scrolling: touch;
 }
 
 .calendar-scroll::-webkit-scrollbar {
-  height: 6px;
+  height: 4px;
 }
 
 .calendar-scroll::-webkit-scrollbar-thumb {
   background: var(--color-border);
-  border-radius: 3px;
+  border-radius: var(--radius-full);
+}
+
+@media (min-width: 769px) {
+  .calendar-scroll {
+    padding-bottom: var(--space-2);
+  }
 }
 
 /* Linear calendar grid */
 
 .linear-calendar {
   min-width: max-content;
-  padding: var(--space-4) 0;
-  --day-cell-size: 35px;
+  padding: var(--space-2) 0;
+  --day-cell-size: 28px;
+  --month-label-width: 2.25rem;
+}
+
+@media (min-width: 769px) {
+  .linear-calendar {
+    padding: var(--space-4) 0;
+    --day-cell-size: 35px;
+    --month-label-width: 3rem;
+  }
 }
 
 .weekday-band {
   display: grid;
-  grid-template-columns: 3rem repeat(37, var(--day-cell-size)) 3rem;
+  grid-template-columns: var(--month-label-width) repeat(37, var(--day-cell-size)) var(--month-label-width);
   margin-bottom: var(--space-2);
-  padding-left: 0;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--color-surface);
+  padding-top: var(--space-1);
 }
 
 .weekday-band--bottom {
   margin-top: var(--space-2);
   margin-bottom: 0;
-}
-
-.weekday-band__corner {
-  /* month label column spacer */
+  top: auto;
+  bottom: 0;
 }
 
 .weekday-band__year {
@@ -229,13 +261,18 @@
 
 .weekday-band__cell {
   font-family: var(--font-mono);
-  font-size: 0.625rem;
+  font-size: 0.5625rem;
   text-align: center;
   color: var(--color-text-muted);
   padding: var(--space-1) 0;
 }
 
-/* Weekend column shading via 7-column cycle (Sun=1, Sat=7) */
+@media (min-width: 769px) {
+  .weekday-band__cell {
+    font-size: 0.625rem;
+  }
+}
+
 .weekday-band__cell:nth-child(7n + 2),
 .weekday-band__cell:nth-child(7n + 8) {
   background: var(--color-weekend);
@@ -244,7 +281,7 @@
 
 .month-row {
   display: grid;
-  grid-template-columns: 3rem repeat(37, var(--day-cell-size)) 3rem;
+  grid-template-columns: var(--month-label-width) repeat(37, var(--day-cell-size)) var(--month-label-width);
   align-items: stretch;
   margin-bottom: var(--space-1);
 }
@@ -255,11 +292,31 @@
 
 .month-row__label {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--color-text-muted);
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: sticky;
+  z-index: 2;
+  background: var(--color-surface);
+}
+
+.month-row__label:first-child {
+  left: 0;
+}
+
+.month-row__label:last-child {
+  right: 0;
+}
+
+@media (min-width: 769px) {
+  .month-row__label {
+    font-size: 0.6875rem;
+  }
 }
 
 .month-row__days {
@@ -272,15 +329,22 @@
   position: relative;
   width: var(--day-cell-size);
   height: var(--day-cell-size);
-  padding: 4px 0 0 4px;
+  padding: 3px 0 0 3px;
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   line-height: 1;
   color: var(--color-text);
   text-align: left;
+  border-radius: var(--radius-sm);
 }
 
-/* Weekend bands aligned to weekday columns */
+@media (min-width: 769px) {
+  .day-cell {
+    padding: 4px 0 0 4px;
+    font-size: 0.6875rem;
+  }
+}
+
 .day-cell:nth-child(7n + 1),
 .day-cell:nth-child(7n + 7) {
   background: var(--color-weekend);
@@ -298,21 +362,35 @@
 .day-cell--today::before {
   content: "";
   position: absolute;
-  inset: 2px;
-  border: 1.5px solid var(--color-primary);
+  inset: 1px;
+  border: 2px solid var(--color-primary);
   border-radius: var(--radius-sm);
   pointer-events: none;
+}
+
+@media (min-width: 769px) {
+  .day-cell--today::before {
+    inset: 2px;
+    border-width: 1.5px;
+  }
 }
 
 /* Day indicators */
 
 .day-cell__indicators {
   position: absolute;
-  bottom: 5px;
-  right: 5px;
+  bottom: 3px;
+  right: 3px;
   display: flex;
   gap: 2px;
   align-items: center;
+}
+
+@media (min-width: 769px) {
+  .day-cell__indicators {
+    bottom: 5px;
+    right: 5px;
+  }
 }
 
 .indicator {

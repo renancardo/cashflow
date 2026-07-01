@@ -10,7 +10,9 @@
 </head>
 <body>
   <div class="app">
-    <nav class="nav">
+    <div class="nav-overlay" id="nav-overlay" aria-hidden="true"></div>
+
+    <nav class="nav" id="nav-drawer">
       <div class="nav__brand">Cashflow</div>
       <div>
         <div class="nav__label">Screens</div>
@@ -28,6 +30,18 @@
     </nav>
 
     <div class="main">
+      <header class="mobile-header">
+        <button
+          class="mobile-header__menu"
+          type="button"
+          id="nav-toggle"
+          aria-label="Open menu"
+          aria-expanded="false"
+          aria-controls="nav-drawer"
+        >☰</button>
+        <span class="mobile-header__title">Year Calendar</span>
+      </header>
+
       <header class="header-strip">
         <div class="metric">
           <span class="metric__label">Working balance</span>
@@ -718,6 +732,29 @@
         </div>
       </div>
     </div>
+    <nav class="bottom-nav" aria-label="Main">
+      <a class="bottom-nav__item bottom-nav__item--active" href="year.html">
+        <span class="bottom-nav__icon" aria-hidden="true">📅</span>
+        Calendar
+      </a>
+      <a class="bottom-nav__item" href="transactions.html">
+        <span class="bottom-nav__icon" aria-hidden="true">↕</span>
+        Transactions
+      </a>
+      <a class="bottom-nav__item" href="forecast.html">
+        <span class="bottom-nav__icon" aria-hidden="true">◎</span>
+        Forecast
+      </a>
+      <a class="bottom-nav__item" href="categories.html">
+        <span class="bottom-nav__icon" aria-hidden="true">▦</span>
+        Categories
+      </a>
+      <a class="bottom-nav__item" href="settings.html">
+        <span class="bottom-nav__icon" aria-hidden="true">⋯</span>
+        More
+      </a>
+    </nav>
+
   </div>
 
   <div class="day-overlay" id="day-overlay" aria-hidden="true">
@@ -926,6 +963,7 @@
     </aside>
   </div>
 
+  <script src="js/nav.js"></script>
   <script src="js/year.js"></script>
   <script src="js/day-panel.js"></script>
 </body>

@@ -93,6 +93,16 @@
   align-items: start;
 }
 
+@media (max-width: 768px) {
+  .snap-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .page__header {
+    display: none;
+  }
+}
+
 @media (max-width: 960px) {
   .snap-layout {
     grid-template-columns: 1fr;
