@@ -28,6 +28,7 @@
   if (!calendar || !scrollEl || !yearLabel || !prevBtn || !nextBtn) return;
 
   var today = new Date();
+  today.setHours(0, 0, 0, 0);
   var horizonEnd = new Date(today);
   horizonEnd.setMonth(horizonEnd.getMonth() + HORIZON_MONTHS);
 
@@ -46,11 +47,50 @@
     return cell;
   }
 
-  function createDayCell(dayNumber) {
+  function dayDate(year, monthIndex, dayNumber) {
+    var date = new Date(year, monthIndex, dayNumber);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }
+
+  function temporalClassForDay(year, monthIndex, dayNumber) {
+    var date = dayDate(year, monthIndex, dayNumber);
+    if (date.getTime() === today.getTime()) return "day-cell--today";
+    if (date < today) return "day-cell--past";
+    return "day-cell--future";
+  }
+
+  function dayNumberFromCell(cell) {
+    var dayText = cell.textContent.trim().split(/\s+/)[0];
+    return Number.parseInt(dayText, 10);
+  }
+
+  function applyTemporalClass(cell, year, monthIndex, dayNumber) {
+    cell.classList.remove("day-cell--past", "day-cell--today", "day-cell--future");
+    cell.classList.add(temporalClassForDay(year, monthIndex, dayNumber));
+  }
+
+  function createDayCell(year, monthIndex, dayNumber) {
     var cell = document.createElement("div");
     cell.className = "day-cell";
     cell.textContent = String(dayNumber).padStart(2, "0");
+    applyTemporalClass(cell, year, monthIndex, dayNumber);
     return cell;
+  }
+
+  function applyTemporalClassesToCalendar() {
+    calendar.querySelectorAll(".month-row").forEach(function (row) {
+      var year = Number.parseInt(row.dataset.year || "", 10);
+      var label = row.querySelector(".month-row__label");
+      var monthIndex = label ? monthIndexFromLabel(label.textContent) : -1;
+      if (!year || monthIndex < 0) return;
+
+      row.querySelectorAll(".day-cell:not(.day-cell--empty)").forEach(function (cell) {
+        var dayNumber = dayNumberFromCell(cell);
+        if (!dayNumber) return;
+        applyTemporalClass(cell, year, monthIndex, dayNumber);
+      });
+    });
   }
 
   function lastMonthIndexForYear(year) {
@@ -79,7 +119,7 @@
     }
 
     for (index = 1; index <= totalDays; index += 1) {
-      days.appendChild(createDayCell(index));
+      days.appendChild(createDayCell(year, monthIndex, index));
     }
 
     while (days.children.length < GRID_COLUMNS) {
@@ -178,8 +218,12 @@
     }
   }
 
-  function monthIndex(label) {
+  function monthIndexFromLabel(label) {
     return monthNames.indexOf(label.trim());
+  }
+
+  function monthIndex(label) {
+    return monthIndexFromLabel(label);
   }
 
   function showYear(year) {
@@ -198,6 +242,7 @@
 
     updateYearLabels(year);
     updateNavButtons();
+    applyTemporalClassesToCalendar();
     scrollEl.scrollTo({ left: 0, behavior: "smooth" });
   }
 
