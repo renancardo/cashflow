@@ -371,6 +371,10 @@
   line-height: 1;
 }
 
+.month-row .day-cell:not(.day-cell--today) .day-cell__num {
+  display: none;
+}
+
 @media (min-width: 769px) {
   .day-cell {
     padding-top: 5px;
