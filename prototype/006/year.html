@@ -135,6 +135,36 @@
               <button class="btn btn--ghost" type="button" id="year-jump-today">Jump to today</button>
             </div>
 
+            <div class="style-switcher" id="calendar-style-switcher" role="group" aria-label="Calendar style">
+              <span class="style-switcher__label">Style</span>
+              <div class="style-switcher__options">
+                <button
+                  class="style-switcher__btn style-switcher__btn--active"
+                  type="button"
+                  data-calendar-style="grid"
+                  aria-pressed="true"
+                >Grid</button>
+                <button
+                  class="style-switcher__btn"
+                  type="button"
+                  data-calendar-style="minimal"
+                  aria-pressed="false"
+                >Minimal</button>
+                <button
+                  class="style-switcher__btn"
+                  type="button"
+                  data-calendar-style="tinted"
+                  aria-pressed="false"
+                >Tinted</button>
+                <button
+                  class="style-switcher__btn"
+                  type="button"
+                  data-calendar-style="spacious"
+                  aria-pressed="false"
+                >Spacious</button>
+              </div>
+            </div>
+
             <div class="help-tooltip">
               <button
                 class="help-tooltip__trigger"
@@ -165,7 +195,7 @@
           </div>
 
           <div class="calendar-scroll card" id="calendar-scroll">
-            <div class="linear-calendar" id="linear-calendar">
+            <div class="linear-calendar linear-calendar--grid" id="linear-calendar">
         <div class="day-band">
           <div class="day-band__month-label"></div>
           <div class="day-band__cell">1</div>

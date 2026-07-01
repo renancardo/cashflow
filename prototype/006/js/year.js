@@ -222,4 +222,55 @@
   }
 
   showYear(focusedYear);
+
+  var CALENDAR_STYLES = ["grid", "minimal", "tinted", "spacious"];
+  var STYLE_STORAGE_KEY = "year-calendar-style";
+  var styleSwitcher = document.getElementById("calendar-style-switcher");
+
+  function applyCalendarStyle(style) {
+    if (CALENDAR_STYLES.indexOf(style) === -1) {
+      style = "grid";
+    }
+
+    CALENDAR_STYLES.forEach(function (name) {
+      calendar.classList.remove("linear-calendar--" + name);
+    });
+    calendar.classList.add("linear-calendar--" + style);
+
+    if (styleSwitcher) {
+      styleSwitcher.querySelectorAll("[data-calendar-style]").forEach(function (btn) {
+        var isActive = btn.dataset.calendarStyle === style;
+        btn.classList.toggle("style-switcher__btn--active", isActive);
+        btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+      });
+    }
+
+    try {
+      localStorage.setItem(STYLE_STORAGE_KEY, style);
+    } catch (error) {
+      /* ignore storage errors */
+    }
+  }
+
+  function initCalendarStyle() {
+    var savedStyle = "grid";
+
+    try {
+      savedStyle = localStorage.getItem(STYLE_STORAGE_KEY) || "grid";
+    } catch (error) {
+      savedStyle = "grid";
+    }
+
+    applyCalendarStyle(savedStyle);
+  }
+
+  if (styleSwitcher) {
+    styleSwitcher.addEventListener("click", function (event) {
+      var btn = event.target.closest("[data-calendar-style]");
+      if (!btn) return;
+      applyCalendarStyle(btn.dataset.calendarStyle);
+    });
+  }
+
+  initCalendarStyle();
 })();

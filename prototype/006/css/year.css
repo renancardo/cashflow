@@ -441,3 +441,233 @@
 .indicator--warning {
   background: var(--color-warning);
 }
+
+/* Style switcher */
+
+.style-switcher {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.style-switcher__label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.style-switcher__options {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+.style-switcher__btn {
+  min-height: var(--touch-min);
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-right: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.style-switcher__btn:last-child {
+  border-right: none;
+}
+
+.style-switcher__btn:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.style-switcher__btn:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--color-primary);
+  z-index: 1;
+}
+
+.style-switcher__btn--active {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .year-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .style-switcher {
+    order: 3;
+    flex-wrap: wrap;
+  }
+
+  .style-switcher__options {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .style-switcher__btn {
+    flex: 1;
+    min-width: 0;
+    padding: var(--space-2);
+    font-size: 0.6875rem;
+  }
+}
+
+/* Calendar style variants */
+
+/* Minimal — row dividers only, softer empties, column rhythm */
+
+.linear-calendar--minimal .day-cell,
+.linear-calendar--minimal .day-band__cell {
+  border-left: none;
+}
+
+.linear-calendar--minimal .day-cell--empty {
+  background: transparent !important;
+  opacity: 0.25;
+}
+
+.linear-calendar--minimal .month-row--odd {
+  background: transparent;
+}
+
+.linear-calendar--minimal .month-row--odd .month-row__label--sticky {
+  background: var(--color-surface);
+}
+
+.linear-calendar--minimal .day-band__cell:nth-child(2),
+.linear-calendar--minimal .day-band__cell:nth-child(12),
+.linear-calendar--minimal .day-band__cell:nth-child(22),
+.linear-calendar--minimal .day-band__cell:nth-child(32) {
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.linear-calendar--minimal .month-row > .day-cell:nth-child(2):not(.day-cell--empty),
+.linear-calendar--minimal .month-row > .day-cell:nth-child(12):not(.day-cell--empty),
+.linear-calendar--minimal .month-row > .day-cell:nth-child(22):not(.day-cell--empty),
+.linear-calendar--minimal .month-row > .day-cell:nth-child(32):not(.day-cell--empty) {
+  background: rgba(15, 23, 42, 0.03);
+}
+
+.linear-calendar--minimal .day-cell--today::after {
+  background: transparent;
+}
+
+.linear-calendar--minimal .day-cell--selected {
+  box-shadow: none !important;
+}
+
+/* Tinted — cell background tints instead of small bars */
+
+.linear-calendar--tinted .day-cell,
+.linear-calendar--tinted .day-band__cell {
+  border-left: none;
+}
+
+.linear-calendar--tinted .day-cell--empty {
+  background: transparent !important;
+  opacity: 0.2;
+}
+
+.linear-calendar--tinted .month-row--odd {
+  background: transparent;
+}
+
+.linear-calendar--tinted .month-row--odd .month-row__label--sticky {
+  background: var(--color-surface);
+}
+
+.linear-calendar--tinted .day-cell:has(.indicator--success) {
+  background: var(--color-success-soft);
+}
+
+.linear-calendar--tinted .day-cell:has(.indicator--warning) {
+  background: var(--color-warning-soft);
+}
+
+.linear-calendar--tinted .day-cell:has(.indicator--success):has(.indicator--warning) {
+  background: linear-gradient(
+    135deg,
+    var(--color-success-soft) 50%,
+    var(--color-warning-soft) 50%
+  );
+}
+
+.linear-calendar--tinted .day-cell:has(.indicator--danger):not(:has(.indicator--success)):not(:has(.indicator--warning)) {
+  background: var(--color-danger-soft);
+}
+
+.linear-calendar--tinted .indicator--success,
+.linear-calendar--tinted .indicator--warning {
+  opacity: 0;
+}
+
+.linear-calendar--tinted .indicator--danger {
+  width: 6px;
+  height: 6px;
+  top: 4px;
+  right: 4px;
+  box-shadow: 0 0 0 2px var(--color-surface);
+}
+
+.linear-calendar--tinted .day-cell--today::after {
+  inset: 1px;
+}
+
+.linear-calendar--tinted .day-cell--selected {
+  box-shadow: inset 0 0 0 2px var(--color-primary) !important;
+}
+
+/* Spacious — larger cells and stronger markers */
+
+.linear-calendar--spacious {
+  --day-cell-size: 36px;
+}
+
+@media (min-width: 769px) {
+  .linear-calendar--spacious {
+    --day-cell-size: 42px;
+  }
+}
+
+.linear-calendar--spacious .indicator--success,
+.linear-calendar--spacious .indicator--warning {
+  left: 2px;
+  right: 2px;
+  bottom: 4px;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.linear-calendar--spacious .indicator--warning:nth-of-type(2) {
+  bottom: 9px;
+}
+
+.linear-calendar--spacious .indicator--danger {
+  top: 4px;
+  right: 4px;
+  width: 7px;
+  height: 7px;
+}
+
+.linear-calendar--spacious .day-cell--today::after {
+  inset: 3px;
+  border-width: 2px;
+}
