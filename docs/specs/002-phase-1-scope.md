@@ -124,7 +124,7 @@ Answer one question every day:
 
 ## 3. Screens in scope
 
-Phase 1 ships **10 screens/panels**. No separate Dashboard or Investments screen.
+Phase 1 ships **9 screens/panels**. No separate Dashboard, Investments, or Installments screen.
 
 | # | Screen / panel | Phase 1 scope summary |
 |---|---|---|
@@ -133,11 +133,10 @@ Phase 1 ships **10 screens/panels**. No separate Dashboard or Investments screen
 | 3 | **Day Detail Panel** | Slide-over from calendar; projected balance, items, quick-add |
 | 4 | **Transactions** | Chronological ledger with filters and running balance |
 | 5 | **Accounts** | List, balances, working flag, card cycle config, re-anchor |
-| 6 | **Forecast Items** | Planned income/expense/transfer, recurrence, subscriptions, **investment outflows** |
-| 7 | **Installments & Subscriptions** | Plans, payoff dates, per-installment paid status, dormant debt |
-| 8 | **Categories & Budgets** | Category CRUD; set monthly budget per category; track current-month actual vs target (child + parent roll-up) |
-| 9 | **Snapshots** | Create baseline, compare variance by category/month |
-| 10 | **Settings** | Language, buffer, large-outflow threshold, horizon, alert lead time, export/backup, card defaults |
+| 6 | **Forecast Items** | Recurring + one-off planned items, **installment plans**, subscriptions (filter), investment outflows |
+| 7 | **Categories & Budgets** | Category CRUD; set monthly budget per category; track current-month actual vs target (child + parent roll-up) |
+| 8 | **Snapshots** | Create baseline, compare variance by category/month |
+| 9 | **Settings** | Language, buffer, large-outflow threshold, horizon, alert lead time, export/backup, card defaults |
 
 ### Screen decisions (locked)
 
@@ -145,6 +144,8 @@ Phase 1 ships **10 screens/panels**. No separate Dashboard or Investments screen
 |---|---|
 | Separate Dashboard? | **No** — metrics in calendar header |
 | Separate Investments screen? | **No** — investment outflows are one-off transfers in **Forecast Items** (see [000-initial-ideas.md §4.H](../ideas/000-initial-ideas.md)) |
+| Separate Installments screen? | **No** — installment plans live in **Forecast Items** (Installments group); `InstallmentPlan` entity unchanged |
+| Subscriptions as separate group/screen? | **No** — `isSubscription` tag on recurring `PlannedItem`s; filter chip on Forecast Items |
 | Insights screen? | **Phase 2** — stub only in screen specs |
 
 ### Navigation (high level)
@@ -157,7 +158,6 @@ flowchart TB
   Txn["Transactions"]
   Acct["Accounts"]
   Forecast["Forecast Items"]
-  Install["Installments"]
   Budgets["Categories & Budgets"]
   Snap["Snapshots"]
   Settings["Settings"]
@@ -168,7 +168,6 @@ flowchart TB
   YearCal --> Txn
   YearCal --> Acct
   YearCal --> Forecast
-  YearCal --> Install
   YearCal --> Budgets
   YearCal --> Snap
   YearCal --> Settings
@@ -251,8 +250,9 @@ Copied from [000-initial-ideas.md §9](../ideas/000-initial-ideas.md) and [001-d
 | Item | Decision | Spec ref |
 |---|---|---|
 | Month view layout | Month grid (same weekday columns as year, single month) | [003 §4](./003-screen-specs.md#4-screen-2--month-calendar) |
-| Snapshot compare UI | Side-by-side month table + category breakdown | [003 §11](./003-screen-specs.md#11-screen-9--snapshots) |
-| CSV import format | Minimal 4-column template (date, description, amount, account) | [003 §13](./003-screen-specs.md#13-csv-import-onboarding) |
+| Forecast Items grouping | Active/dormant → Recurring / One-off / Installments; subscriptions via filter chip | [003 §8](./003-screen-specs.md#8-screen-6--forecast-items) |
+| Snapshot compare UI | Side-by-side month table + category breakdown | [003 §10](./003-screen-specs.md#10-screen-8--snapshots) |
+| CSV import format | Minimal 4-column template (date, description, amount, account) | [003 §12](./003-screen-specs.md#12-csv-import-onboarding) |
 | Bulk-entry mode | Multi-row inline form on Transactions screen | [003 §6](./003-screen-specs.md#6-screen-4--transactions) |
 
 ---
@@ -280,6 +280,6 @@ Copied from [000-initial-ideas.md §9](../ideas/000-initial-ideas.md) and [001-d
 
 | Order | Document | Uses this scope for |
 |---|---|---|
-| 1 | [003-screen-specs.md](./003-screen-specs.md) | Per-screen fields, actions, states (10 screens above) |
+| 1 | [003-screen-specs.md](./003-screen-specs.md) | Per-screen fields, actions, states (9 screens above) |
 | 2 | [004-style-guide.md](./004-style-guide.md) | Calendar components, tokens, semantic colors |
 | 3 | [005-prd.md](./005-prd.md) | User stories + acceptance criteria synthesized from specs |

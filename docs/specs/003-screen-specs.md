@@ -1,6 +1,6 @@
 ---
 name: Screen Specs (Phase 1)
-overview: Per-screen specification for the 10 Phase 1 screens — purpose, layout regions, fields/columns, actions, states, and the data-model entities each reads and writes. Bridges the locked scope and data model into concrete UI behavior for the PRD and implementation.
+overview: Per-screen specification for the 9 Phase 1 screens — purpose, layout regions, fields/columns, actions, states, and the data-model entities each reads and writes. Bridges the locked scope and data model into concrete UI behavior for the PRD and implementation.
 status: draft
 isProject: false
 ---
@@ -9,7 +9,7 @@ isProject: false
 
 > **Sources:** [001-data-model.md](./001-data-model.md), [002-phase-1-scope.md §3](./002-phase-1-scope.md). Visual tokens, components, and semantic colors come from [004-style-guide.md](./004-style-guide.md) (pending).
 >
-> **Scope guard:** This doc specifies only the 10 locked Phase 1 screens plus a deferred **Insights** stub. No new entities are introduced — every field maps to [001-data-model.md](./001-data-model.md).
+> **Scope guard:** This doc specifies only the 9 locked Phase 1 screens plus a deferred **Insights** stub. No new entities are introduced — every field maps to [001-data-model.md](./001-data-model.md).
 
 ---
 
@@ -25,7 +25,7 @@ isProject: false
 | **i18n** | All labels are translation keys (pt-BR + en); no hardcoded strings |
 
 **Global chrome (all screens):**
-- Persistent left/top **nav** to the 10 screens (see §1 navigation map).
+- Persistent left/top **nav** to the 9 screens (see §1 navigation map).
 - **Calendar header strip** (working balance, next negative date, alert badge) is visible on calendar screens; other screens show a condensed version in the top bar.
 - Locale + language switch lives in **Settings**, but the active language applies everywhere immediately.
 
@@ -40,12 +40,13 @@ isProject: false
 | 3 | Day Detail Panel | overlay `?day=YYYY-MM-DD` | `ProjectionDay` + quick-add |
 | 4 | Transactions | `/transactions` | `Transaction` |
 | 5 | Accounts | `/accounts` | `Account` |
-| 6 | Forecast Items | `/forecast` | `PlannedItem` (+ `PlannedItemOverride`) |
-| 7 | Installments & Subscriptions | `/installments` | `InstallmentPlan` (+ `Installment`), subscription `PlannedItem`s |
-| 8 | Categories & Budgets | `/categories` | `Category` (+ `CategoryBudget`) |
-| 9 | Snapshots | `/snapshots` | `Snapshot` (+ `SnapshotPayload`) |
-| 10 | Settings | `/settings` | `Settings` |
+| 6 | Forecast Items | `/forecast` | `PlannedItem` (+ `PlannedItemOverride`), `InstallmentPlan` (+ `Installment`) |
+| 7 | Categories & Budgets | `/categories` | `Category` (+ `CategoryBudget`) |
+| 8 | Snapshots | `/snapshots` | `Snapshot` (+ `SnapshotPayload`) |
+| 9 | Settings | `/settings` | `Settings` |
 | — | Insights (Phase 2 stub) | `/insights` | deferred |
+
+> **Route alias:** `/installments` redirects to `/forecast` (Installments group). Former Screen 7 merged into Screen 6; data model unchanged.
 
 ```mermaid
 flowchart TB
@@ -55,17 +56,16 @@ flowchart TB
   Txn["4 Transactions"]
   Acct["5 Accounts"]
   Forecast["6 Forecast Items"]
-  Install["7 Installments"]
-  Budgets["8 Categories & Budgets"]
-  Snap["9 Snapshots"]
-  Settings["10 Settings"]
+  Budgets["7 Categories & Budgets"]
+  Snap["8 Snapshots"]
+  Settings["9 Settings"]
 
   YearCal --- MonthCal
   YearCal --> DayPanel
   MonthCal --> DayPanel
   DayPanel -->|quick-add| Txn
   DayPanel -->|quick-add planned| Forecast
-  YearCal --> Txn & Acct & Forecast & Install & Budgets & Snap & Settings
+  YearCal --> Txn & Acct & Forecast & Budgets & Snap & Settings
 ```
 
 Primary entry is **Year Calendar**. The Day Detail Panel is an overlay reachable from either calendar.
@@ -300,65 +300,96 @@ else:
 
 ## 8. Screen 6 — Forecast Items
 
-**Purpose:** Manage planned income/expense/transfer, recurrence, subscriptions, and one-off **investment outflows** (no separate Investments screen).
+**Purpose:** Unified home for all forecast-generating obligations: recurring planned items, one-off planned items (including **investment outflows**), and finite **installment debt** plans. No separate Installments, Subscriptions, or Investments screen — entities stay distinct in the data model (§3.5 vs §3.8).
 
-**List grouping:** by active/dormant, then by recurrence. Show next occurrence date + amount.
+**Layout regions**
+- **Header strip:** working balance (condensed); primary actions **+ Add forecast item** and **+ Add installment plan**.
+- **Summary strip (optional):** active item counts, subscription count, next inflow/outflow (derived).
+- **Filter bar:** chip/toggle filters — **All**, **Subscriptions** (`PlannedItem.isSubscription = true`, applies within Recurring only), type (income/expense/transfer). Filters narrow rows within groups; they do not replace group structure.
+- **List:** Active section, then Dormant section (`isActive = false` on either entity type).
 
-**Editor fields** (`PlannedItem`)
+**List grouping:** within Active / Dormant, three groups:
+
+| Group | Contents | Entity |
+|---|---|---|
+| **Recurring** | `recurrence ∈ {weekly, monthly, yearly}` | `PlannedItem` |
+| **One-off** | `recurrence = once` (includes investment transfer pattern) | `PlannedItem` |
+| **Installments** | Finite debt with payoff date | `InstallmentPlan` (+ `Installment` rows) |
+
+Subscriptions are **not** a separate group — they are recurring `PlannedItem`s tagged with `isSubscription = true`, surfaced via filter chip and row badge.
+
+### PlannedItem rows (Recurring / One-off)
+
+| Element | Source |
+|---|---|
+| Description | `description` |
+| Type chip | `type` (income/expense/transfer) |
+| Category | `categoryId` |
+| Subscription badge | shown when `isSubscription = true` |
+| Account | `accountId` (transfers: `accountId → toAccountId`) |
+| Recurrence summary | derived from `recurrence`, `interval`, day/weekday/month fields |
+| Next occurrence | derived next date + `amountCents` |
+| Active | `isActive` toggle |
+
+**Investment outflow pattern:** `type = transfer`, `recurrence = once`, `accountId = working`, `toAccountId = investment`. → data-model §7.
+
+### InstallmentPlan rows (Installments group)
+
+| Element | Source |
+|---|---|
+| Description | `description` |
+| Per-installment amount | `installmentAmountCents` |
+| Progress | paid count / `installmentCount` |
+| Payoff date | derived `payoffDate` (installment #`installmentCount`) |
+| Remaining | derived `remainingCount` |
+| Next due | derived next unpaid `Installment.dueDate` + amount |
+| Active | `isActive` toggle |
+
+**Expanded schedule (per plan):** rows of `Installment` with `index`, `dueDate`, amount (`amountCentsOverride ?? plan amount`), `status` (`scheduled` / `paid` — green cell when paid), settle action (§2.2).
+
+### PlannedItem editor fields
 
 | Field | Control | Notes |
 |---|---|---|
 | `type` | income/expense/transfer | |
+| `description` | text | |
 | `amountCents` | money | default per occurrence |
 | `accountId` | account select | card → accrues to statements |
 | `toAccountId` | account select | transfer only; not a credit card |
 | `categoryId` | category select | required for income/expense |
-| `recurrence` | once/weekly/monthly/yearly | drives day/weekday/month fields |
+| `recurrence` | once/weekly/monthly/yearly | drives day/weekday/month fields; `once` → One-off group |
 | `interval` | integer | every N periods |
 | `dayOfMonth` / `weekday` / `monthOfYear` | conditional | weekday: 0 = Sun … 6 = Sat |
 | `startDate`, `endDate` | date | endDate null = indefinite |
-| `isSubscription` | toggle | semantic tag |
+| `isSubscription` | toggle | semantic tag; filterable, not a separate list |
 | `isActive` | toggle | dormant excluded from projection |
+| Upcoming preview | read-only list | next N occurrences (Recurring only) |
 
-**Investment outflow pattern:** `type = transfer`, `recurrence = once`, `accountId = working`, `toAccountId = investment`. → data-model §7.
+### InstallmentPlan editor fields
 
-| Concern | Spec |
-|---|---|
-| **Reads / Writes** | `PlannedItem` (CRUD), `PlannedItemOverride` (per-occurrence) |
-| **Actions** | Create/edit/delete with recurrence dialog (§2.1); pause/resume (`isActive`); preview upcoming occurrences |
-| **States** | Empty (→ add first planned item); loading; error; populated (active + dormant sections) |
-
----
-
-## 9. Screen 7 — Installments & Subscriptions
-
-**Purpose:** Finite debt plans with payoff dates + per-installment paid status; plus subscription view (indefinite recurring obligations).
-
-**Plan list contents** (`InstallmentPlan`)
-
-| Element | Field |
-|---|---|
-| Description | `description` |
-| Per-installment amount | `installmentAmountCents` |
-| Progress | paid / `installmentCount` |
-| Payoff date | derived `payoffDate` (#`installmentCount`) |
-| Remaining | derived `remainingCount` |
-| Active? | `isActive` (dormant excluded) |
-
-**Installment schedule (expand a plan):** rows of `Installment` with `index`, `dueDate`, amount (`amountCentsOverride ?? plan amount`), `status` (scheduled/paid green cell), settle action.
-
-**Subscriptions tab:** `PlannedItem` where `isSubscription = true` — name, amount, billing day, account/card, active/paused.
+| Field | Control | Notes |
+|---|---|---|
+| `description` | text | |
+| `installmentAmountCents` | money | default per installment |
+| `installmentCount` | integer | total installments |
+| `firstDueDate` | date | installment #1 |
+| `dayOfMonth` | integer? | subsequent due days; defaults from `firstDueDate` |
+| `accountId` | account select | card → accrues to statements |
+| `categoryId` | category select | optional |
+| `isActive` | toggle | dormant excluded from projection |
+| Schedule preview | expandable grid | eager `Installment` rows; inline paid toggle / amount override |
 
 | Concern | Spec |
 |---|---|
-| **Reads / Writes** | `InstallmentPlan` (CRUD, eager `Installment` generation), `Installment` (mark paid / override amount), subscription `PlannedItem`s |
-| **Rules** | Eager rows on save; regeneration preserves paid/overridden rows; count cannot drop below highest paid index (data-model §3.8) |
-| **Actions** | Create/edit plan; mark installment paid (§2.2); override one installment amount; pause/resume; activate dormant debt |
-| **States** | Empty (→ add a plan / subscription); loading; error; populated (plans + subscriptions tabs) |
+| **Reads / Writes** | `PlannedItem` (CRUD), `PlannedItemOverride` (per-occurrence); `InstallmentPlan` (CRUD, eager `Installment` generation), `Installment` (mark paid / override amount) |
+| **PlannedItem actions** | Create/edit/delete with recurrence dialog (§2.1) when `recurrence ≠ once`; pause/resume (`isActive`); preview upcoming occurrences |
+| **InstallmentPlan actions** | Create/edit plan; mark installment paid (§2.2); override one installment amount; pause/resume; activate dormant debt |
+| **InstallmentPlan rules** | Eager rows on save; regeneration preserves paid/overridden rows; count cannot drop below highest paid index (data-model §3.8) |
+| **States** | Empty (→ add forecast item or installment plan); loading; error; populated (active + dormant sections, three groups each) |
 
 ---
 
-## 10. Screen 8 — Categories & Budgets
+## 9. Screen 7 — Categories & Budgets
 
 **Purpose:** Category CRUD (one-level hierarchy) + monthly **expense** budgets with current-month actual-vs-target, including parent roll-up. Also surfaces snapshot variance when a snapshot is selected.
 
@@ -386,7 +417,7 @@ else:
 
 ---
 
-## 11. Screen 9 — Snapshots
+## 10. Screen 8 — Snapshots
 
 **Purpose:** Create baselines (full forecast clone) and compare baseline-vs-actual variance by category and month.
 
@@ -403,7 +434,7 @@ else:
 
 ---
 
-## 12. Screen 10 — Settings
+## 11. Screen 9 — Settings
 
 **Purpose:** Global configuration; export/backup. Single `Settings` row (`id = "singleton"`).
 
@@ -430,7 +461,7 @@ else:
 
 ---
 
-## 13. CSV import (onboarding)
+## 12. CSV import (onboarding)
 
 Lightweight bulk entry, reachable from Transactions and first-run empty states. Minimal 4-column template (scope §8): `date, description, amount, account`.
 
@@ -445,13 +476,13 @@ No schema impact — imports map to existing entities (data-model §9). Full Goo
 
 ---
 
-## 14. Insights (Phase 2 — stub only)
+## 13. Insights (Phase 2 — stub only)
 
 A single placeholder screen with a "coming in Phase 2" state. No data wiring. Present so navigation is stable; lists future capabilities (risk summaries, suggestions, NL queries) per [002-phase-1-scope.md §5](./002-phase-1-scope.md).
 
 ---
 
-## 15. Global states & accessibility
+## 14. Global states & accessibility
 
 | Concern | Requirement |
 |---|---|
@@ -464,25 +495,24 @@ A single placeholder screen with a "coming in Phase 2" state. No data wiring. Pr
 
 ---
 
-## 16. Traceability (screen → scope → entities)
+## 15. Traceability (screen → scope → entities)
 
 | Screen | Scope ref | Primary entities / derived |
 |---|---|---|
 | Year Calendar | §2.9, §3.1 | `ProjectionResult` |
 | Month Calendar | §2.9, §3.2 | `ProjectionDay[]` |
-| Day Detail Panel | §2.9, §3.3 | `ProjectionDay`, `Transaction`, `PlannedItemOverride` |
+| Day Detail Panel | §2.9, §3.3 | `ProjectionDay`, `Transaction`, `PlannedItemOverride`, `Installment` |
 | Transactions | §2.3, §3.4 | `Transaction` |
 | Accounts | §2.2, §3.5 | `Account`, `CreditCardStatement` (side effect) |
-| Forecast Items | §2.4, §3.6 | `PlannedItem`, `PlannedItemOverride` |
-| Installments & Subscriptions | §2.6, §3.7 | `InstallmentPlan`, `Installment`, subscription `PlannedItem` |
-| Categories & Budgets | §2.7, §3.8 | `Category`, `CategoryBudget` |
-| Snapshots | §2.7, §3.9 | `Snapshot`, `SnapshotPayload` |
-| Settings | §2.1, §3.10 | `Settings` |
+| Forecast Items | §2.4, §2.6, §3.6 | `PlannedItem`, `PlannedItemOverride`, `InstallmentPlan`, `Installment` |
+| Categories & Budgets | §2.7, §3.7 | `Category`, `CategoryBudget` |
+| Snapshots | §2.7, §3.8 | `Snapshot`, `SnapshotPayload` |
+| Settings | §2.1, §3.9 | `Settings` |
 | Insights (stub) | §5 | — (Phase 2) |
 
 ---
 
-## 17. Next documents
+## 16. Next documents
 
 | Order | Document | Uses this spec for |
 |---|---|---|
