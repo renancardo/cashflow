@@ -214,13 +214,12 @@
   width: max-content;
   padding: 0;
   --day-cell-size: 28px;
-  --month-label-width: 6.5rem;
+  --month-label-width: 3.5rem;
 }
 
 @media (min-width: 769px) {
   .linear-calendar {
     --day-cell-size: 34px;
-    --month-label-width: 7.5rem;
   }
 }
 
