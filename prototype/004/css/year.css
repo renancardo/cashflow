@@ -249,6 +249,10 @@
   margin-bottom: var(--space-1);
 }
 
+.month-row[hidden] {
+  display: none !important;
+}
+
 .month-row__label {
   font-family: var(--font-mono);
   font-size: 0.6875rem;

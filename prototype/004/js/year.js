@@ -114,13 +114,6 @@
     calendar.insertBefore(fragment, anchor);
   }
 
-  function ensureHorizonYears() {
-    var year;
-    for (year = minYear; year <= maxYear; year += 1) {
-      ensureYearMonths(year);
-    }
-  }
-
   function monthRowsForYear(year) {
     return calendar.querySelectorAll('.month-row[data-year="' + year + '"]');
   }
@@ -232,6 +225,5 @@
     });
   }
 
-  ensureHorizonYears();
   showYear(focusedYear);
 })();
