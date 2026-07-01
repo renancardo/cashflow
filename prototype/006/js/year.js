@@ -48,10 +48,6 @@
   function createDayCell(year, monthIndex, dayNumber) {
     var cell = document.createElement("div");
     cell.className = "day-cell";
-    var weekday = new Date(year, monthIndex, dayNumber).getDay();
-    if (weekday === 0 || weekday === 6) {
-      cell.classList.add("day-cell--weekend");
-    }
     if (
       year === today.getFullYear() &&
       monthIndex === today.getMonth() &&

@@ -73,7 +73,7 @@ Sidebar `.nav` hidden on mobile; drawer opens from hamburger in header.
 - Header row: sticky **Month** column + day-of-month columns **1–31** (not weekday abbreviations)
 - Month rows: label + year + status chip (Historical / Current with blue dot / Projected)
 - Grid is linear: column N = day N of the month (no weekday padding cells)
-- Zebra striping on alternate rows; weekend cells get light blue tint per actual date
+- Zebra striping on alternate rows
 - Day cells: centered day number, status bars at bottom (green=income, orange=outflow), red dot top-right for below-buffer, card icon top-left
 - Selected day: light blue background + blue border
 - Trailing empty cells for months with fewer than 31 days

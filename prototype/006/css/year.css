@@ -418,14 +418,6 @@
   }
 }
 
-.day-cell--weekend {
-  background: rgba(219, 234, 254, 0.35);
-}
-
-.month-row--odd .day-cell--weekend {
-  background: rgba(219, 234, 254, 0.5);
-}
-
 .day-cell--empty {
   color: transparent;
   background: var(--color-bg) !important;
