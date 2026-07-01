@@ -182,13 +182,6 @@
   background: var(--color-warning);
 }
 
-.help-tooltip__marker--card {
-  width: 10px;
-  height: 7px;
-  border-radius: 2px;
-  background: var(--color-warning);
-}
-
 /* Calendar card + horizontal scroll */
 
 .calendar-scroll {
@@ -444,31 +437,4 @@
 
 .indicator--warning {
   background: var(--color-warning);
-}
-.indicator--card {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 10px;
-  height: 7px;
-  border-radius: 1px;
-  background: var(--color-warning);
-  border: 1px solid rgba(234, 88, 12, 0.35);
-}
-
-.indicator--card::before {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 1px;
-  right: 1px;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.7);
-  border-radius: 1px;
-}
-
-/* Card icon — no extra margin needed with absolute layout */
-
-.day-cell__indicators:has(.indicator--card) .indicator:not(.indicator--card):not(.indicator--danger) {
-  bottom: 3px;
 }
