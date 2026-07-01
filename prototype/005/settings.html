@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings — Cashflow Prototype</title>
+  <link rel="stylesheet" href="css/ink.css">
+  <link rel="stylesheet" href="css/settings.css">
+</head>
+<body>
+  <div class="app">
+    <div class="nav-overlay" id="nav-overlay" aria-hidden="true"></div>
+
+    <nav class="nav" id="nav-drawer" aria-label="Secondary">
+      <div class="nav__brand">Cashflow</div>
+      <div>
+        <div class="nav__label">More screens</div>
+        <ul class="nav__list">
+          <li><a class="nav__link" href="year.html">Year Calendar</a></li>
+          <li><a class="nav__link" href="month.html">Month Calendar</a></li>
+          <li><a class="nav__link" href="accounts.html">Accounts</a></li>
+          <li><a class="nav__link" href="snapshots.html">Snapshots</a></li>
+          <li><a class="nav__link nav__link--active" href="settings.html" aria-current="page">Settings</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="main">
+      <header class="mobile-header">
+        <button class="mobile-header__menu" type="button" id="nav-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="nav-drawer">☰</button>
+        <span class="mobile-header__title">Settings</span>
+      </header>
+
+      <header class="header-strip header-strip--condensed">
+        <div class="metric">
+          <span class="metric__label">Working balance</span>
+          <span class="metric__value">R$ 12.450,00</span>
+        </div>
+        <div class="header-strip__spacer"></div>
+        <button class="btn btn--ghost" type="button" id="export-backup-btn">Download JSON</button>
+      </header>
+
+      <div class="page" id="settings-page">
+        <div class="page__header">
+          <div>
+            <h1 class="page__title">Settings</h1>
+            <p class="page__subtitle">Language, projection thresholds, account defaults, and data backup</p>
+          </div>
+        </div>
+
+        <div class="settings-banner settings-banner--error" id="import-error-banner" role="alert" aria-hidden="true">
+          <span class="settings-banner__icon" aria-hidden="true">⚠</span>
+          <div class="settings-banner__content">
+            <p class="settings-banner__title">Import failed</p>
+            <p class="settings-banner__desc">
+              The backup file could not be restored. Invalid JSON at line 42 — expected a closing brace.
+              Your current data was not modified.
+            </p>
+          </div>
+          <button class="settings-banner__dismiss" type="button" aria-label="Dismiss">×</button>
+        </div>
+
+        <div class="settings-banner settings-banner--success" id="save-success-banner" role="status" aria-hidden="true">
+          <span class="settings-banner__icon" aria-hidden="true">✓</span>
+          <div class="settings-banner__content">
+            <p class="settings-banner__title">Settings saved</p>
+            <p class="settings-banner__desc">
+              Changes applied. Projection will recompute when buffer or horizon values change.
+            </p>
+          </div>
+          <button class="settings-banner__dismiss" type="button" aria-label="Dismiss">×</button>
+        </div>
+
+        <div class="settings-layout">
+          <div class="settings-sections">
+            <section class="settings-section" aria-labelledby="locale-section-title">
+              <div class="settings-section__header">
+                <h2 class="settings-section__title" id="locale-section-title">Locale &amp; display</h2>
+                <p class="settings-section__desc">Language applies immediately across all screens</p>
+              </div>
+              <div class="settings-section__body">
+                <div class="settings-field">
+                  <label class="settings-field__label" for="language-en">Language</label>
+                  <div class="settings-field__control">
+                    <div class="lang-switch" role="group" aria-label="Language">
+                      <button class="lang-switch__btn lang-switch__btn--active" type="button" id="language-en" aria-pressed="true">English</button>
+                      <button class="lang-switch__btn" type="button" id="language-pt" aria-pressed="false">Português (BR)</button>
+                    </div>
+                    <p class="settings-field__hint">Switches UI copy and locale formatting for dates, currency, and numbers</p>
+                  </div>
+                </div>
+
+                <div class="settings-field">
+                  <label class="settings-field__label" for="date-format">Date format</label>
+                  <div class="settings-field__control">
+                    <select class="settings-select" id="date-format">
+                      <option value="DD/MM/YYYY" selected>DD/MM/YYYY</option>
+                      <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                      <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                    </select>
+                    <p class="settings-field__hint">How dates appear in calendars, transactions, and forms</p>
+                  </div>
+                </div>
+
+                <div class="settings-field">
+                  <span class="settings-field__label">Default currency</span>
+                  <div class="settings-field__control">
+                    <input class="settings-input settings-input--readonly" type="text" value="BRL (R$)" readonly aria-readonly="true">
+                    <p class="settings-field__hint">Phase 1 supports Brazilian Real only</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="settings-section" aria-labelledby="projection-section-title">
+              <div class="settings-section__header">
+                <h2 class="settings-section__title" id="projection-section-title">Projection &amp; alerts</h2>
+                <p class="settings-section__desc">Controls calendar indicators and in-app negative-balance warnings</p>
+              </div>
+              <div class="settings-section__body">
+                <div class="settings-field">
+                  <label class="settings-field__label" for="negative-buffer">Negative buffer</label>
+                  <div class="settings-field__control">
+                    <div class="settings-input-group">
+                      <span class="settings-input-group__prefix">R$</span>
+                      <input class="settings-input settings-input--money" id="negative-buffer" type="text" value="0,00" inputmode="decimal">
+                    </div>
+                    <p class="settings-field__hint">
+                      Days where projected balance falls below this amount show a red dot on the calendar
+                    </p>
+                  </div>
+                </div>
+
+                <div class="settings-field">
+                  <label class="settings-field__label" for="large-outflow">Large outflow threshold</label>
+                  <div class="settings-field__control">
+                    <div class="settings-input-group">
+                      <span class="settings-input-group__prefix">R$</span>
+                      <input class="settings-input settings-input--money" id="large-outflow" type="text" value="500,00" inputmode="decimal">
+                    </div>
+                    <p class="settings-field__hint">
+                      Single-day net outflows at or above this amount show an amber indicator. Set to R$ 0 to disable
+                    </p>
+                  </div>
+                </div>
+
+                <div class="settings-field">
+                  <label class="settings-field__label" for="horizon-months">Forecast horizon</label>
+                  <div class="settings-field__control">
+                    <input class="settings-input" id="horizon-months" type="number" min="1" max="60" value="24">
+                    <p class="settings-field__hint">Rolling months of projection from today — affects calendar range and snapshot scope</p>
+                  </div>
+                </div>
+
+                <div class="settings-field">
+                  <label class="settings-field__label" for="alert-lead-time">Alert lead time</label>
+                  <div class="settings-field__control">
+                    <input class="settings-input" id="alert-lead-time" type="number" min="0" max="90" value="14">
+                    <p class="settings-field__hint">
+                      Days before the next negative date to show the in-app alert badge on calendar screens
+                    </p>
+                  </div>
+                </div>
+
+                <div class="indicator-legend" aria-label="Calendar indicator legend">
+                  <span class="indicator-legend__item">
+                    <span class="indicator-legend__dot indicator-legend__dot--buffer"></span>
+                    Below buffer
+                  </span>
+                  <span class="indicator-legend__item">
+                    <span class="indicator-legend__dot indicator-legend__dot--outflow"></span>
+                    Large outflow
+                  </span>
+                  <span class="indicator-legend__item">
+                    <span class="indicator-legend__dot indicator-legend__dot--income"></span>
+                    Net income day
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            <section class="settings-section" aria-labelledby="defaults-section-title">
+              <div class="settings-section__header">
+                <h2 class="settings-section__title" id="defaults-section-title">New account defaults</h2>
+                <p class="settings-section__desc">Default working flag when creating a new account of each type</p>
+              </div>
+              <div class="settings-section__body">
+                <div class="working-defaults" role="list">
+                  <div class="working-default" role="listitem">
+                    <div class="working-default__info">
+                      <div class="working-default__name">Checking</div>
+                      <div class="working-default__note">Counts toward aggregate working balance</div>
+                    </div>
+                    <span class="toggle toggle--on working-default__toggle" role="switch" aria-checked="true" aria-label="Working by default" tabindex="0"></span>
+                  </div>
+
+                  <div class="working-default" role="listitem">
+                    <div class="working-default__info">
+                      <div class="working-default__name">Savings</div>
+                      <div class="working-default__note">Typically excluded from day-to-day cash flow</div>
+                    </div>
+                    <span class="toggle working-default__toggle" role="switch" aria-checked="false" aria-label="Not working by default" tabindex="0"></span>
+                  </div>
+
+                  <div class="working-default" role="listitem">
+                    <div class="working-default__info">
+                      <div class="working-default__name">Wallet</div>
+                      <div class="working-default__note">Cash on hand included in working balance</div>
+                    </div>
+                    <span class="toggle toggle--on working-default__toggle" role="switch" aria-checked="true" aria-label="Working by default" tabindex="0"></span>
+                  </div>
+
+                  <div class="working-default working-default--disabled" role="listitem">
+                    <div class="working-default__info">
+                      <div class="working-default__name">Credit card</div>
+                      <div class="working-default__note">Cards are never working accounts — statement payments hit working balance on due date</div>
+                    </div>
+                    <span class="toggle working-default__toggle" role="switch" aria-checked="false" aria-disabled="true" aria-label="Not applicable"></span>
+                  </div>
+
+                  <div class="working-default" role="listitem">
+                    <div class="working-default__info">
+                      <div class="working-default__name">Investment</div>
+                      <div class="working-default__note">Brokerage and investment accounts</div>
+                    </div>
+                    <span class="toggle working-default__toggle" role="switch" aria-checked="false" aria-label="Not working by default" tabindex="0"></span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="settings-section" aria-labelledby="data-section-title">
+              <div class="settings-section__header">
+                <h2 class="settings-section__title" id="data-section-title">Data backup</h2>
+                <p class="settings-section__desc">Export or restore a full JSON backup of all local data</p>
+              </div>
+              <div class="settings-section__body">
+                <div class="data-actions">
+                  <div class="data-action">
+                    <div class="data-action__info">
+                      <h3 class="data-action__title">Export backup</h3>
+                      <p class="data-action__desc">
+                        Download a JSON file containing all accounts, transactions, forecast items, categories, budgets, snapshots, and settings.
+                      </p>
+                      <div class="data-action__entities" aria-label="Included entities">
+                        <span class="data-action__entity">Accounts</span>
+                        <span class="data-action__entity">Transactions</span>
+                        <span class="data-action__entity">Planned items</span>
+                        <span class="data-action__entity">Installments</span>
+                        <span class="data-action__entity">Categories</span>
+                        <span class="data-action__entity">Budgets</span>
+                        <span class="data-action__entity">Snapshots</span>
+                        <span class="data-action__entity">Settings</span>
+                      </div>
+                    </div>
+                    <div class="data-action__controls">
+                      <button class="btn btn--primary" type="button" id="export-backup-secondary">Download JSON</button>
+                    </div>
+                  </div>
+
+                  <div class="data-action">
+                    <div class="data-action__info">
+                      <h3 class="data-action__title">Restore from backup</h3>
+                      <p class="data-action__desc">
+                        Replace all local data with a previously exported backup. This action cannot be undone — export first if unsure.
+                      </p>
+                    </div>
+                    <div class="data-action__controls">
+                      <div class="import-zone">
+                        <input class="import-zone__input" id="import-file" type="file" accept=".json,application/json">
+                        <button class="btn btn--ghost" type="button" id="import-restore-btn">Choose file &amp; restore</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <aside class="settings-sidebar" aria-label="Settings summary">
+            <div class="settings-sidebar__card">
+              <h2 class="settings-sidebar__title">Current values</h2>
+              <dl class="settings-sidebar__list">
+                <div>
+                  <dt>Language</dt>
+                  <dd>English</dd>
+                </div>
+                <div>
+                  <dt>Buffer</dt>
+                  <dd>R$ 0,00</dd>
+                </div>
+                <div>
+                  <dt>Large outflow</dt>
+                  <dd>R$ 500,00</dd>
+                </div>
+                <div>
+                  <dt>Horizon</dt>
+                  <dd>24 months</dd>
+                </div>
+                <div>
+                  <dt>Alert lead</dt>
+                  <dd>14 days</dd>
+                </div>
+                <div>
+                  <dt>Date format</dt>
+                  <dd>DD/MM/YYYY</dd>
+                </div>
+              </dl>
+            </div>
+
+            <div class="settings-sidebar__card">
+              <h2 class="settings-sidebar__title">Actions</h2>
+              <div class="settings-sidebar__actions">
+                <button class="btn btn--primary" type="button" id="save-settings-btn">Save changes</button>
+                <a class="btn btn--ghost" href="year.html">Back to calendar</a>
+              </div>
+              <p class="settings-sidebar__note">
+                Changing buffer or horizon triggers a full projection recompute. All data stays on this device — no network calls.
+              </p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <nav class="bottom-nav" aria-label="Main">
+      <a class="bottom-nav__item" href="year.html">
+        <span class="bottom-nav__icon" aria-hidden="true">📅</span>
+        Calendar
+      </a>
+      <a class="bottom-nav__item" href="transactions.html">
+        <span class="bottom-nav__icon" aria-hidden="true">↕</span>
+        Transactions
+      </a>
+      <a class="bottom-nav__item" href="forecast.html">
+        <span class="bottom-nav__icon" aria-hidden="true">◎</span>
+        Forecast
+      </a>
+      <a class="bottom-nav__item" href="categories.html">
+        <span class="bottom-nav__icon" aria-hidden="true">▦</span>
+        Categories
+      </a>
+      <a class="bottom-nav__item bottom-nav__item--active" href="settings.html" aria-current="page">
+        <span class="bottom-nav__icon" aria-hidden="true">⋯</span>
+        More
+      </a>
+    </nav>
+  </div>
+
+  <script>
+    (function () {
+      var menuBtn = document.getElementById("nav-menu-btn");
+      var nav = document.getElementById("nav-drawer");
+      var overlay = document.getElementById("nav-overlay");
+
+      function closeDrawer() {
+        nav.classList.remove("nav--open");
+        overlay.classList.remove("nav-overlay--visible");
+        overlay.setAttribute("aria-hidden", "true");
+        if (menuBtn) menuBtn.setAttribute("aria-expanded", "false");
+      }
+
+      function openDrawer() {
+        nav.classList.add("nav--open");
+        overlay.classList.add("nav-overlay--visible");
+        overlay.setAttribute("aria-hidden", "false");
+        if (menuBtn) menuBtn.setAttribute("aria-expanded", "true");
+      }
+
+      if (menuBtn) {
+        menuBtn.addEventListener("click", function () {
+          if (nav.classList.contains("nav--open")) closeDrawer();
+          else openDrawer();
+        });
+      }
+
+      if (overlay) overlay.addEventListener("click", closeDrawer);
+    })();
+  </script>
+  <script src="js/settings.js"></script>
+</body>
+</html>

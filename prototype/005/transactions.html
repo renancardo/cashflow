@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transactions — Cashflow Prototype</title>
+  <link rel="stylesheet" href="css/ink.css">
+  <link rel="stylesheet" href="css/transactions.css">
+</head>
+<body>
+  <div class="nav-overlay" id="nav-overlay"></div>
+
+  <div class="app">
+    <nav class="nav" id="nav-drawer" aria-label="Screens">
+      <div class="nav__brand">Cashflow</div>
+      <div>
+        <div class="nav__label">Screens</div>
+        <ul class="nav__list">
+          <li><a class="nav__link" href="year.html">Year Calendar</a></li>
+          <li><a class="nav__link" href="month.html">Month Calendar</a></li>
+          <li><a class="nav__link nav__link--active" href="transactions.html">Transactions</a></li>
+          <li><a class="nav__link" href="accounts.html">Accounts</a></li>
+          <li><a class="nav__link" href="forecast.html">Forecast Items</a></li>
+          <li><a class="nav__link" href="categories.html">Categories</a></li>
+          <li><a class="nav__link" href="snapshots.html">Snapshots</a></li>
+          <li><a class="nav__link" href="settings.html">Settings</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="main">
+      <header class="mobile-header">
+        <button class="mobile-header__menu" type="button" id="nav-menu-btn" aria-label="Open menu">☰</button>
+        <span class="mobile-header__title">Transactions</span>
+      </header>
+
+      <header class="header-strip header-strip--condensed">
+        <div class="metric">
+          <span class="metric__label">Working balance</span>
+          <span class="metric__value">R$ 12.450,00</span>
+        </div>
+        <div class="header-strip__spacer"></div>
+        <button class="btn btn--ghost" type="button" id="import-csv-btn">Import CSV</button>
+        <button class="btn btn--primary" type="button" id="add-txn-btn">+ Add transaction</button>
+      </header>
+
+      <div class="page" id="txn-page">
+        <div class="page__header">
+          <div>
+            <h1 class="page__title">Transactions</h1>
+            <p class="page__subtitle">Chronological ledger with filters and running balance</p>
+          </div>
+        </div>
+
+        <div class="txn-empty" id="txn-empty">
+          <div class="txn-empty__icon">📒</div>
+          <h2 class="txn-empty__title">No transactions yet</h2>
+          <p class="txn-empty__desc">
+            Add your first transaction manually or import a CSV to get started quickly.
+          </p>
+          <div class="txn-empty__actions">
+            <button class="btn btn--primary" type="button" id="empty-add-btn">+ Add transaction</button>
+            <button class="btn btn--ghost" type="button" id="empty-import-btn">Import CSV</button>
+          </div>
+        </div>
+
+        <form class="txn-filters" id="txn-filters" aria-label="Transaction filters">
+          <div class="txn-filters__scroll">
+            <div class="txn-filters__group">
+              <label class="txn-filters__label" for="filter-account">Account</label>
+              <select class="txn-filters__select" id="filter-account">
+                <option value="all">All accounts</option>
+                <option value="cora" selected>Cora Checking</option>
+                <option value="nubank">Nubank Savings</option>
+                <option value="carteira">Carteira</option>
+                <option value="card">Cartão Cora</option>
+              </select>
+            </div>
+            <div class="txn-filters__group">
+              <label class="txn-filters__label" for="filter-type">Type</label>
+              <select class="txn-filters__select" id="filter-type">
+                <option value="all">All types</option>
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+                <option value="transfer">Transfer</option>
+              </select>
+            </div>
+            <div class="txn-filters__group">
+              <label class="txn-filters__label" for="filter-category">Category</label>
+              <select class="txn-filters__select" id="filter-category">
+                <option value="all">All categories</option>
+                <option value="salary">Salary</option>
+                <option value="food">Food</option>
+                <option value="transport">Transport</option>
+                <option value="housing">Housing</option>
+                <option value="utilities">Utilities</option>
+              </select>
+            </div>
+            <div class="txn-filters__group txn-filters__group--dates">
+              <span class="txn-filters__label">Date range</span>
+              <div class="txn-filters__date-row">
+                <input class="txn-filters__input" type="text" value="01/06/2026" aria-label="From date">
+                <span class="txn-filters__date-sep" aria-hidden="true">–</span>
+                <input class="txn-filters__input" type="text" value="30/06/2026" aria-label="To date">
+              </div>
+            </div>
+          </div>
+          <div class="txn-filters__actions">
+            <button class="btn btn--ghost" type="button">Clear</button>
+            <button class="btn btn--primary" type="button">Apply</button>
+          </div>
+        </form>
+
+        <div class="txn-toolbar">
+          <p class="txn-toolbar__count">Showing <strong>12</strong> transactions · sorted by date (newest first)</p>
+        </div>
+
+        <section class="txn-list" aria-label="Transaction list">
+          <div class="txn-list__header">
+            <span>Date</span>
+            <span>Type</span>
+            <span>Description</span>
+            <span>Category</span>
+            <span>Account</span>
+            <span>To</span>
+            <span>Amount</span>
+            <span>Balance</span>
+            <span>Settles</span>
+            <span></span>
+          </div>
+
+          <article class="txn-row" data-type="expense" data-account="cora">
+            <div class="txn-row__date">28/06</div>
+            <div><span class="chip chip--expense">Expense</span></div>
+            <div class="txn-row__description">Supermercado Extra</div>
+            <div class="txn-row__category">Food</div>
+            <div class="txn-row__account">Cora Checking</div>
+            <div class="txn-row__to txn-row__to--empty">—</div>
+            <div class="txn-row__amount txn-row__amount--expense">− R$ 287,40</div>
+            <div class="txn-row__balance">R$ 8.450,00</div>
+            <div class="txn-row__settles"></div>
+            <div class="txn-row__actions">
+              <button class="icon-btn txn-row__edit" type="button" title="Edit">✎</button>
+            </div>
+          </article>
+
+          <article class="txn-row" data-type="transfer" data-account="cora">
+            <div class="txn-row__date">27/06</div>
+            <div><span class="chip chip--transfer">Transfer</span></div>
+            <div class="txn-row__description">Card payment — Jun statement</div>
+            <div class="txn-row__category txn-row__category--empty">—</div>
+            <div class="txn-row__account">Cora Checking</div>
+            <div class="txn-row__to">Cartão Cora</div>
+            <div class="txn-row__amount txn-row__amount--transfer">− R$ 1.850,00</div>
+            <div class="txn-row__balance">R$ 8.737,40</div>
+            <div class="txn-row__settles">
+              <span class="chip chip--settle" title="Pays statement">Statement</span>
+            </div>
+            <div class="txn-row__actions">
+              <button class="icon-btn txn-row__edit" type="button" title="Edit">✎</button>
+            </div>
+          </article>
+
+          <article class="txn-row" data-type="expense" data-account="cora">
+            <div class="txn-row__date">25/06</div>
+            <div><span class="chip chip--expense">Expense</span></div>
+            <div class="txn-row__description">Uber — airport</div>
+            <div class="txn-row__category">Transport</div>
+            <div class="txn-row__account">Cora Checking</div>
+            <div class="txn-row__to txn-row__to--empty">—</div>
+            <div class="txn-row__amount txn-row__amount--expense">− R$ 62,30</div>
+            <div class="txn-row__balance">R$ 10.587,40</div>
+            <div class="txn-row__settles"></div>
+            <div class="txn-row__actions">
+              <button class="icon-btn txn-row__edit" type="button" title="Edit">✎</button>
+            </div>
+          </article>
+
+          <article class="txn-row" data-type="expense" data-account="card">
+            <div class="txn-row__date">24/06</div>
+            <div><span class="chip chip--expense">Expense</span></div>
+            <div class="txn-row__description">Netflix subscription</div>
+            <div class="txn-row__category">Entertainment</div>
+            <div class="txn-row__account">Cartão Cora</div>
+            <div class="txn-row__to txn-row__to--empty">—</div>
+            <div class="txn-row__amount txn-row__amount--expense">− R$ 55,90</div>
+            <div class="txn-row__balance txn-row__balance--muted">—</div>
+            <div class="txn-row__settles">
+              <span class="chip chip--settle" title="Settles planned item">Planned</span>
+            </div>
+            <div class="txn-row__actions">
+              <button class="icon-btn txn-row__edit" type="button" title="Edit">✎</button>
+            </div>
+          </article>
+
+          <article class="txn-row" data-type="expense" data-account="cora">
+            <div class="txn-row__date">20/06</div>
+            <div><span class="chip chip--expense">Expense</span></div>
+            <div class="txn-row__description">Aluguel — Jun</div>
+            <div class="txn-row__category">Housing</div>
+            <div class="txn-row__account">Cora Checking</div>
+            <div class="txn-row__to txn-row__to--empty">—</div>
+            <div class="txn-row__amount txn-row__amount--expense">− R$ 2.400,00</div>
+            <div class="txn-row__balance">R$ 10.649,70</div>
+            <div class="txn-row__settles">
+              <span class="chip chip--settle" title="Settles planned item">Planned</span>
+            </div>
+            <div class="txn-row__actions">
+              <button class="icon-btn txn-row__edit" type="button" title="Edit">✎</button>
+            </div>
+          </article>
+
+          <article class="txn-row" data-type="income" data-account="cora">
+            <div class="txn-row__date">05/06</div>
+            <div><span class="chip chip--income">Income</span></div>
+            <div class="txn-row__description">Salary — Acme Corp</div>
+            <div class="txn-row__category">Salary</div>
+            <div class="txn-row__account">Cora Checking</div>
+            <div class="txn-row__to txn-row__to--empty">—</div>
+            <div class="txn-row__amount txn-row__amount--income">+ R$ 8.500,00</div>
+            <div class="txn-row__balance">R$ 13.049,70</div>
+            <div class="txn-row__settles">
+              <span class="chip chip--settle" title="Settles planned item">Planned</span>
+            </div>
+            <div class="txn-row__actions">
+              <button class="icon-btn txn-row__edit" type="button" title="Edit">✎</button>
+            </div>
+          </article>
+
+          <article class="txn-row" data-type="transfer" data-account="cora">
+            <div class="txn-row__date">03/06</div>
+            <div><span class="chip chip--transfer">Transfer</span></div>
+            <div class="txn-row__description">Investment — XP</div>
+            <div class="txn-row__category txn-row__category--empty">—</div>
+            <div class="txn-row__account">Cora Checking</div>
+            <div class="txn-row__to">XP Investimentos</div>
+            <div class="txn-row__amount txn-row__amount--transfer">− R$ 1.000,00</div>
+            <div class="txn-row__balance">R$ 4.549,70</div>
+            <div class="txn-row__settles"></div>
+            <div class="txn-row__actions">
+              <button class="icon-btn txn-row__edit" type="button" title="Edit">✎</button>
+            </div>
+          </article>
+
+          <article class="txn-row" data-type="expense" data-account="cora">
+            <div class="txn-row__date">02/06</div>
+            <div><span class="chip chip--expense">Expense</span></div>
+            <div class="txn-row__description">Parcela 12/36 — Ipanema</div>
+            <div class="txn-row__category">Debt</div>
+            <div class="txn-row__account">Cora Checking</div>
+            <div class="txn-row__to txn-row__to--empty">—</div>
+            <div class="txn-row__amount txn-row__amount--expense">− R$ 475,00</div>
+            <div class="txn-row__balance">R$ 5.549,70</div>
+            <div class="txn-row__settles">
+              <span class="chip chip--settle" title="Settles installment">Installment</span>
+            </div>
+            <div class="txn-row__actions">
+              <button class="icon-btn txn-row__edit" type="button" title="Edit">✎</button>
+            </div>
+          </article>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Main">
+    <a class="bottom-nav__item" href="year.html">
+      <span class="bottom-nav__icon" aria-hidden="true">📅</span>
+      Calendar
+    </a>
+    <a class="bottom-nav__item bottom-nav__item--active" href="transactions.html">
+      <span class="bottom-nav__icon" aria-hidden="true">📒</span>
+      Transactions
+    </a>
+    <a class="bottom-nav__item" href="forecast.html">
+      <span class="bottom-nav__icon" aria-hidden="true">📋</span>
+      Forecast
+    </a>
+    <a class="bottom-nav__item" href="categories.html">
+      <span class="bottom-nav__icon" aria-hidden="true">🏷</span>
+      Categories
+    </a>
+    <a class="bottom-nav__item" href="settings.html" id="more-nav-btn">
+      <span class="bottom-nav__icon" aria-hidden="true">⋯</span>
+      More
+    </a>
+  </nav>
+
+  <div class="txn-overlay" id="txn-overlay" aria-hidden="true">
+    <div class="txn-overlay__backdrop"></div>
+    <aside class="txn-editor" role="dialog" aria-labelledby="txn-editor-title" aria-modal="true">
+      <div class="txn-editor__header">
+        <div class="txn-editor__header-top">
+          <div>
+            <h2 class="txn-editor__title" id="txn-editor-title">Edit transaction</h2>
+            <p class="txn-editor__subtitle" id="txn-editor-subtitle">Supermercado Extra · 28/06/2026</p>
+          </div>
+          <button class="txn-editor__close" type="button" aria-label="Close editor">×</button>
+        </div>
+      </div>
+
+      <div class="txn-editor__body">
+        <div class="txn-editor__type" role="group" aria-label="Transaction type">
+          <button class="txn-editor__type-btn" type="button" data-type="income">Income</button>
+          <button class="txn-editor__type-btn txn-editor__type-btn--active" type="button" data-type="expense">Expense</button>
+          <button class="txn-editor__type-btn" type="button" data-type="transfer">Transfer</button>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-group__label" for="txn-date">Date</label>
+            <input class="form-group__input" id="txn-date" type="text" value="28/06/2026">
+          </div>
+          <div class="form-group">
+            <label class="form-group__label" for="txn-amount">Amount</label>
+            <input class="form-group__input" id="txn-amount" type="text" value="R$ 287,40">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-group__label" for="txn-description">Description</label>
+          <input class="form-group__input" id="txn-description" type="text" value="Supermercado Extra">
+        </div>
+
+        <div class="form-group" id="txn-category-group">
+          <label class="form-group__label" for="txn-category">Category</label>
+          <select class="form-group__select" id="txn-category">
+            <option>Food</option>
+            <option>Transport</option>
+            <option>Housing</option>
+            <option>Salary</option>
+            <option>Entertainment</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-group__label" for="txn-account">Account</label>
+            <select class="form-group__select" id="txn-account">
+              <option selected>Cora Checking</option>
+              <option>Nubank Savings</option>
+              <option>Carteira</option>
+              <option>Cartão Cora</option>
+            </select>
+          </div>
+          <div class="form-group" id="txn-to-group" hidden>
+            <label class="form-group__label" for="txn-to">To account</label>
+            <select class="form-group__select" id="txn-to">
+              <option>XP Investimentos</option>
+              <option>Nubank Savings</option>
+              <option>Carteira</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="txn-editor__settlement" id="txn-settlement" hidden>
+          <div class="txn-editor__settlement-label">Settlement link</div>
+          <span id="txn-settlement-text">Settles planned item: Netflix subscription (Jun)</span>
+        </div>
+      </div>
+
+      <div class="txn-editor__footer">
+        <button class="btn btn--ghost" type="button">Delete</button>
+        <button class="btn btn--primary" type="button">Save</button>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    (function () {
+      var menuBtn = document.getElementById("nav-menu-btn");
+      var moreBtn = document.getElementById("more-nav-btn");
+      var nav = document.getElementById("nav-drawer");
+      var navOverlay = document.getElementById("nav-overlay");
+
+      function toggleNav(event) {
+        if (event) event.preventDefault();
+        nav.classList.toggle("nav--open");
+        navOverlay.classList.toggle("nav-overlay--visible");
+      }
+
+      if (menuBtn) menuBtn.addEventListener("click", toggleNav);
+      if (moreBtn) moreBtn.addEventListener("click", toggleNav);
+      if (navOverlay) navOverlay.addEventListener("click", toggleNav);
+    })();
+  </script>
+  <script src="js/transactions.js"></script>
+</body>
+</html>

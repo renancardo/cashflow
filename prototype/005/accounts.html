@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accounts — Cashflow Prototype</title>
+  <link rel="stylesheet" href="css/ink.css">
+  <link rel="stylesheet" href="css/accounts.css">
+</head>
+<body>
+  <div class="app">
+    <div class="nav-overlay" aria-hidden="true"></div>
+
+    <nav class="nav" aria-label="Screens">
+      <div class="nav__brand">Cashflow</div>
+      <div>
+        <div class="nav__label">Screens</div>
+        <ul class="nav__list">
+          <li><a class="nav__link" href="year.html">Year Calendar</a></li>
+          <li><a class="nav__link" href="month.html">Month Calendar</a></li>
+          <li><a class="nav__link" href="transactions.html">Transactions</a></li>
+          <li><a class="nav__link nav__link--active" href="accounts.html">Accounts</a></li>
+          <li><a class="nav__link" href="forecast.html">Forecast Items</a></li>
+          <li><a class="nav__link" href="categories.html">Categories</a></li>
+          <li><a class="nav__link" href="snapshots.html">Snapshots</a></li>
+          <li><a class="nav__link" href="settings.html">Settings</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="main">
+      <header class="mobile-header">
+        <button class="mobile-header__menu" type="button" aria-label="Open menu">☰</button>
+        <span class="mobile-header__title">Accounts</span>
+      </header>
+
+      <header class="header-strip header-strip--condensed">
+        <div class="metric">
+          <span class="metric__label">Working balance</span>
+          <span class="metric__value">R$ 12.450,00</span>
+        </div>
+        <div class="header-strip__spacer"></div>
+        <button class="btn btn--primary" type="button">+ Add account</button>
+      </header>
+
+      <div class="page">
+        <div class="page__header">
+          <div>
+            <h1 class="page__title">Accounts</h1>
+            <p class="page__subtitle">Manage balances, working flags, and credit card cycles</p>
+          </div>
+        </div>
+
+        <div class="summary-strip">
+          <div class="summary-strip__item">
+            <span class="summary-strip__label">Total accounts</span>
+            <span class="summary-strip__value">5</span>
+          </div>
+          <div class="summary-strip__item">
+            <span class="summary-strip__label">Working accounts</span>
+            <span class="summary-strip__value summary-strip__value--working">3</span>
+          </div>
+          <div class="summary-strip__item">
+            <span class="summary-strip__label">Aggregate working</span>
+            <span class="summary-strip__value">R$ 12.450,00</span>
+          </div>
+        </div>
+
+        <section class="account-list" aria-label="Account list">
+          <div class="account-list__header">
+            <span>Account</span>
+            <span>Working</span>
+            <span>Balance</span>
+            <span></span>
+          </div>
+
+          <article class="account-row">
+            <div class="account-row__info">
+              <div class="account-row__name">Cora Checking</div>
+              <div class="account-row__meta">
+                <span class="chip">Checking</span>
+              </div>
+            </div>
+            <div class="account-row__working">
+              <span class="toggle toggle--on" aria-label="Working account"></span>
+            </div>
+            <div class="account-row__balance">R$ 8.450,00</div>
+            <div class="account-row__actions">
+              <button class="icon-btn account-row__edit" type="button" title="Edit">✎</button>
+            </div>
+          </article>
+
+          <article class="account-row">
+            <div class="account-row__info">
+              <div class="account-row__name">Nubank Savings</div>
+              <div class="account-row__meta">
+                <span class="chip">Savings</span>
+              </div>
+            </div>
+            <div class="account-row__working">
+              <span class="toggle" aria-label="Not working"></span>
+            </div>
+            <div class="account-row__balance">R$ 15.200,00</div>
+            <div class="account-row__actions">
+              <button class="icon-btn account-row__edit" type="button" title="Edit">✎</button>
+            </div>
+          </article>
+
+          <article class="account-row">
+            <div class="account-row__info">
+              <div class="account-row__name">Cartão Cora</div>
+              <div class="account-row__meta">
+                <span class="chip chip--card">Credit card</span>
+              </div>
+            </div>
+            <div class="account-row__working">
+              <span class="toggle" aria-label="Not working (cards excluded)"></span>
+            </div>
+            <div class="account-row__balance account-row__balance--debt">
+              <span class="account-row__balance-label">Owed</span>
+              R$ 1.850,00
+            </div>
+            <div class="account-row__actions">
+              <button class="icon-btn account-row__edit" type="button" title="Edit">✎</button>
+            </div>
+          </article>
+
+          <article class="account-row">
+            <div class="account-row__info">
+              <div class="account-row__name">Carteira</div>
+              <div class="account-row__meta">
+                <span class="chip">Wallet</span>
+              </div>
+            </div>
+            <div class="account-row__working">
+              <span class="toggle toggle--on" aria-label="Working account"></span>
+            </div>
+            <div class="account-row__balance">R$ 320,00</div>
+            <div class="account-row__actions">
+              <button class="icon-btn account-row__edit" type="button" title="Edit">✎</button>
+            </div>
+          </article>
+
+          <article class="account-row">
+            <div class="account-row__info">
+              <div class="account-row__name">XP Investimentos</div>
+              <div class="account-row__meta">
+                <span class="chip">Investment</span>
+              </div>
+            </div>
+            <div class="account-row__working">
+              <span class="toggle" aria-label="Not working"></span>
+            </div>
+            <div class="account-row__balance">R$ 42.000,00</div>
+            <div class="account-row__actions">
+              <button class="icon-btn account-row__edit" type="button" title="Edit">✎</button>
+            </div>
+          </article>
+        </section>
+      </div>
+    </div>
+
+    <nav class="bottom-nav" aria-label="Main">
+      <a class="bottom-nav__item" href="year.html">
+        <span class="bottom-nav__icon" aria-hidden="true">📅</span>
+        Calendar
+      </a>
+      <a class="bottom-nav__item" href="transactions.html">
+        <span class="bottom-nav__icon" aria-hidden="true">↕</span>
+        Transactions
+      </a>
+      <a class="bottom-nav__item" href="forecast.html">
+        <span class="bottom-nav__icon" aria-hidden="true">◎</span>
+        Forecast
+      </a>
+      <a class="bottom-nav__item" href="categories.html">
+        <span class="bottom-nav__icon" aria-hidden="true">▦</span>
+        Categories
+      </a>
+      <a class="bottom-nav__item bottom-nav__item--active" href="accounts.html">
+        <span class="bottom-nav__icon" aria-hidden="true">⋯</span>
+        More
+      </a>
+    </nav>
+  </div>
+
+  <div class="account-overlay" id="account-overlay" aria-hidden="true">
+    <div class="account-overlay__backdrop"></div>
+    <aside class="editor-panel" role="dialog" aria-labelledby="editor-panel-title" aria-modal="true">
+      <div class="editor-panel__header">
+        <div class="editor-panel__header-top">
+          <div>
+            <h2 class="editor-panel__title" id="editor-panel-title">Edit account</h2>
+            <p class="editor-panel__subtitle" id="editor-panel-subtitle">Cartão Cora · Credit card</p>
+          </div>
+          <button class="editor-panel__close" type="button" aria-label="Close editor">×</button>
+        </div>
+      </div>
+
+      <div class="editor-panel__body">
+        <div class="form-group">
+          <label class="form-group__label" for="name">Name</label>
+          <input class="form-group__input" id="name" type="text" value="Cartão Cora">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-group__label" for="type">Type</label>
+            <select class="form-group__select" id="type">
+              <option>Checking</option>
+              <option>Savings</option>
+              <option>Wallet</option>
+              <option selected>Credit card</option>
+              <option>Investment</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-group__label" for="currency">Currency</label>
+            <input class="form-group__input" id="currency" type="text" value="BRL" readonly>
+          </div>
+        </div>
+
+        <div class="form-toggle-row">
+          <div>
+            <div class="form-toggle-row__label">Working account</div>
+            <div class="form-toggle-row__hint">Credit cards are always excluded</div>
+          </div>
+          <span class="toggle" aria-label="Not working"></span>
+        </div>
+
+        <div class="form-section">
+          <h3 class="form-section__title">Balance anchor</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-group__label" for="anchor-balance">Amount owed</label>
+              <input class="form-group__input" id="anchor-balance" type="text" value="R$ 1.850,00">
+            </div>
+            <div class="form-group">
+              <label class="form-group__label" for="anchor-date">Anchor date</label>
+              <input class="form-group__input" id="anchor-date" type="text" value="01/06/2026">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section form-section--card">
+          <h3 class="form-section__title">Credit card cycle</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-group__label" for="closing-day">Closing day</label>
+              <input class="form-group__input" id="closing-day" type="text" value="25">
+            </div>
+            <div class="form-group">
+              <label class="form-group__label" for="due-day">Due day</label>
+              <input class="form-group__input" id="due-day" type="text" value="3">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-group__label" for="credit-limit">Credit limit</label>
+            <input class="form-group__input" id="credit-limit" type="text" value="R$ 8.000,00">
+          </div>
+          <div class="form-group">
+            <label class="form-group__label" for="pay-from">Default pay from</label>
+            <select class="form-group__select" id="pay-from">
+              <option selected>Cora Checking</option>
+              <option>Carteira</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="form-section__title">Optional metadata</h3>
+          <div class="form-group">
+            <label class="form-group__label" for="institution">Institution</label>
+            <input class="form-group__input" id="institution" type="text" value="Cora">
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-panel__footer">
+        <button class="btn btn--ghost" type="button">Archive</button>
+        <button class="btn btn--primary" type="button">Save</button>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    (function () {
+      var menu = document.querySelector(".mobile-header__menu");
+      var nav = document.querySelector(".nav");
+      var overlay = document.querySelector(".nav-overlay");
+      if (!menu || !nav || !overlay) return;
+
+      function openNav() {
+        nav.classList.add("nav--open");
+        overlay.classList.add("nav-overlay--visible");
+        overlay.setAttribute("aria-hidden", "false");
+      }
+
+      function closeNav() {
+        nav.classList.remove("nav--open");
+        overlay.classList.remove("nav-overlay--visible");
+        overlay.setAttribute("aria-hidden", "true");
+      }
+
+      menu.addEventListener("click", openNav);
+      overlay.addEventListener("click", closeNav);
+      nav.querySelectorAll(".nav__link").forEach(function (link) {
+        link.addEventListener("click", closeNav);
+      });
+    })();
+  </script>
+  <script src="js/accounts.js"></script>
+</body>
+</html>

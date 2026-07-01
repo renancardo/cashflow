@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cashflow Prototype — Ink</title>
+  <link rel="stylesheet" href="css/ink.css">
+  <style>
+    .hub {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: var(--space-4) var(--space-4) var(--space-7);
+    }
+
+    @media (min-width: 480px) {
+      .hub {
+        padding: var(--space-6) var(--space-5) var(--space-7);
+      }
+    }
+
+    .hub__badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-secondary);
+      background: var(--color-secondary-soft);
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-full);
+      margin-bottom: var(--space-3);
+    }
+
+    .hub__title {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0 0 var(--space-2);
+      color: var(--color-primary);
+      letter-spacing: -0.02em;
+    }
+
+    @media (min-width: 480px) {
+      .hub__title {
+        font-size: 2rem;
+      }
+    }
+
+    .hub__desc {
+      color: var(--color-text-muted);
+      margin: 0 0 var(--space-5);
+      line-height: 1.6;
+      font-size: 0.9375rem;
+    }
+
+    .hub__desc code {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      background: var(--color-surface);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .hub__links {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .hub__link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      min-height: var(--touch-min);
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: none;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      transition: box-shadow 0.2s, transform 0.15s, background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    @media (min-width: 480px) {
+      .hub__link {
+        padding: var(--space-4) var(--space-5);
+      }
+    }
+
+    .hub__link:hover,
+    .hub__link:focus-visible {
+      box-shadow: var(--shadow-lg);
+      background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-secondary-soft) 100%);
+      outline: none;
+    }
+
+    .hub__link:active {
+      transform: scale(0.99);
+    }
+
+    .hub__link-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--color-primary);
+    }
+
+    @media (min-width: 480px) {
+      .hub__link-title {
+        font-size: 1.0625rem;
+      }
+    }
+
+    .hub__link-desc {
+      font-size: 0.8125rem;
+      color: var(--color-text-muted);
+      margin-top: var(--space-1);
+      line-height: 1.45;
+    }
+
+    .hub__arrow {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      background: var(--color-bg);
+      color: var(--color-secondary);
+      font-size: 1.125rem;
+      font-weight: 600;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .hub__link:hover .hub__arrow,
+    .hub__link:focus-visible .hub__arrow {
+      background: var(--color-secondary);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="hub">
+    <span class="hub__badge">Prototype 005</span>
+    <h1 class="hub__title">Cashflow Prototype</h1>
+    <p class="hub__desc">
+      Static HTML/CSS prototypes for Phase 1 screens, using the Ink design system
+      from <code>prototype/005/DESIGN.md</code> — mobile-first cards, teal accents, and Inter typography.
+    </p>
+    <nav class="hub__links" aria-label="Prototype screens">
+      <a class="hub__link" href="year.html">
+        <div>
+          <div class="hub__link-title">Year Calendar</div>
+          <div class="hub__link-desc">Linear grid hub with projection indicators — click a day to open the detail panel</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="month.html">
+        <div>
+          <div class="hub__link-title">Month Calendar</div>
+          <div class="hub__link-desc">Denser single-month grid with totals, balances, and day detail panel</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="month.html?day=2026-08-15">
+        <div>
+          <div class="hub__link-title">Month Calendar — Aug demo</div>
+          <div class="hub__link-desc">August 2026 with day 15 pre-opened (below buffer scenario)</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="year.html?day=2026-08-15">
+        <div>
+          <div class="hub__link-title">Day Detail Panel</div>
+          <div class="hub__link-desc">Slide-over breakdown with quick-add and confirm payment actions</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="accounts.html">
+        <div>
+          <div class="hub__link-title">Accounts</div>
+          <div class="hub__link-desc">Account list, working flags, and card editor</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="transactions.html">
+        <div>
+          <div class="hub__link-title">Transactions</div>
+          <div class="hub__link-desc">Chronological ledger with filters, running balance, and edit panel</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="transactions.html?empty=1">
+        <div>
+          <div class="hub__link-title">Transactions — Empty state</div>
+          <div class="hub__link-desc">First-run empty state with CSV import and add prompts</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="transactions.html?edit=1">
+        <div>
+          <div class="hub__link-title">Transactions — Edit demo</div>
+          <div class="hub__link-desc">Populated ledger with edit panel pre-opened</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="forecast.html">
+        <div>
+          <div class="hub__link-title">Forecast Items</div>
+          <div class="hub__link-desc">Recurring, one-off, installment plans, and subscriptions — unified forecast screen</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="forecast.html?empty=1">
+        <div>
+          <div class="hub__link-title">Forecast Items — Empty state</div>
+          <div class="hub__link-desc">First-run empty state with add prompt</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="forecast.html?edit=1">
+        <div>
+          <div class="hub__link-title">Forecast Items — Edit demo</div>
+          <div class="hub__link-desc">Netflix subscription editor with upcoming occurrences preview</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="forecast.html?recurrence=1">
+        <div>
+          <div class="hub__link-title">Forecast Items — Recurrence dialog</div>
+          <div class="hub__link-desc">This occurrence vs this+future scope picker on save</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="forecast.html?filter=subscription">
+        <div>
+          <div class="hub__link-title">Forecast Items — Subscriptions filter</div>
+          <div class="hub__link-desc">Filter chip applied; Netflix and Spotify in Recurring group</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="forecast.html?installments=1">
+        <div>
+          <div class="hub__link-title">Forecast Items — Installments</div>
+          <div class="hub__link-desc">Ipanema plan with expandable schedule and mark-paid rows</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="categories.html">
+        <div>
+          <div class="hub__link-title">Categories & Budgets</div>
+          <div class="hub__link-desc">Category tree, monthly expense budgets, actual vs target, and snapshot compare</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="categories.html?empty=1">
+        <div>
+          <div class="hub__link-title">Categories — Empty state</div>
+          <div class="hub__link-desc">First-run empty state with add prompt</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="categories.html?edit=1">
+        <div>
+          <div class="hub__link-title">Categories — Edit demo</div>
+          <div class="hub__link-desc">Food parent category editor with budget fields</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="categories.html?snapshot=1">
+        <div>
+          <div class="hub__link-title">Categories — Snapshot compare</div>
+          <div class="hub__link-desc">Snapshot variance column and compare banner visible</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="snapshots.html">
+        <div>
+          <div class="hub__link-title">Snapshots</div>
+          <div class="hub__link-desc">Create forecast baselines and compare variance by month and category</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="snapshots.html?empty=1">
+        <div>
+          <div class="hub__link-title">Snapshots — Empty state</div>
+          <div class="hub__link-desc">First-run empty state with create prompt</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="snapshots.html?create=1">
+        <div>
+          <div class="hub__link-title">Snapshots — Create demo</div>
+          <div class="hub__link-desc">Create snapshot panel pre-opened</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="settings.html">
+        <div>
+          <div class="hub__link-title">Settings</div>
+          <div class="hub__link-desc">Language, projection thresholds, account defaults, and JSON export/backup</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="hub__link" href="settings.html?import-error=1">
+        <div>
+          <div class="hub__link-title">Settings — Import error demo</div>
+          <div class="hub__link-desc">Backup restore failure banner shown inline</div>
+        </div>
+        <span class="hub__arrow" aria-hidden="true">→</span>
+      </a>
+    </nav>
+  </div>
+</body>
+</html>
