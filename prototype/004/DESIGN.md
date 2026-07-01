@@ -34,6 +34,8 @@ spacing:
 
 Paper-textured, print-inspired design with minimal colors, clean serif/sans typography, and tactile surface qualities.
 
+> **Canonical reference for Phase 1.** Full specification: [`docs/specs/004-style-guide.md`](../../docs/specs/004-style-guide.md) (locked). Prototypes `005` and `006` are exploratory alternates.
+
 ## Style Foundations
 
 - **Visual style:** minimal, clean

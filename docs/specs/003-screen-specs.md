@@ -7,7 +7,7 @@ isProject: false
 
 # Screen Specs — Phase 1
 
-> **Sources:** [001-data-model.md](./001-data-model.md), [002-phase-1-scope.md §3](./002-phase-1-scope.md). Visual tokens, components, and semantic colors come from [004-style-guide.md](./004-style-guide.md) (pending).
+> **Sources:** [001-data-model.md](./001-data-model.md), [002-phase-1-scope.md §3](./002-phase-1-scope.md). Visual tokens, components, and semantic colors come from [004-style-guide.md](./004-style-guide.md) (locked — canonical reference: `prototype/004/`).
 >
 > **Scope guard:** This doc specifies only the 9 locked Phase 1 screens plus a deferred **Insights** stub. No new entities are introduced — every field maps to [001-data-model.md](./001-data-model.md).
 
