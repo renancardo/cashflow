@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snapshots — Cashflow Prototype</title>
+  <link rel="stylesheet" href="css/paper.css">
+  <link rel="stylesheet" href="css/snapshots.css">
+</head>
+<body>
+  <div class="app">
+    <nav class="nav">
+      <div class="nav__brand">Cashflow</div>
+      <div>
+        <div class="nav__label">Screens</div>
+        <ul class="nav__list">
+          <li><a class="nav__link" href="year.html">Year Calendar</a></li>
+          <li><a class="nav__link" href="month.html">Month Calendar</a></li>
+          <li><a class="nav__link" href="transactions.html">Transactions</a></li>
+          <li><a class="nav__link" href="accounts.html">Accounts</a></li>
+          <li><a class="nav__link" href="forecast.html">Forecast Items</a></li>
+          <li><a class="nav__link" href="categories.html">Categories</a></li>
+          <li><a class="nav__link nav__link--active" href="snapshots.html">Snapshots</a></li>
+          <li><a class="nav__link" href="#">Settings</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="main">
+      <header class="header-strip header-strip--condensed">
+        <div class="metric">
+          <span class="metric__label">Working balance</span>
+          <span class="metric__value">R$ 12.450,00</span>
+        </div>
+        <div class="header-strip__spacer"></div>
+        <button class="btn btn--primary" type="button" id="create-snapshot-btn">+ Create snapshot</button>
+      </header>
+
+      <div class="page" id="snapshots-page">
+        <div class="page__header">
+          <div>
+            <h1 class="page__title">Snapshots</h1>
+            <p class="page__subtitle">Freeze forecast baselines and compare projected vs actual spending by month and category</p>
+          </div>
+        </div>
+
+        <div class="snap-empty" id="snap-empty">
+          <div class="snap-empty__icon">📸</div>
+          <h2 class="snap-empty__title">No snapshots yet</h2>
+          <p class="snap-empty__desc">
+            Create your first snapshot to capture the current forecast as a baseline. You can then track variance as actual transactions come in.
+          </p>
+          <button class="btn btn--primary" type="button" id="empty-create-btn">+ Create snapshot</button>
+        </div>
+
+        <div class="summary-strip" id="snap-summary">
+          <div class="summary-strip__item">
+            <span class="summary-strip__label">Snapshots</span>
+            <span class="summary-strip__value">2</span>
+          </div>
+          <div class="summary-strip__item">
+            <span class="summary-strip__label">Selected</span>
+            <span class="summary-strip__value" id="summary-selected-name">Baseline — Jun 2026</span>
+          </div>
+          <div class="summary-strip__item">
+            <span class="summary-strip__label">As of</span>
+            <span class="summary-strip__value" id="summary-as-of">01/06/2026</span>
+          </div>
+          <div class="summary-strip__item">
+            <span class="summary-strip__label">Jun variance</span>
+            <span class="summary-strip__value summary-strip__value--danger" id="summary-variance">− R$ 230,60</span>
+          </div>
+        </div>
+
+        <div class="snap-layout" id="snap-layout">
+          <section class="snap-list-panel" aria-label="Snapshot list">
+            <div class="snap-list-panel__header">
+              <h2 class="snap-list-panel__title">Saved baselines</h2>
+              <span class="snap-list-panel__hint">Immutable once created</span>
+            </div>
+
+            <div class="snap-list">
+              <article class="snap-row snap-row--selected" data-id="baseline-jun" data-name="Baseline — Jun 2026" data-as-of="01/06/2026" data-variance="− R$ 230,60">
+                <div class="snap-row__main">
+                  <div class="snap-row__info">
+                    <div class="snap-row__name">Baseline — Jun 2026</div>
+                    <div class="snap-row__meta">Full forecast clone</div>
+                  </div>
+                  <div class="snap-row__actions">
+                    <a class="icon-btn snap-row__categories" href="categories.html?snapshot=1" title="Open in Categories">↗</a>
+                    <button class="icon-btn snap-row__delete" type="button" title="Delete">🗑</button>
+                  </div>
+                </div>
+                <dl class="snap-row__details">
+                  <div class="snap-row__detail">
+                    <dt>As of</dt>
+                    <dd>01/06/2026</dd>
+                  </div>
+                  <div class="snap-row__detail">
+                    <dt>Horizon</dt>
+                    <dd>24 mo</dd>
+                  </div>
+                  <div class="snap-row__detail">
+                    <dt>Created</dt>
+                    <dd>01/06/2026 · 09:14</dd>
+                  </div>
+                </dl>
+              </article>
+
+              <article class="snap-row" data-id="pre-vacation" data-name="Pre-vacation — May 2026" data-as-of="15/05/2026" data-variance="− R$ 85,00">
+                <div class="snap-row__main">
+                  <div class="snap-row__info">
+                    <div class="snap-row__name">Pre-vacation — May 2026</div>
+                    <div class="snap-row__meta">Full forecast clone</div>
+                  </div>
+                  <div class="snap-row__actions">
+                    <a class="icon-btn snap-row__categories" href="categories.html?snapshot=1" title="Open in Categories">↗</a>
+                    <button class="icon-btn snap-row__delete" type="button" title="Delete">🗑</button>
+                  </div>
+                </div>
+                <dl class="snap-row__details">
+                  <div class="snap-row__detail">
+                    <dt>As of</dt>
+                    <dd>15/05/2026</dd>
+                  </div>
+                  <div class="snap-row__detail">
+                    <dt>Horizon</dt>
+                    <dd>24 mo</dd>
+                  </div>
+                  <div class="snap-row__detail">
+                    <dt>Created</dt>
+                    <dd>15/05/2026 · 18:30</dd>
+                  </div>
+                </dl>
+              </article>
+            </div>
+          </section>
+
+          <section class="snap-compare" id="snap-compare" aria-label="Variance compare">
+            <div class="snap-compare__header">
+              <div>
+                <h2 class="snap-compare__title">Compare</h2>
+                <p class="snap-compare__subtitle" id="compare-subtitle">Baseline — Jun 2026 · snapshot baseline vs current actuals</p>
+              </div>
+              <a class="btn btn--ghost snap-compare__link" href="categories.html?snapshot=1">View in Categories →</a>
+            </div>
+
+            <div class="snap-compare__legend">
+              <span class="snap-compare__legend-item snap-compare__legend-item--under">Under baseline</span>
+              <span class="snap-compare__legend-item snap-compare__legend-item--over">Over baseline</span>
+            </div>
+
+            <div class="snap-compare__section">
+              <h3 class="snap-compare__section-title">Monthly expense variance</h3>
+              <p class="snap-compare__section-desc">Total outflows per month — baseline from snapshot vs actual transactions to date</p>
+
+              <div class="var-table var-table--months">
+                <div class="var-table__header">
+                  <span>Month</span>
+                  <span>Baseline</span>
+                  <span>Actual</span>
+                  <span>Variance</span>
+                </div>
+
+                <div class="var-row">
+                  <span class="var-row__label">Jun 2026</span>
+                  <span class="var-row__baseline">R$ 5.050,00</span>
+                  <span class="var-row__actual">R$ 5.280,60</span>
+                  <span class="var-row__variance var-row__variance--over">− R$ 230,60</span>
+                </div>
+                <div class="var-row">
+                  <span class="var-row__label">Jul 2026</span>
+                  <span class="var-row__baseline">R$ 4.920,00</span>
+                  <span class="var-row__actual">R$ 1.180,00</span>
+                  <span class="var-row__variance var-row__variance--under">+ R$ 3.740,00</span>
+                </div>
+                <div class="var-row">
+                  <span class="var-row__label">Aug 2026</span>
+                  <span class="var-row__baseline">R$ 5.100,00</span>
+                  <span class="var-row__actual">R$ 0,00</span>
+                  <span class="var-row__variance var-row__variance--under">+ R$ 5.100,00</span>
+                </div>
+                <div class="var-row">
+                  <span class="var-row__label">Sep 2026</span>
+                  <span class="var-row__baseline">R$ 4.850,00</span>
+                  <span class="var-row__actual">R$ 0,00</span>
+                  <span class="var-row__variance var-row__variance--under">+ R$ 4.850,00</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="snap-compare__section">
+              <div class="snap-compare__section-head">
+                <div>
+                  <h3 class="snap-compare__section-title">Category breakdown</h3>
+                  <p class="snap-compare__section-desc">Expense variance by category for the selected month</p>
+                </div>
+                <div class="snap-compare__month-picker">
+                  <label class="snap-compare__month-label" for="compare-month">Month</label>
+                  <select class="snap-compare__month-select" id="compare-month">
+                    <option value="2026-06" selected>June 2026</option>
+                    <option value="2026-07">July 2026</option>
+                    <option value="2026-05">May 2026</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="var-table var-table--categories">
+                <div class="var-table__header">
+                  <span>Category</span>
+                  <span>Baseline</span>
+                  <span>Actual</span>
+                  <span>Variance</span>
+                </div>
+
+                <div class="var-row">
+                  <span class="var-row__label">Food</span>
+                  <span class="var-row__baseline">R$ 1.500,00</span>
+                  <span class="var-row__actual">R$ 1.425,00</span>
+                  <span class="var-row__variance var-row__variance--under">+ R$ 75,00</span>
+                </div>
+                <div class="var-row var-row--child">
+                  <span class="var-row__label">Groceries</span>
+                  <span class="var-row__baseline">R$ 900,00</span>
+                  <span class="var-row__actual">R$ 820,00</span>
+                  <span class="var-row__variance var-row__variance--under">+ R$ 80,00</span>
+                </div>
+                <div class="var-row var-row--child">
+                  <span class="var-row__label">Restaurants</span>
+                  <span class="var-row__baseline">R$ 600,00</span>
+                  <span class="var-row__actual">R$ 605,00</span>
+                  <span class="var-row__variance var-row__variance--over">− R$ 5,00</span>
+                </div>
+                <div class="var-row">
+                  <span class="var-row__label">Transport</span>
+                  <span class="var-row__baseline">R$ 450,00</span>
+                  <span class="var-row__actual">R$ 525,00</span>
+                  <span class="var-row__variance var-row__variance--over">− R$ 75,00</span>
+                </div>
+                <div class="var-row">
+                  <span class="var-row__label">Housing</span>
+                  <span class="var-row__baseline">R$ 2.200,00</span>
+                  <span class="var-row__actual">R$ 2.200,00</span>
+                  <span class="var-row__variance">R$ 0,00</span>
+                </div>
+                <div class="var-row">
+                  <span class="var-row__label">Subscriptions</span>
+                  <span class="var-row__baseline">R$ 120,00</span>
+                  <span class="var-row__actual">R$ 155,90</span>
+                  <span class="var-row__variance var-row__variance--over">− R$ 35,90</span>
+                </div>
+                <div class="var-row">
+                  <span class="var-row__label">Health</span>
+                  <span class="var-row__baseline">R$ 300,00</span>
+                  <span class="var-row__actual">R$ 244,10</span>
+                  <span class="var-row__variance var-row__variance--under">+ R$ 55,90</span>
+                </div>
+                <div class="var-row var-row--total">
+                  <span class="var-row__label">Total</span>
+                  <span class="var-row__baseline">R$ 5.050,00</span>
+                  <span class="var-row__actual">R$ 5.280,60</span>
+                  <span class="var-row__variance var-row__variance--over">− R$ 230,60</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="snapshot-overlay" id="snapshot-overlay" aria-hidden="true">
+    <div class="snapshot-overlay__backdrop"></div>
+    <aside class="editor-panel" role="dialog" aria-labelledby="editor-panel-title" aria-modal="true">
+      <div class="editor-panel__header">
+        <div class="editor-panel__header-top">
+          <div>
+            <h2 class="editor-panel__title" id="editor-panel-title">Create snapshot</h2>
+            <p class="editor-panel__subtitle" id="editor-panel-subtitle">Captures the full forecast state at a point in time</p>
+          </div>
+          <button class="editor-panel__close" type="button" aria-label="Close editor">×</button>
+        </div>
+      </div>
+
+      <div class="editor-panel__body">
+        <div class="form-group">
+          <label class="form-group__label" for="snap-name">Name</label>
+          <input class="form-group__input" id="snap-name" type="text" placeholder="e.g. Baseline — Jun 2026">
+        </div>
+
+        <div class="form-group">
+          <label class="form-group__label" for="snap-as-of">As of date</label>
+          <input class="form-group__input" id="snap-as-of" type="text" value="30/06/2026">
+          <p class="form-group__hint">Forecast reference date for this baseline</p>
+        </div>
+
+        <div class="form-section">
+          <h3 class="form-section__title">What gets captured</h3>
+          <p class="form-section__desc">
+            A full clone of account anchors, planned items, installments, credit card statements, and projected daily balances across the forecast horizon.
+          </p>
+          <div class="snap-capture-list">
+            <span class="snap-capture-list__item">Account anchors & balances</span>
+            <span class="snap-capture-list__item">Planned items & overrides</span>
+            <span class="snap-capture-list__item">Installment schedules</span>
+            <span class="snap-capture-list__item">Card statements</span>
+            <span class="snap-capture-list__item">Projected daily balances</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-group__label">Horizon</label>
+            <input class="form-group__input" type="text" value="24 months" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-group__label">Currency</label>
+            <input class="form-group__input" type="text" value="BRL" readonly>
+          </div>
+        </div>
+
+        <p class="form-group__hint snap-immutable-note">Snapshots are immutable once created and cannot be edited.</p>
+      </div>
+
+      <div class="editor-panel__footer">
+        <button class="btn btn--ghost editor-panel__cancel" type="button">Cancel</button>
+        <button class="btn btn--primary" type="button">Create snapshot</button>
+      </div>
+    </aside>
+  </div>
+
+  <script src="js/snapshots.js"></script>
+</body>
+</html>
