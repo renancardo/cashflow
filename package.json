@@ -1,0 +1,26 @@
+{
+  "name": "cashflow",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --filter @cashflow/app dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "test:engine": "pnpm --filter @cashflow/engine test",
+    "storybook": "pnpm --filter @cashflow/ui storybook",
+    "lint": "eslint \"packages/*/src/**/*.{ts,tsx}\"",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "eslint": "^9.39.1",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.48.0"
+  },
+  "packageManager": "pnpm@10.18.3",
+  "engines": {
+    "node": ">=20"
+  }
+}

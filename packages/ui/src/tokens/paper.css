@@ -1,0 +1,55 @@
+/* Paper design tokens — canonical: docs/prototype/004/css/paper.css */
+
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=PT+Mono&family=Roboto:wght@300;400;500&display=swap");
+
+:root {
+  --color-primary: #111111;
+  --color-secondary: #8b5cf6;
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+  --color-surface: #ffffff;
+  --color-text: #111827;
+  --color-text-muted: #6b7280;
+  --color-border: #e5e7eb;
+  --color-weekend: #f3f4f6;
+  --color-paper: #faf8f5;
+  --color-paper-shadow: #ebe6df;
+
+  --font-display: "Montserrat", system-ui, sans-serif;
+  --font-body: "Roboto", system-ui, sans-serif;
+  --font-mono: "PT Mono", ui-monospace, monospace;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --nav-width: 220px;
+  --header-height: 56px;
+  --bottom-nav-height: 64px;
+  --touch-min: 44px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background-color: var(--color-paper);
+}

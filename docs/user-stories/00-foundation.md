@@ -40,16 +40,16 @@ Project setup, stack evaluation, and development tooling. **Ship before or in pa
 
 ### Acceptance criteria
 
-- [ ] Repo layout matches [006-project-structure.md](../specs/006-project-structure.md):
+- [x] Repo layout matches [006-project-structure.md](../specs/006-project-structure.md):
   - `packages/engine/` — pure projection (no React)
   - `packages/core/` — shared types
   - `packages/db/` — client repos + `loadEngineInput()`
   - `packages/ui/` — components + Storybook
   - `packages/app/` — React SPA, TanStack Query + Router
-- [ ] Root tooling: package manager lockfile, ESLint, Prettier (or project conventions)
-- [ ] Scripts: `dev`, `test`, `build`, `storybook`
-- [ ] Engine package is importable from app without circular deps
-- [ ] README at app root explains how to run dev + tests
+- [x] Root tooling: package manager lockfile, ESLint, Prettier (or project conventions)
+- [x] Scripts: `dev`, `test`, `build`, `storybook`
+- [x] Engine package is importable from app without circular deps
+- [x] README at app root explains how to run dev + tests
 
 ---
 

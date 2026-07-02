@@ -1,7 +1,8 @@
-.DS_Store
 node_modules
 dist
 storybook-static
 coverage
 *.local
 .vite
+docs/
+prototype/

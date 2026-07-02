@@ -1,0 +1,30 @@
+{
+  "name": "@cashflow/app",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@cashflow/core": "workspace:*",
+    "@cashflow/db": "workspace:*",
+    "@cashflow/engine": "workspace:*",
+    "@cashflow/ui": "workspace:*",
+    "@tanstack/react-query": "^5.90.5",
+    "@tanstack/react-router": "^1.134.12",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react": "^5.0.4",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.12",
+    "vitest": "^3.2.4"
+  }
+}
