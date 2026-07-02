@@ -8,13 +8,7 @@ type Props = {
   className?: string;
 };
 
-export function Toggle({
-  checked,
-  onChange,
-  disabled,
-  "aria-label": ariaLabel,
-  className,
-}: Props) {
+export function Toggle({ checked, onChange, disabled, "aria-label": ariaLabel, className }: Props) {
   return (
     <button
       type="button"

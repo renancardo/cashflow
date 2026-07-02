@@ -1,5 +1,12 @@
-import type { AccountType } from "@cashflow/core";
-import type { ChipVariant } from "../atoms/Chip/Chip.js";
+import type { AccountType } from "./entities.js";
+
+export const ACCOUNT_TYPES = [
+  "checking",
+  "savings",
+  "wallet",
+  "credit_card",
+  "investment",
+] as const satisfies readonly AccountType[];
 
 export const ACCOUNT_TYPE_LABELS: Record<AccountType, string> = {
   checking: "Checking",
@@ -9,7 +16,9 @@ export const ACCOUNT_TYPE_LABELS: Record<AccountType, string> = {
   investment: "Investment",
 };
 
-export function accountTypeChipVariant(type: AccountType): ChipVariant {
+export type AccountTypeChipVariant = "card" | "default";
+
+export function accountTypeChipVariant(type: AccountType): AccountTypeChipVariant {
   return type === "credit_card" ? "card" : "default";
 }
 

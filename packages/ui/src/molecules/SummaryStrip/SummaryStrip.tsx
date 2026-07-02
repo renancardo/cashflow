@@ -20,7 +20,9 @@ export function SummaryStripItem({ label, children, tone = "default" }: ItemProp
   return (
     <div className={styles.item}>
       <span className={styles.label}>{label}</span>
-      <span className={[styles.value, tone === "working" && styles.working].filter(Boolean).join(" ")}>
+      <span
+        className={[styles.value, tone === "working" && styles.working].filter(Boolean).join(" ")}
+      >
         {children}
       </span>
     </div>

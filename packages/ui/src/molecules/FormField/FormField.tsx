@@ -11,17 +11,67 @@ type BaseProps = {
 
 type InputProps = BaseProps & {
   inputType?: "input";
+  /** Static adornment rendered inside the field, before the input (e.g. a currency code). */
+  prefix?: ReactNode;
 } & Pick<
-  InputHTMLAttributes<HTMLInputElement>,
-  "type" | "value" | "defaultValue" | "onChange" | "readOnly" | "placeholder" | "required" | "min" | "max" | "step"
->;
+    InputHTMLAttributes<HTMLInputElement>,
+    | "type"
+    | "value"
+    | "defaultValue"
+    | "onChange"
+    | "onBlur"
+    | "readOnly"
+    | "placeholder"
+    | "required"
+    | "min"
+    | "max"
+    | "step"
+    | "inputMode"
+    | "autoFocus"
+  >;
 
 type SelectProps = BaseProps & {
   inputType: "select";
   children: ReactNode;
-} & Pick<SelectHTMLAttributes<HTMLSelectElement>, "value" | "defaultValue" | "onChange" | "required">;
+} & Pick<
+    SelectHTMLAttributes<HTMLSelectElement>,
+    "value" | "defaultValue" | "onChange" | "required"
+  >;
 
 type Props = InputProps | SelectProps;
+
+function FieldInput(props: InputProps) {
+  const input = (
+    <input
+      id={props.id}
+      className={styles.input}
+      type={props.type ?? "text"}
+      value={props.value}
+      defaultValue={props.defaultValue}
+      onChange={props.onChange}
+      onBlur={props.onBlur}
+      readOnly={props.readOnly}
+      placeholder={props.placeholder}
+      required={props.required}
+      min={props.min}
+      max={props.max}
+      step={props.step}
+      inputMode={props.inputMode}
+      autoFocus={props.autoFocus}
+    />
+  );
+
+  if (!props.prefix) return input;
+
+  return (
+    <div className={styles.inputGroup}>
+      <span className={styles.prefix} aria-hidden="true">
+        {props.prefix}
+      </span>
+      {input}
+    </div>
+  );
+}
 
 export function FormField(props: Props) {
   const { label, id, hint, className } = props;
@@ -41,20 +91,7 @@ export function FormField(props: Props) {
           {props.children}
         </select>
       ) : (
-        <input
-          id={id}
-          className={styles.input}
-          type={props.type ?? "text"}
-          value={props.value}
-          defaultValue={props.defaultValue}
-          onChange={props.onChange}
-          readOnly={props.readOnly}
-          placeholder={props.placeholder}
-          required={props.required}
-          min={props.min}
-          max={props.max}
-          step={props.step}
-        />
+        <FieldInput {...props} />
       )}
       {hint && <div className={styles.hint}>{hint}</div>}
     </div>

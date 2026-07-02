@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Account, AccountType } from "@cashflow/core";
+import { defaultIsWorking } from "@cashflow/core";
 import { accountsRepo } from "@cashflow/db";
-import { defaultIsWorking } from "@cashflow/ui";
 import { queryKeys } from "../keys";
 
 export type AccountInput = {
@@ -23,7 +23,8 @@ function toAccountPayload(input: AccountInput): Omit<Account, "id"> {
     name: input.name.trim(),
     type: input.type,
     currency: input.currency,
-    isWorking: input.type === "credit_card" || input.type === "investment" ? false : input.isWorking,
+    isWorking:
+      input.type === "credit_card" || input.type === "investment" ? false : input.isWorking,
     anchorBalanceCents: input.anchorBalanceCents,
     anchorDate: input.anchorDate,
     closingDay: input.type === "credit_card" ? input.closingDay : undefined,

@@ -2,7 +2,10 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { AppLayout } from "./AppLayout.js";
 import { AccountsScreen } from "../../organisms/AccountsScreen/AccountsScreen.js";
-import { AccountEditorPanel, type AccountEditorValues } from "../../organisms/AccountEditorPanel/AccountEditorPanel.js";
+import {
+  AccountEditorPanel,
+  type AccountEditorValues,
+} from "../../organisms/AccountEditorPanel/AccountEditorPanel.js";
 import { DEMO_ACCOUNTS, DEMO_WORKING_BALANCE_CENTS } from "../../fixtures/accounts.js";
 
 const meta: Meta<typeof AppLayout> = {

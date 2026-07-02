@@ -1,11 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Account } from "@cashflow/core";
-import { defaultIsWorking } from "@cashflow/ui";
-import {
-  AccountEditorPanel,
-  AccountsScreen,
-  type AccountEditorValues,
-} from "@cashflow/ui";
+import { defaultIsWorking } from "@cashflow/core";
+import { AccountEditorPanel, AccountsScreen, type AccountEditorValues } from "@cashflow/ui";
 import {
   createEmptyAccountInput,
   useAccountMutations,

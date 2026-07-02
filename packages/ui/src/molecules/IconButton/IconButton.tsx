@@ -4,7 +4,10 @@ import styles from "./IconButton.module.css";
 type Props = {
   children: ReactNode;
   className?: string;
-} & Pick<ButtonHTMLAttributes<HTMLButtonElement>, "type" | "disabled" | "onClick" | "title" | "aria-label">;
+} & Pick<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  "type" | "disabled" | "onClick" | "title" | "aria-label"
+>;
 
 export function IconButton({
   children,

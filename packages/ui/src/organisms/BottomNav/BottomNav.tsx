@@ -22,7 +22,11 @@ export function BottomNav({ items = BOTTOM_NAV_ITEMS, activePath = "/", onNaviga
         if (item.disabled) {
           return (
             <span key={item.path} className={className}>
-              {item.icon && <span className={styles.icon} aria-hidden="true">{item.icon}</span>}
+              {item.icon && (
+                <span className={styles.icon} aria-hidden="true">
+                  {item.icon}
+                </span>
+              )}
               {item.label}
             </span>
           );
@@ -41,7 +45,11 @@ export function BottomNav({ items = BOTTOM_NAV_ITEMS, activePath = "/", onNaviga
               }
             }}
           >
-            {item.icon && <span className={styles.icon} aria-hidden="true">{item.icon}</span>}
+            {item.icon && (
+              <span className={styles.icon} aria-hidden="true">
+                {item.icon}
+              </span>
+            )}
             {item.label}
           </a>
         );

@@ -3,7 +3,7 @@ import { Chip } from "../../atoms/Chip/Chip.js";
 import { MoneyAmount } from "../../atoms/MoneyAmount/MoneyAmount.js";
 import { Toggle } from "../../atoms/Toggle/Toggle.js";
 import { IconButton } from "../../molecules/IconButton/IconButton.js";
-import { ACCOUNT_TYPE_LABELS, accountTypeChipVariant } from "../../lib/account-types.js";
+import { ACCOUNT_TYPE_LABELS, accountTypeChipVariant } from "@cashflow/core";
 import styles from "./AccountRow.module.css";
 
 export type AccountRowData = {
@@ -48,7 +48,11 @@ export function AccountRow({ account, onWorkingChange, onEdit, workingDisabled }
         <MoneyAmount cents={account.balanceCents} tone={isCreditCard ? "danger" : "default"} />
       </div>
       <div className={styles.actions}>
-        <IconButton title="Edit" aria-label={`Edit ${account.name}`} onClick={() => onEdit?.(account.id)}>
+        <IconButton
+          title="Edit"
+          aria-label={`Edit ${account.name}`}
+          onClick={() => onEdit?.(account.id)}
+        >
           ✎
         </IconButton>
       </div>
