@@ -59,6 +59,11 @@ export function AccountsPage() {
     [data?.rawAccounts],
   );
 
+  const editingBalanceCents = useMemo(() => {
+    if (!editingId) return 0;
+    return data?.accounts.find((account) => account.id === editingId)?.balanceCents ?? 0;
+  }, [data?.accounts, editingId]);
+
   const openCreate = () => {
     setEditorMode("create");
     setEditingId(null);
@@ -118,6 +123,7 @@ export function AccountsPage() {
           open={editorOpen}
           mode={editorMode}
           values={editorValues}
+          balanceCents={editingBalanceCents}
           payFromOptions={payFromOptions}
           onChange={handleTypeChange}
           onClose={() => setEditorOpen(false)}

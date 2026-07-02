@@ -8,6 +8,7 @@ import {
 } from "@cashflow/core";
 import { Button } from "../../atoms/Button/Button.js";
 import { Toggle } from "../../atoms/Toggle/Toggle.js";
+import { Tooltip } from "../../atoms/Tooltip/Tooltip.js";
 import { FormField } from "../../molecules/FormField/FormField.js";
 import styles from "./AccountEditorPanel.module.css";
 
@@ -35,6 +36,7 @@ type Props = {
   open: boolean;
   mode: "create" | "edit";
   values: AccountEditorValues;
+  balanceCents?: number;
   payFromOptions?: PayFromOption[];
   onChange: (patch: Partial<AccountEditorValues>) => void;
   onClose: () => void;
@@ -97,6 +99,7 @@ export function AccountEditorPanel({
   open,
   mode,
   values,
+  balanceCents = 0,
   payFromOptions = [],
   onChange,
   onClose,
@@ -106,6 +109,7 @@ export function AccountEditorPanel({
   const isCreditCard = values.type === "credit_card";
   const workingLocked = isCreditCard || values.type === "investment";
   const canSave = values.name.trim().length > 0;
+  const canArchive = balanceCents === 0;
 
   return (
     <div
@@ -303,11 +307,24 @@ export function AccountEditorPanel({
 
           <div className={styles.footer}>
             {mode === "edit" && onArchive && (
-              <Button variant="ghost" className={styles.archiveButton} onClick={onArchive}>
-                Archive
-              </Button>
+              <Tooltip
+                align="start"
+                content={
+                  canArchive ? undefined : "Accounts can only be archived when the balance is zero."
+                }
+              >
+                <Button
+                  variant="ghost"
+                  className={styles.archiveButton}
+                  disabled={!canArchive}
+                  onClick={onArchive}
+                >
+                  Archive
+                </Button>
+              </Tooltip>
             )}
             <div className={styles.footerActions}>
+
               <Button variant="ghost" onClick={onClose}>
                 Cancel
               </Button>

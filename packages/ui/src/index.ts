@@ -5,6 +5,7 @@ export { Indicator, type IndicatorKind } from "./atoms/Indicator/Indicator.js";
 export { Label } from "./atoms/Label/Label.js";
 export { MoneyAmount } from "./atoms/MoneyAmount/MoneyAmount.js";
 export { Toggle } from "./atoms/Toggle/Toggle.js";
+export { Tooltip, type TooltipAlign, type TooltipPlacement } from "./atoms/Tooltip/Tooltip.js";
 export {
   CalendarDayCell,
   type DayTemporalState,

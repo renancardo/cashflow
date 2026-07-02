@@ -1,0 +1,157 @@
+.root {
+  position: relative;
+  display: inline-flex;
+}
+
+.bubble {
+  position: absolute;
+  z-index: 1;
+  width: max-content;
+  max-width: 16rem;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-text);
+  color: var(--color-surface);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+
+.top .bubble {
+  bottom: calc(100% + var(--space-2));
+}
+
+.bottom .bubble {
+  top: calc(100% + var(--space-2));
+}
+
+.left .bubble {
+  right: calc(100% + var(--space-2));
+}
+
+.right .bubble {
+  left: calc(100% + var(--space-2));
+}
+
+.alignCenter.top .bubble {
+  left: 50%;
+  transform: translate(-50%, 4px);
+}
+
+.alignStart.top .bubble {
+  left: 0;
+  transform: translateY(4px);
+}
+
+.alignEnd.top .bubble {
+  right: 0;
+  left: auto;
+  transform: translateY(4px);
+}
+
+.alignCenter.bottom .bubble {
+  left: 50%;
+  transform: translate(-50%, -4px);
+}
+
+.alignStart.bottom .bubble {
+  left: 0;
+  transform: translateY(-4px);
+}
+
+.alignEnd.bottom .bubble {
+  right: 0;
+  left: auto;
+  transform: translateY(-4px);
+}
+
+.alignCenter.left .bubble {
+  top: 50%;
+  transform: translate(4px, -50%);
+}
+
+.alignStart.left .bubble {
+  top: 0;
+  transform: translateX(4px);
+}
+
+.alignEnd.left .bubble {
+  bottom: 0;
+  top: auto;
+  transform: translateX(4px);
+}
+
+.alignCenter.right .bubble {
+  top: 50%;
+  transform: translate(-4px, -50%);
+}
+
+.alignStart.right .bubble {
+  top: 0;
+  transform: translateX(-4px);
+}
+
+.alignEnd.right .bubble {
+  bottom: 0;
+  top: auto;
+  transform: translateX(-4px);
+}
+
+.root:hover .bubble,
+.root:focus-within .bubble {
+  opacity: 1;
+}
+
+.alignCenter.top:hover .bubble,
+.alignCenter.top:focus-within .bubble {
+  transform: translate(-50%, 0);
+}
+
+.alignStart.top:hover .bubble,
+.alignStart.top:focus-within .bubble,
+.alignEnd.top:hover .bubble,
+.alignEnd.top:focus-within .bubble {
+  transform: translateY(0);
+}
+
+.alignCenter.bottom:hover .bubble,
+.alignCenter.bottom:focus-within .bubble {
+  transform: translate(-50%, 0);
+}
+
+.alignStart.bottom:hover .bubble,
+.alignStart.bottom:focus-within .bubble,
+.alignEnd.bottom:hover .bubble,
+.alignEnd.bottom:focus-within .bubble {
+  transform: translateY(0);
+}
+
+.alignCenter.left:hover .bubble,
+.alignCenter.left:focus-within .bubble {
+  transform: translate(0, -50%);
+}
+
+.alignStart.left:hover .bubble,
+.alignStart.left:focus-within .bubble,
+.alignEnd.left:hover .bubble,
+.alignEnd.left:focus-within .bubble {
+  transform: translateX(0);
+}
+
+.alignCenter.right:hover .bubble,
+.alignCenter.right:focus-within .bubble {
+  transform: translate(0, -50%);
+}
+
+.alignStart.right:hover .bubble,
+.alignStart.right:focus-within .bubble,
+.alignEnd.right:hover .bubble,
+.alignEnd.right:focus-within .bubble {
+  transform: translateX(0);
+}

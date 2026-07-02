@@ -238,7 +238,6 @@
 
   .footerActions {
     flex: 1;
-    min-width: 100%;
   }
 
   .footerActions button {
