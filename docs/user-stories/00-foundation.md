@@ -87,7 +87,9 @@ Project setup, stack evaluation, and development tooling. **Ship before or in pa
 
 ### Acceptance criteria
 
-- [ ] `npm test` (or equivalent) runs unit tests in `packages/engine`
-- [ ] CI workflow (GitHub Actions or similar) runs lint + test on push/PR
-- [ ] Engine tests run without browser/DOM when possible
-- [ ] Documented target: projection recompute &lt; 500 ms (perf test added when engine has realistic fixtures)
+- [x] `pnpm test` (or `pnpm test:engine`) runs unit tests in `packages/engine` and other workspace packages (Vitest)
+- [x] CI workflow ([`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)) runs format check, lint, test, E2E, and build on push/PR to `main`
+- [x] Engine tests run without browser/DOM (Vitest in Node — no `jsdom` / Playwright in `packages/engine`)
+- [x] Playwright E2E baseline: [`e2e/`](../../e2e/), [`playwright.config.ts`](../../playwright.config.ts), `pnpm test:e2e` (smoke test against the app dev server)
+- [x] Playwright MCP for Cursor: [`.cursor/mcp.json`](../../.cursor/mcp.json) — `@playwright/mcp` scoped to `localhost:5173`
+- [x] Documented target: projection recompute &lt; 500 ms — [002-phase-1-scope.md](../specs/002-phase-1-scope.md), [ADR-001](../decisions/ADR-001-monorepo-react-vite.md); **perf test deferred** until engine has realistic fixtures ([US-1.8](./01-projection-engine.md#us-18--engine-unit-test-suite))

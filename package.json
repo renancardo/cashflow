@@ -6,7 +6,10 @@
     "dev": "pnpm --filter @cashflow/app dev",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "test:engine": "pnpm --filter @cashflow/engine test",
+    "playwright:install": "playwright install chromium",
     "storybook": "pnpm --filter @cashflow/ui storybook",
     "lint": "eslint \"packages/*/src/**/*.{ts,tsx}\"",
     "format": "prettier --write .",
@@ -14,6 +17,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@playwright/test": "^1.61.1",
     "eslint": "^9.39.1",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3",

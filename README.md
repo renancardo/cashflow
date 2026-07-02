@@ -23,8 +23,9 @@ Personal cash flow forecasting app — local-first, calendar-centric.
 pnpm install
 pnpm dev          # http://localhost:5173 — React app
 pnpm storybook    # http://localhost:6006 — component library
-pnpm test         # all packages
+pnpm test         # all packages (Vitest)
 pnpm test:engine  # projection engine only
+pnpm test:e2e     # Playwright E2E (starts dev server automatically)
 ```
 
 ---
@@ -46,16 +47,18 @@ See [`docs/specs/006-project-structure.md`](docs/specs/006-project-structure.md)
 
 ## Scripts
 
-| Command             | Description                      |
-| ------------------- | -------------------------------- |
-| `pnpm dev`          | Start `@cashflow/app` dev server |
-| `pnpm build`        | Typecheck/build all packages     |
-| `pnpm test`         | Run Vitest in all packages       |
-| `pnpm test:engine`  | Engine tests + fixtures          |
-| `pnpm storybook`    | Storybook for `@cashflow/ui`     |
-| `pnpm lint`         | ESLint across packages           |
-| `pnpm format`       | Prettier write                   |
-| `pnpm format:check` | Prettier check                   |
+| Command                   | Description                      |
+| ------------------------- | -------------------------------- |
+| `pnpm dev`                | Start `@cashflow/app` dev server |
+| `pnpm build`              | Typecheck/build all packages     |
+| `pnpm test`               | Run Vitest in all packages       |
+| `pnpm test:e2e`           | Playwright E2E against the app   |
+| `pnpm test:engine`        | Engine tests + fixtures          |
+| `pnpm playwright:install` | Install Chromium for E2E / MCP   |
+| `pnpm storybook`          | Storybook for `@cashflow/ui`     |
+| `pnpm lint`               | ESLint across packages           |
+| `pnpm format`             | Prettier write                   |
+| `pnpm format:check`       | Prettier check                   |
 
 ---
 
@@ -72,9 +75,18 @@ engine → core
 
 ---
 
+## E2E & Playwright MCP
+
+- E2E tests live in [`e2e/`](e2e/) and run via `pnpm test:e2e` (config: [`playwright.config.ts`](playwright.config.ts)).
+- After clone, run `pnpm playwright:install` once to download Chromium.
+- **Cursor MCP:** [`.cursor/mcp.json`](.cursor/mcp.json) registers the official `@playwright/mcp` server so agents can drive the app at `http://localhost:5173`. Restart Cursor (or toggle the server in **Settings → MCP**) after pulling.
+
+---
+
 ## Current status
 
 - **US-0.2** — monorepo scaffold ✅
+- **US-0.4** — Vitest + CI baseline ✅; Playwright E2E + MCP added
 - **US-1.x** — engine stub (anchors only); full projection pending
 - **ADR-006** — client storage spike (Dexie vs SQLite) pending
 
