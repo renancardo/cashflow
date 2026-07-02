@@ -22,12 +22,10 @@ Project setup, stack evaluation, and development tooling. **Ship before or in pa
   - **Styling:** CSS modules / tokens from [004-style-guide.md](../specs/004-style-guide.md)
   - **Storage:** local-first (e.g. SQLite via WASM, IndexedDB, or similar)
   - **Testing:** Vitest (or Jest) for engine + unit; Playwright optional for E2E later
-- [ ] Decision records **why React + Storybook** fit Phase 1:
-  - Calendar/grid components benefit from component isolation in Storybook
-  - Paper theme tokens map cleanly to design-system stories
-  - Engine stays framework-agnostic (plain JS package)
-- [ ] Decision records **non-goals for Phase 1:** no cloud backend, no SSR requirement, no multi-currency
-- [ ] Stack doc links to [002-phase-1-scope.md](../specs/002-phase-1-scope.md) NFRs (performance, privacy, local-first)
+- [x] Documented in [`docs/decisions/`](../decisions/) — ADR-001 through ADR-007
+- [x] Decision records **why React + Storybook** fit Phase 1 — [ADR-001](../decisions/ADR-001-monorepo-react-vite.md), [ADR-007](../decisions/ADR-007-storybook-vitest.md)
+- [x] Decision records **non-goals for Phase 1:** [ADR-001](../decisions/ADR-001-monorepo-react-vite.md) — no cloud backend, no SSR, no multi-currency
+- [x] Stack doc links to [002-phase-1-scope.md](../specs/002-phase-1-scope.md) NFRs — see [decisions/README.md](../decisions/README.md)
 
 ---
 

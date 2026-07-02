@@ -15,6 +15,7 @@ Written specifications for the Cashflow app. These docs define **what to build**
 | 4 | [`specs/004-style-guide.md`](specs/004-style-guide.md) | **locked** | Paper theme tokens, components, semantic colors |
 | 5 | [`specs/005-prd.md`](specs/005-prd.md) | draft | Goals, release definition, traceability |
 | — | [`user-stories/`](user-stories/) | draft | Per-epic user stories + acceptance criteria |
+| — | [`decisions/`](decisions/) | draft | ADRs — stack, data layer, styling (US-0.1) |
 
 ---
 
@@ -27,6 +28,10 @@ Early brainstorming and historical context. Useful for understanding *why* decis
 ### `user-stories/`
 
 Detailed backlog: epics, user stories, and Given/When/Then acceptance criteria. Synthesized from the PRD and locked specs; implementation should trace to story IDs (e.g. `US-1.4`).
+
+### `decisions/`
+
+Architecture Decision Records (ADRs): **why** the stack is shaped this way. Outcome of [US-0.1](user-stories/00-foundation.md#us-01--evaluate-and-lock-the-phase-1-tech-stack). Implementation specs in `specs/` say *what*; ADRs say *why*.
 
 ### `specs/`
 
@@ -77,7 +82,8 @@ flowchart LR
   Screens --> PRD
   Style --> PRD
   PRD --> Stories
-  Stories --> App
+  Stories --> ADR["decisions/"]
+  ADR --> App
   Proto -.-> App
 ```
 
