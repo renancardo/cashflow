@@ -40,10 +40,7 @@ export const DisabledButton: Story = {
   name: "Disabled button",
   render: () => (
     <div style={{ alignSelf: "flex-start", paddingLeft: "1.25rem" }}>
-      <Tooltip
-        align="start"
-        content="Accounts can only be archived when the balance is zero."
-      >
+      <Tooltip align="start" content="Accounts can only be archived when the balance is zero.">
         <Button variant="ghost" disabled>
           Archive
         </Button>

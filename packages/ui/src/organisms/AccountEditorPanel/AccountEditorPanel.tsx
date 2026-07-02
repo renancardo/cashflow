@@ -324,7 +324,6 @@ export function AccountEditorPanel({
               </Tooltip>
             )}
             <div className={styles.footerActions}>
-
               <Button variant="ghost" onClick={onClose}>
                 Cancel
               </Button>
