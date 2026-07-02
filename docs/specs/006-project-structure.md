@@ -147,16 +147,16 @@ packages/ui/
 ├── src/
 │   ├── tokens/
 │   │   └── paper.css       # from 004-style-guide / docs/prototype/004
-│   ├── components/
-│   │   ├── CalendarDayCell/
-│   │   │   ├── CalendarDayCell.tsx
-│   │   │   └── CalendarDayCell.module.css
-│   │   ├── YearCalendar/
-│   │   └── …
-│   ├── stories/            # incl. engine fixture → calendar (US-1.9)
+│   ├── atoms/              # Button, Chip, Indicator, …
+│   ├── molecules/          # CalendarDayCell, …
+│   ├── organisms/          # AppStatus, YearCalendar, …
+│   ├── templates/          # layout scaffolds
+│   ├── pages/              # fixture-driven Storybook pages (US-1.9)
 │   └── index.ts
 └── package.json
 ```
+
+Component taxonomy: [ADR-007](../decisions/ADR-007-storybook-vitest.md).
 
 ### 3.5 `packages/app/`
 

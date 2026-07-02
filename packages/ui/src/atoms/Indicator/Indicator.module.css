@@ -1,0 +1,25 @@
+.indicator {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.danger {
+  background: var(--color-danger);
+}
+
+.success {
+  background: var(--color-success);
+}
+
+.warning {
+  background: var(--color-warning);
+}
+
+.card {
+  width: 5px;
+  height: 5px;
+  border-radius: 1px;
+  background: var(--color-secondary);
+}

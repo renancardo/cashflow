@@ -8,6 +8,25 @@ const preview: Preview = {
       default: "paper",
       values: [{ name: "paper", value: "#faf8f5" }],
     },
+    options: {
+      storySort: {
+        order: [
+          "Atoms",
+          ["Overview", "*"],
+          "Molecules",
+          ["Overview", "*"],
+          "Organisms",
+          ["Overview", "*"],
+          "Templates",
+          ["Overview", "*"],
+          "Pages",
+          ["Overview", "*"],
+        ],
+      },
+    },
+    docs: {
+      toc: true,
+    },
   },
 };
 

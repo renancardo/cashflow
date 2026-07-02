@@ -1,0 +1,55 @@
+.chip {
+  display: inline-block;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--color-paper);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+.income {
+  background: #ecfdf5;
+  color: var(--color-success);
+  border-color: #bbf7d0;
+}
+
+.expense {
+  background: var(--color-paper);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.planned {
+  background: #f5f3ff;
+  color: var(--color-secondary);
+  border-color: #ddd6fe;
+}
+
+.actual {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.card,
+.statement {
+  background: #f5f3ff;
+  color: var(--color-secondary);
+  border-color: #ddd6fe;
+}
+
+.installment {
+  background: #fff7ed;
+  color: var(--color-warning);
+  border-color: #fed7aa;
+}
+
+.subscription {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #bfdbfe;
+}

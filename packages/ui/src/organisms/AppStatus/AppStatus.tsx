@@ -1,8 +1,9 @@
+import type { ReactNode } from "react";
 import styles from "./AppStatus.module.css";
 
 type Props = {
   title: string;
-  children?: React.ReactNode;
+  children?: ReactNode;
 };
 
 export function AppStatus({ title, children }: Props) {

@@ -1,0 +1,17 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Atoms/Overview" />
+
+# Atoms
+
+The smallest building blocks of the Paper UI. Atoms have no layout responsibility beyond their own box and never import other Cashflow components.
+
+**Current atoms:** `Button`, `Chip`, `Indicator`, `Label`, `MoneyAmount`, `FormattedDate`
+
+**Rules**
+
+- Format money and dates through `@cashflow/core` — never hardcode locale strings.
+- Use CSS Modules and Paper tokens from `tokens/paper.css`.
+- Keep atoms stateless and presentational.
+
+See [ADR-007](../../../../docs/decisions/ADR-007-storybook-vitest.md) for the full taxonomy.

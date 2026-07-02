@@ -64,13 +64,14 @@ Project setup, stack evaluation, and development tooling. **Ship before or in pa
 
 ### Acceptance criteria
 
-- [ ] Storybook starts locally and builds statically
-- [ ] Global decorators apply Paper tokens from [004-style-guide.md](../specs/004-style-guide.md) (background, typography, semantic colors)
-- [ ] At least **3 starter stories** exist:
+- [x] Storybook starts locally and builds statically
+- [x] Global decorators apply Paper tokens from [004-style-guide.md](../specs/004-style-guide.md) (background, typography, semantic colors)
+- [x] At least **3 starter stories** exist:
   - Money formatter (BRL cents → display)
   - Date formatter (pt-BR / en)
   - Calendar day cell (empty, red dot, income indicator)
-- [ ] Stories document prop tables for key components
+- [x] Stories document prop tables for key components
+- [x] Atomic design taxonomy documented in [ADR-007](../decisions/ADR-007-storybook-vitest.md); Storybook sidebar ordered Atoms → Pages
 - [ ] Storybook is the canonical place to preview engine-driven calendar states once [US-1.9](./01-projection-engine.md#us-19--storybook-visualization-of-fixture-projections) lands
 
 ---

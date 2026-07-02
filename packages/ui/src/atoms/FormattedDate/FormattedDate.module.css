@@ -1,5 +1,5 @@
-.amount {
-  font-family: var(--font-mono);
+.date {
+  font-family: var(--font-body);
   font-variant-numeric: tabular-nums;
   color: var(--color-text);
 }
