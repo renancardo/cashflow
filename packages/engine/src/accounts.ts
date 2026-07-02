@@ -1,0 +1,51 @@
+import type { Account, Transaction } from "@cashflow/core";
+
+export type AccountMap = Map<string, Account>;
+
+export function buildAccountMap(accounts: Account[]): AccountMap {
+  return new Map(accounts.map((a) => [a.id, a]));
+}
+
+export function isWorkingAccount(account: Account | undefined): boolean {
+  return Boolean(account?.isWorking && !account.archivedAt);
+}
+
+/** Per-account balance delta from a transaction (cash-on-hand sign for working accounts). */
+export function transactionAccountDelta(tx: Transaction, accountId: string): number {
+  if (tx.accountId === accountId) {
+    if (tx.type === "income") return tx.amountCents;
+    if (tx.type === "expense") return -tx.amountCents;
+    if (tx.type === "transfer") return -tx.amountCents;
+  }
+  if (tx.type === "transfer" && tx.toAccountId === accountId) {
+    return tx.amountCents;
+  }
+  return 0;
+}
+
+/** Balance of one working account at the start of `beforeDate` (exclusive). */
+export function workingAccountBalanceAt(
+  account: Account,
+  transactions: Transaction[],
+  beforeDate: string,
+): number {
+  if (!isWorkingAccount(account)) return 0;
+
+  let balance = account.anchorBalanceCents;
+  for (const tx of transactions) {
+    if (tx.effectiveDate < account.anchorDate || tx.effectiveDate >= beforeDate) continue;
+    balance += transactionAccountDelta(tx, account.id);
+  }
+  return balance;
+}
+
+/** Aggregate working balance at the start of `beforeDate`. */
+export function aggregateWorkingBalanceAt(
+  accounts: Account[],
+  transactions: Transaction[],
+  beforeDate: string,
+): number {
+  return accounts
+    .filter(isWorkingAccount)
+    .reduce((sum, account) => sum + workingAccountBalanceAt(account, transactions, beforeDate), 0);
+}

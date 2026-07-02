@@ -8,15 +8,12 @@ import {
 import { projectCashFlow } from "./project.js";
 
 describe("fixture library", () => {
-  it.each(FIXTURE_CATALOG.map((f) => [f.id, f]))(
-    "%s validates as EngineInput",
-    (id) => {
-      const input = getFixture(id as keyof typeof fixtures);
-      expect(input.accounts.length).toBeGreaterThan(0);
-      expect(input.settings.horizonMonths).toBe(24);
-      assertEngineInputShape(input);
-    },
-  );
+  it.each(FIXTURE_CATALOG.map((f) => [f.id, f]))("%s validates as EngineInput", (id) => {
+    const input = getFixture(id as keyof typeof fixtures);
+    expect(input.accounts.length).toBeGreaterThan(0);
+    expect(input.settings.horizonMonths).toBe(24);
+    assertEngineInputShape(input);
+  });
 
   it("household-june-2026 has expected scale", () => {
     const input = getFixture("household-june-2026");
@@ -35,12 +32,22 @@ describe("fixture library", () => {
     expect(stmt?.paymentTransactionId).toBe(payment?.id);
   });
 
-  it("all fixtures run through stub projectCashFlow", () => {
+  it("all fixtures run through projectCashFlow", () => {
     for (const meta of FIXTURE_CATALOG) {
       const result = projectCashFlow(getFixture(meta.id as keyof typeof fixtures), meta.asOfDate);
       expect(result.days.length).toBeGreaterThan(0);
       expect(result).toHaveProperty("nextNegativeDate");
       expect(result).toHaveProperty("workingBalanceTodayCents");
     }
+  });
+
+  it("household-june-2026 projects within performance budget", () => {
+    const input = getFixture("household-june-2026");
+    const start = performance.now();
+    const result = projectCashFlow(input, "2026-07-01");
+    const elapsed = performance.now() - start;
+
+    expect(result.days.length).toBeGreaterThan(0);
+    expect(elapsed).toBeLessThan(500);
   });
 });
