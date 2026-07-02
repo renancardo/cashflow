@@ -1,4 +1,4 @@
-import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from "react";
+import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { Label } from "../../atoms/Label/Label.js";
 import styles from "./FormField.module.css";
 
@@ -14,31 +14,38 @@ type InputProps = BaseProps & {
   /** Static adornment rendered inside the field, before the input (e.g. a currency code). */
   prefix?: ReactNode;
 } & Pick<
-    InputHTMLAttributes<HTMLInputElement>,
-    | "type"
-    | "value"
-    | "defaultValue"
-    | "onChange"
-    | "onBlur"
-    | "readOnly"
-    | "placeholder"
-    | "required"
-    | "min"
-    | "max"
-    | "step"
-    | "inputMode"
-    | "autoFocus"
-  >;
+  InputHTMLAttributes<HTMLInputElement>,
+  | "type"
+  | "value"
+  | "defaultValue"
+  | "onChange"
+  | "onBlur"
+  | "readOnly"
+  | "placeholder"
+  | "required"
+  | "min"
+  | "max"
+  | "step"
+  | "inputMode"
+  | "autoFocus"
+>;
 
 type SelectProps = BaseProps & {
   inputType: "select";
   children: ReactNode;
 } & Pick<
-    SelectHTMLAttributes<HTMLSelectElement>,
-    "value" | "defaultValue" | "onChange" | "required"
-  >;
+  SelectHTMLAttributes<HTMLSelectElement>,
+  "value" | "defaultValue" | "onChange" | "required"
+>;
 
-type Props = InputProps | SelectProps;
+type TextareaProps = BaseProps & {
+  inputType: "textarea";
+} & Pick<
+  TextareaHTMLAttributes<HTMLTextAreaElement>,
+  "value" | "defaultValue" | "onChange" | "onBlur" | "readOnly" | "placeholder" | "required" | "rows"
+>;
+
+type Props = InputProps | SelectProps | TextareaProps;
 
 function FieldInput(props: InputProps) {
   const input = (
@@ -90,6 +97,19 @@ export function FormField(props: Props) {
         >
           {props.children}
         </select>
+      ) : props.inputType === "textarea" ? (
+        <textarea
+          id={id}
+          className={styles.textarea}
+          value={props.value}
+          defaultValue={props.defaultValue}
+          onChange={props.onChange}
+          onBlur={props.onBlur}
+          readOnly={props.readOnly}
+          placeholder={props.placeholder}
+          required={props.required}
+          rows={props.rows ?? 4}
+        />
       ) : (
         <FieldInput {...props} />
       )}

@@ -16,6 +16,7 @@ export type AccountInput = {
   creditLimitCents?: number;
   defaultPayFromAccountId?: string;
   institution?: string;
+  notes?: string;
 };
 
 function toAccountPayload(input: AccountInput): Omit<Account, "id"> {
@@ -33,6 +34,7 @@ function toAccountPayload(input: AccountInput): Omit<Account, "id"> {
     defaultPayFromAccountId:
       input.type === "credit_card" ? input.defaultPayFromAccountId : undefined,
     institution: input.institution,
+    notes: input.notes,
   };
 }
 

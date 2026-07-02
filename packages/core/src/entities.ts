@@ -22,6 +22,7 @@ export interface Account {
   institution?: string;
   agency?: string;
   pixKey?: string;
+  notes?: string;
   archivedAt?: string;
 }
 

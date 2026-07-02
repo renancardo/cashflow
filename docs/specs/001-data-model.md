@@ -80,6 +80,7 @@ A financial container with a balance anchor. Covers banks, wallets, credit cards
 | `institution` | string? | Optional metadata (bank name) |
 | `agency` | string? | Optional metadata |
 | `pixKey` | string? | Optional metadata |
+| `notes` | string? | Optional free-text notes about the account |
 | `archivedAt` | datetime? | Soft delete |
 
 **Invariants**

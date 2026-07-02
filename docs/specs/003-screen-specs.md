@@ -287,7 +287,7 @@ else:
 | `creditLimitCents` | type = credit_card | |
 | `closingDay`, `dueDay` | type = credit_card | required; clamped 1–31 |
 | `defaultPayFromAccountId` | type = credit_card | working account |
-| `institution`, `agency`, `pixKey` | optional | metadata |
+| `institution`, `agency`, `pixKey`, `notes` | optional | metadata |
 
 | Concern | Spec |
 |---|---|

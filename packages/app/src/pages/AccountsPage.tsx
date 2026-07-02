@@ -22,6 +22,7 @@ function toEditorValues(account: Account): AccountEditorValues {
     creditLimitCents: account.creditLimitCents,
     defaultPayFromAccountId: account.defaultPayFromAccountId,
     institution: account.institution,
+    notes: account.notes,
   };
 }
 
@@ -38,6 +39,7 @@ function toAccountInput(values: AccountEditorValues): AccountInput {
     creditLimitCents: values.creditLimitCents,
     defaultPayFromAccountId: values.defaultPayFromAccountId,
     institution: values.institution,
+    notes: values.notes,
   };
 }
 

@@ -23,6 +23,7 @@ export type AccountEditorValues = {
   creditLimitCents?: number;
   defaultPayFromAccountId?: string;
   institution?: string;
+  notes?: string;
 };
 
 type PayFromOption = {
@@ -287,6 +288,15 @@ export function AccountEditorPanel({
                 value={values.institution ?? ""}
                 hint="Optional"
                 onChange={(event) => onChange({ institution: event.target.value || undefined })}
+              />
+              <FormField
+                id="notes"
+                label="Notes"
+                inputType="textarea"
+                placeholder="Account number, branch, or anything else worth remembering"
+                value={values.notes ?? ""}
+                hint="Optional"
+                onChange={(event) => onChange({ notes: event.target.value || undefined })}
               />
             </div>
           </div>
