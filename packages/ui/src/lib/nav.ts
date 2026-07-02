@@ -15,11 +15,3 @@ export const SIDE_NAV_ITEMS: NavItem[] = [
   { label: "Snapshots", path: "/snapshots", disabled: true },
   { label: "Settings", path: "/settings", disabled: true },
 ];
-
-export const BOTTOM_NAV_ITEMS: NavItem[] = [
-  { label: "Calendar", path: "/", icon: "📅" },
-  { label: "Transactions", path: "/transactions", icon: "↕", disabled: true },
-  { label: "Forecast", path: "/forecast", icon: "◎", disabled: true },
-  { label: "Categories", path: "/categories", icon: "▦", disabled: true },
-  { label: "More", path: "/accounts", icon: "⋯" },
-];

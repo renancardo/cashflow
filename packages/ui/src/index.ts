@@ -22,7 +22,6 @@ export {
 export { AccountList } from "./organisms/AccountList/AccountList.js";
 export { AccountRow, type AccountRowData } from "./organisms/AccountRow/AccountRow.js";
 export { AccountsScreen } from "./organisms/AccountsScreen/AccountsScreen.js";
-export { BottomNav } from "./organisms/BottomNav/BottomNav.js";
 export { HeaderStrip } from "./organisms/HeaderStrip/HeaderStrip.js";
 export { MobileHeader } from "./organisms/MobileHeader/MobileHeader.js";
 export { PageHeader } from "./organisms/PageHeader/PageHeader.js";
@@ -36,4 +35,4 @@ export {
   formatCents,
   parseMoney,
 } from "@cashflow/core";
-export { BOTTOM_NAV_ITEMS, SIDE_NAV_ITEMS, type NavItem } from "./lib/nav.js";
+export { SIDE_NAV_ITEMS, type NavItem } from "./lib/nav.js";

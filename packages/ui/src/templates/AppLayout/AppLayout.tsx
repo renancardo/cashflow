@@ -1,5 +1,4 @@
 import { useState, type ReactNode } from "react";
-import { BottomNav } from "../../organisms/BottomNav/BottomNav.js";
 import { MobileHeader } from "../../organisms/MobileHeader/MobileHeader.js";
 import { SideNav } from "../../organisms/SideNav/SideNav.js";
 import styles from "./AppLayout.module.css";
@@ -31,7 +30,6 @@ export function AppLayout({ children, activePath = "/", mobileTitle, onNavigate 
           />
         )}
         {children}
-        <BottomNav activePath={activePath} onNavigate={onNavigate} />
       </div>
     </div>
   );
