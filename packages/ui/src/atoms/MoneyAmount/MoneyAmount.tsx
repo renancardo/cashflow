@@ -9,12 +9,7 @@ type Props = {
   className?: string;
 };
 
-export function MoneyAmount({
-  cents,
-  language = "pt-BR",
-  tone = "default",
-  className,
-}: Props) {
+export function MoneyAmount({ cents, language = "pt-BR", tone = "default", className }: Props) {
   return (
     <span className={[styles.amount, styles[tone], className].filter(Boolean).join(" ")}>
       {formatMoney(cents, language)}

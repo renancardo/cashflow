@@ -8,7 +8,7 @@ Personal cash flow forecasting app — local-first, calendar-centric.
 
 ## Prerequisites
 
-- Node.js **20+**
+- Node.js **22+**
 - [pnpm](https://pnpm.io/) **10+** (`corepack enable` if needed)
 
 > **pnpm 10:** `esbuild` postinstall is pre-approved in `pnpm-workspace.yaml` and `.npmrc`.
