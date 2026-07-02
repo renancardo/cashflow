@@ -19,7 +19,7 @@ todos:
     status: completed
   - id: write-prd
     content: Draft PRD with Phase 1 scope, user stories, and acceptance criteria — see docs/specs/005-prd.md
-    status: pending
+    status: completed
 isProject: false
 ---
 
@@ -387,7 +387,7 @@ Ideas are organized and the key design decisions are resolved (§9). Recommended
 2. ✅ **Phase 1 scope lock** — [`docs/specs/002-phase-1-scope.md`](../specs/002-phase-1-scope.md)
 3. ✅ **Screen-by-screen spec** — [`docs/specs/003-screen-specs.md`](../specs/003-screen-specs.md) — fields, actions, empty states for Phase 1 screens
 4. **Style guide** — [`docs/specs/004-style-guide.md`](../specs/004-style-guide.md) — **locked**; Paper theme (minimal grid, weekday columns, weekend bands, red-dot semantics, typography/color tokens). Canonical reference: `prototype/004/`.
-5. **PRD** — [`docs/specs/005-prd.md`](../specs/005-prd.md) — goals, user stories, acceptance criteria (ratification doc)
+5. ✅ **PRD** — [`docs/specs/005-prd.md`](../specs/005-prd.md) + [`docs/user-stories/`](../user-stories/) — goals, user stories, acceptance criteria (ratification doc)
 
 ---
 

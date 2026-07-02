@@ -13,7 +13,8 @@ Written specifications for the Cashflow app. These docs define **what to build**
 | 2 | [`specs/002-phase-1-scope.md`](specs/002-phase-1-scope.md) | **locked** | Phase 1 features, screens, out-of-scope |
 | 3 | [`specs/003-screen-specs.md`](specs/003-screen-specs.md) | draft | Per-screen layout, actions, states |
 | 4 | [`specs/004-style-guide.md`](specs/004-style-guide.md) | **locked** | Paper theme tokens, components, semantic colors |
-| 5 | [`specs/005-prd.md`](specs/005-prd.md) | pending | User stories + acceptance criteria |
+| 5 | [`specs/005-prd.md`](specs/005-prd.md) | draft | Goals, release definition, traceability |
+| — | [`user-stories/`](user-stories/) | draft | Per-epic user stories + acceptance criteria |
 
 ---
 
@@ -23,12 +24,16 @@ Written specifications for the Cashflow app. These docs define **what to build**
 
 Early brainstorming and historical context. Useful for understanding *why* decisions were made, but not normative once superseded by `specs/`.
 
+### `user-stories/`
+
+Detailed backlog: epics, user stories, and Given/When/Then acceptance criteria. Synthesized from the PRD and locked specs; implementation should trace to story IDs (e.g. `US-1.4`).
+
 ### `specs/`
 
 Decisions that implementation must follow. Numbered files encode dependency order:
 
 ```
-001 data model  →  002 scope  →  003 screens  →  004 style  →  005 PRD
+001 data model  →  002 scope  →  003 screens  →  004 style  →  005 PRD  →  user-stories/
 ```
 
 **Status meanings:**
@@ -63,6 +68,7 @@ flowchart LR
   Screens["003 screens"]
   Style["004 style"]
   PRD["005 PRD"]
+  Stories["user-stories/"]
   Proto["prototype/004"]
   App["app (future)"]
 
@@ -70,7 +76,8 @@ flowchart LR
   Scope --> Style --> Proto
   Screens --> PRD
   Style --> PRD
-  PRD --> App
+  PRD --> Stories
+  Stories --> App
   Proto -.-> App
 ```
 
