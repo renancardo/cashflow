@@ -1,15 +1,12 @@
-import { Outlet, createRootRoute, createRoute, createRouter } from "@tanstack/react-router";
+import { createRootRoute, createRoute, createRouter } from "@tanstack/react-router";
 import { formatMoney } from "@cashflow/core";
 import { AppStatus, MoneyAmount } from "@cashflow/ui";
 import { AppShell } from "./layout/AppShell";
 import { useProjection } from "./data/queries/useProjection";
+import { AccountsPage } from "./pages/AccountsPage";
 
 const rootRoute = createRootRoute({
-  component: () => (
-    <AppShell>
-      <Outlet />
-    </AppShell>
-  ),
+  component: AppShell,
 });
 
 function YearCalendarPage() {
@@ -52,7 +49,13 @@ const indexRoute = createRoute({
   component: YearCalendarPage,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute]);
+const accountsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/accounts",
+  component: AccountsPage,
+});
+
+const routeTree = rootRoute.addChildren([indexRoute, accountsRoute]);
 
 export const router = createRouter({
   routeTree,

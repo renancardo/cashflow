@@ -1,0 +1,27 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+@media (min-width: 769px) {
+  .shell {
+    display: grid;
+    grid-template-columns: var(--nav-width) 1fr;
+  }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+  padding-bottom: var(--bottom-nav-height);
+}
+
+@media (min-width: 769px) {
+  .main {
+    padding-bottom: 0;
+  }
+}

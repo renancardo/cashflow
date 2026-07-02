@@ -26,4 +26,9 @@ export const accountsRepo = {
     db.accounts[index] = { ...db.accounts[index], ...patch };
     return db.accounts[index];
   },
+
+  async archive(id: string): Promise<Account> {
+    const today = new Date().toISOString().slice(0, 10);
+    return this.update(id, { archivedAt: today });
+  },
 };

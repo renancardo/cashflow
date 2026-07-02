@@ -1,34 +1,23 @@
-import styles from "./AppShell.module.css";
+import { Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { AppLayout } from "@cashflow/ui";
 
-type Props = {
-  children: React.ReactNode;
+const MOBILE_TITLES: Record<string, string> = {
+  "/": "Year Calendar",
+  "/accounts": "Accounts",
 };
 
-const NAV = [
-  { label: "Year", path: "/" },
-  { label: "Transactions", path: "/transactions", disabled: true },
-  { label: "Accounts", path: "/accounts", disabled: true },
-  { label: "Settings", path: "/settings", disabled: true },
-];
+export function AppShell() {
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const mobileTitle = MOBILE_TITLES[pathname];
 
-export function AppShell({ children }: Props) {
   return (
-    <div className={styles.shell}>
-      <aside className={styles.nav}>
-        <div className={styles.brand}>Cashflow</div>
-        <nav className={styles.navList}>
-          {NAV.map((item) => (
-            <span
-              key={item.path}
-              className={item.disabled ? styles.navItemDisabled : styles.navItem}
-            >
-              {item.label}
-              {item.disabled && " (soon)"}
-            </span>
-          ))}
-        </nav>
-      </aside>
-      <main className={styles.main}>{children}</main>
-    </div>
+    <AppLayout
+      activePath={pathname}
+      mobileTitle={mobileTitle}
+      onNavigate={(path) => navigate({ to: path })}
+    >
+      <Outlet />
+    </AppLayout>
   );
 }
