@@ -281,5 +281,5 @@ Copied from [000-initial-ideas.md §9](../ideas/000-initial-ideas.md) and [001-d
 | Order | Document | Status | Uses this scope for |
 |---|---|---|---|
 | 1 | [003-screen-specs.md](./003-screen-specs.md) | draft | Per-screen fields, actions, states (9 screens above) |
-| 2 | [004-style-guide.md](./004-style-guide.md) | **locked** | Calendar components, tokens, semantic colors — canonical ref: `prototype/004/` |
+| 2 | [004-style-guide.md](./004-style-guide.md) | **locked** | Calendar components, tokens, semantic colors — canonical ref: `docs/prototype/004/` |
 | 3 | [005-prd.md](./005-prd.md) | pending | User stories + acceptance criteria synthesized from specs |

@@ -2,7 +2,7 @@
 
 Static HTML/CSS/JS prototypes for Phase 1 screens. No build step, no backend — open any `.html` file in a browser.
 
-These prototypes show **how the UI looks and behaves** with mock data. Written specs in [`../docs/specs/`](../docs/specs/) define what to build.
+These prototypes show **how the UI looks and behaves** with mock data. Written specs in [`../specs/`](../specs/) define what to build.
 
 ---
 
@@ -10,7 +10,7 @@ These prototypes show **how the UI looks and behaves** with mock data. Written s
 
 | Folder | Theme | Status | Start here |
 |---|---|---|---|
-| [`004/`](004/) | **Paper** | **Canonical** — locked in [004-style-guide](../docs/specs/004-style-guide.md) | [`004/index.html`](004/index.html) |
+| [`004/`](004/) | **Paper** | **Canonical** — locked in [004-style-guide](../specs/004-style-guide.md) | [`004/index.html`](004/index.html) |
 | [`005/`](005/) | Ink | Exploratory alternate (teal/dark nav) | [`005/index.html`](005/index.html) |
 | [`006/`](006/) | Analytical | Exploratory alternate (dashboard-style) | [`006/index.html`](006/index.html) |
 
@@ -37,7 +37,7 @@ Every theme implements the same nine Phase 1 screens:
 | Snapshots | `snapshots.html` | Screen 8 |
 | Settings | `settings.html` | Screen 9 |
 
-See [`../docs/specs/003-screen-specs.md`](../docs/specs/003-screen-specs.md) for per-screen behavior.
+See [`../specs/003-screen-specs.md`](../specs/003-screen-specs.md) for per-screen behavior.
 
 ---
 
@@ -47,16 +47,16 @@ From the repo root:
 
 ```bash
 # Paper (canonical)
-open prototype/004/index.html
+open docs/prototype/004/index.html
 
 # Or any screen directly
-open prototype/004/year.html
+open docs/prototype/004/year.html
 ```
 
 On Linux, replace `open` with `xdg-open`. A local static server also works if you prefer:
 
 ```bash
-cd prototype/004 && python3 -m http.server 8080
+cd docs/prototype/004 && python3 -m http.server 8080
 # then visit http://localhost:8080
 ```
 

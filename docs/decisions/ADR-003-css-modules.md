@@ -9,7 +9,7 @@
 
 ## Context
 
-Phase 1 visual design is **locked** in [004-style-guide.md](../specs/004-style-guide.md) with a canonical CSS implementation in `prototype/004/css/paper.css`. The calendar has **semantic states** (red dot = below buffer, weekend bands, projected vs actual entry colors) that must stay aligned with the style guide.
+Phase 1 visual design is **locked** in [004-style-guide.md](../specs/004-style-guide.md) with a canonical CSS implementation in `docs/prototype/004/css/paper.css`. The calendar has **semantic states** (red dot = below buffer, weekend bands, projected vs actual entry colors) that must stay aligned with the style guide.
 
 We need a styling approach that:
 
@@ -26,7 +26,7 @@ We need a styling approach that:
 
 | Layer | Approach |
 |---|---|
-| Global tokens | `packages/ui/src/tokens/paper.css` — CSS variables from 004 / `prototype/004` |
+| Global tokens | `packages/ui/src/tokens/paper.css` — CSS variables from 004 / `docs/prototype/004` |
 | Component styles | **CSS Modules** (`.module.css`) colocated with components |
 | No Tailwind | Utility framework not adopted in Phase 1 |
 
@@ -128,7 +128,7 @@ Same component — **calendar day cell with below-buffer red dot**.
 
 **Pros**
 
-- Direct port of `prototype/004/css/*.css`
+- Direct port of `docs/prototype/004/css/*.css`
 - Semantic class names (`riskDot`, `weekend`) match style guide vocabulary
 - No `@apply` indirection; what you read is what runs
 - Scoped hashes prevent collisions without memorizing utilities
@@ -174,7 +174,7 @@ export function CalendarDayCell({ day, belowBuffer, isWeekend, isToday }: Props)
 - Long `className` strings are **harder to debug** — styles scattered across JSX, not one stylesheet
 - Paper theme needs full `tailwind.config` token mapping (`--color-danger` → `red-600` drift risk)
 - Semantic calendar rules from 004 (entry line colors, past-due red) become long conditional utility chains
-- `prototype/004` investment doesn't transfer — rewrite as utilities
+- `docs/prototype/004` investment doesn't transfer — rewrite as utilities
 
 ### Hybrid (rejected for Phase 1)
 
@@ -187,7 +187,7 @@ Tailwind for layout + CSS Modules for calendar — two mental models, unclear bo
 | Criterion | CSS Modules | Tailwind |
 |---|---|---|
 | Debug in DevTools | Single `.module.css` file per component | Utilities embedded in JSX |
-| Port from `prototype/004` | Copy/adapt CSS directly | Re-tokenize everything |
+| Port from `docs/prototype/004` | Copy/adapt CSS directly | Re-tokenize everything |
 | Semantic states (red dot, past-due) | Named classes | Long `className` conditionals |
 | Storybook | Import `paper.css` + modules | Needs Tailwind in Storybook vite config |
 | Bundle | Small, only used classes | Purge helps; config overhead |

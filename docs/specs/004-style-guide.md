@@ -1,6 +1,6 @@
 ---
 name: Style Guide (Phase 1)
-overview: Locked visual system for Phase 1 — Paper theme tokens, layout, components, and semantic colors. Canonical reference implementation is prototype/004.
+overview: Locked visual system for Phase 1 — Paper theme tokens, layout, components, and semantic colors. Canonical reference implementation is docs/prototype/004.
 status: locked
 isProject: false
 ---
@@ -11,7 +11,7 @@ isProject: false
 >
 > **Sources:** [002-phase-1-scope.md](./002-phase-1-scope.md), [003-screen-specs.md](./003-screen-specs.md).
 >
-> **Canonical reference:** [`prototype/004/`](../../prototype/004/) — static HTML/CSS prototypes implementing this guide. Prototypes `005` (Ink) and `006` (Analytical) are exploratory alternates; **do not use them for Phase 1 implementation**.
+> **Canonical reference:** [`prototype/004/`](../prototype/004/) — static HTML/CSS prototypes implementing this guide. Prototypes `005` (Ink) and `006` (Analytical) are exploratory alternates; **do not use them for Phase 1 implementation**.
 
 ---
 
@@ -24,7 +24,7 @@ isProject: false
 | Primary accent | Near-black (`#111111`) for text, headings, and primary actions |
 | Secondary accent | Violet (`#8B5CF6`) for focus rings, active mobile tabs, card/statement semantics, and selection highlights |
 | Data density | Data-forward calendar grids; generous touch targets on mobile |
-| Reference CSS | `prototype/004/css/paper.css` (global tokens + shell) + per-screen CSS files |
+| Reference CSS | `docs/prototype/004/css/paper.css` (global tokens + shell) + per-screen CSS files |
 
 **Design principles:**
 - Money and dates are always formatted via locale (`Settings`); never hardcode `R$` or `DD/MM` in components.
@@ -36,7 +36,7 @@ isProject: false
 
 ## 2. Design tokens
 
-All tokens live in `:root` inside [`prototype/004/css/paper.css`](../../prototype/004/css/paper.css). Screen CSS may define local overrides scoped to a component (e.g. calendar day-cell sizes).
+All tokens live in `:root` inside [`prototype/004/css/paper.css`](../prototype/004/css/paper.css). Screen CSS may define local overrides scoped to a component (e.g. calendar day-cell sizes).
 
 ### 2.1 Color palette
 

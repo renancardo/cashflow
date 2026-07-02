@@ -17,8 +17,11 @@ isProject: false
 
 ```text
 cashflow/
-├── docs/                    # Specs, PRD, user stories, ADRs (reference — not imported by app)
-├── prototype/               # Static HTML/CSS UI reference (004 = Paper canonical)
+├── docs/                    # Specs, PRD, user stories, ADRs, UI prototypes (reference — not imported by app)
+│   ├── prototype/           # Static HTML/CSS UI reference (004 = Paper canonical)
+│   ├── specs/
+│   ├── user-stories/
+│   └── decisions/
 ├── packages/                # All runnable TypeScript code
 │   ├── core/                # Shared types, formatters, constants
 │   ├── engine/              # Pure projection — projectCashFlow()
@@ -37,7 +40,7 @@ cashflow/
 | Folder | Imported by app? |
 |---|---|
 | `docs/` | No |
-| `prototype/` | No — port patterns into `packages/ui`, do not import files |
+| `docs/prototype/` | No — port patterns into `packages/ui`, do not import files |
 | `packages/*` | Yes — via workspace protocol (`workspace:*`) |
 
 ---
@@ -143,7 +146,7 @@ packages/ui/
 │   └── preview.ts          # imports paper.css
 ├── src/
 │   ├── tokens/
-│   │   └── paper.css       # from 004-style-guide / prototype/004
+│   │   └── paper.css       # from 004-style-guide / docs/prototype/004
 │   ├── components/
 │   │   ├── CalendarDayCell/
 │   │   │   ├── CalendarDayCell.tsx
@@ -353,7 +356,7 @@ Centralized in `packages/app/src/data/keys.ts`:
 | `docs/specs/` | Behavior specs — implementation must conform |
 | `docs/decisions/` | ADRs — stack rationale |
 | `docs/user-stories/` | Acceptance criteria backlog |
-| `prototype/004/` | Visual reference for Paper theme |
+| `docs/prototype/004/` | Visual reference for Paper theme |
 
 ---
 
@@ -388,7 +391,7 @@ Centralized in `packages/app/src/data/keys.ts`:
 
 | Don't | Do instead |
 |---|---|
-| Import `prototype/` in app | Port CSS/components to `packages/ui` |
+| Import `docs/prototype/` in app | Port CSS/components to `packages/ui` |
 | Put projection math in React hooks | `projectCashFlow` in `engine` |
 | Persist `ProjectionResult` in db | Derive via Query on each invalidation |
 | TanStack Query inside `ui` or `db` | Query hooks in `app` only |

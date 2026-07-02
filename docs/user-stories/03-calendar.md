@@ -15,7 +15,7 @@ Year and month calendar views driven by real engine output.
 
 ### Acceptance criteria
 
-- [ ] Layout matches [004-style-guide.md](../specs/004-style-guide.md) and `prototype/004/`
+- [ ] Layout matches [004-style-guide.md](../specs/004-style-guide.md) and `docs/prototype/004/`
 - [ ] Weekend columns subtly shaded
 - [ ] Horizontal scroll through year; “jump to today” control
 - [ ] Each cell shows day number; data from `ProjectionResult.days`
