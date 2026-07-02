@@ -37,4 +37,4 @@ Each ADR follows:
 | [002-phase-1-scope.md](../specs/002-phase-1-scope.md) | NFRs (local-first, performance, privacy) |
 | [004-style-guide.md](../specs/004-style-guide.md) | Paper tokens — source for CSS variables |
 | [005-prd.md](../specs/005-prd.md) | Product goals |
-| [006-project-structure.md](../specs/006-project-structure.md) | Folder layout (when written) |
+| [006-project-structure.md](../specs/006-project-structure.md) | Folder layout, runtime layers, typical user flows |

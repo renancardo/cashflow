@@ -214,3 +214,4 @@ Manual caching, deduplication, refetch-on-focus, and mutation invalidation must 
 
 - [ADR-006](./ADR-006-client-storage.md) — pick Dexie vs SQLite
 - Add `QueryClientProvider` in app root with sensible defaults (`retry: 1` for local DB)
+- Runtime flows: [006-project-structure.md §5](../specs/006-project-structure.md#5-typical-user-flows)

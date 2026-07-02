@@ -71,4 +71,4 @@ flowchart LR
 | [002-phase-1-scope.md](../specs/002-phase-1-scope.md) | Locked in/out of scope |
 | [001-data-model.md](../specs/001-data-model.md) | Entity fields engine and CRUD must honor |
 | [003-screen-specs.md](../specs/003-screen-specs.md) | UI behavior per screen |
-| [004-style-guide.md](../specs/004-style-guide.md) | Paper theme for React + Storybook |
+| [006-project-structure.md](../specs/006-project-structure.md) | Monorepo layout, runtime layers, typical user flows |

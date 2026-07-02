@@ -14,6 +14,7 @@ Written specifications for the Cashflow app. These docs define **what to build**
 | 3 | [`specs/003-screen-specs.md`](specs/003-screen-specs.md) | draft | Per-screen layout, actions, states |
 | 4 | [`specs/004-style-guide.md`](specs/004-style-guide.md) | **locked** | Paper theme tokens, components, semantic colors |
 | 5 | [`specs/005-prd.md`](specs/005-prd.md) | draft | Goals, release definition, traceability |
+| 6 | [`specs/006-project-structure.md`](specs/006-project-structure.md) | draft | Monorepo layout, runtime & user flows |
 | — | [`user-stories/`](user-stories/) | draft | Per-epic user stories + acceptance criteria |
 | — | [`decisions/`](decisions/) | draft | ADRs — stack, data layer, styling (US-0.1) |
 
@@ -38,7 +39,7 @@ Architecture Decision Records (ADRs): **why** the stack is shaped this way. Outc
 Decisions that implementation must follow. Numbered files encode dependency order:
 
 ```
-001 data model  →  002 scope  →  003 screens  →  004 style  →  005 PRD  →  user-stories/
+001 data model  →  002 scope  →  003 screens  →  004 style  →  005 PRD  →  006 structure  →  user-stories/
 ```
 
 **Status meanings:**
@@ -73,6 +74,7 @@ flowchart LR
   Screens["003 screens"]
   Style["004 style"]
   PRD["005 PRD"]
+  Structure["006 structure"]
   Stories["user-stories/"]
   Proto["prototype/004"]
   App["app (future)"]
@@ -81,8 +83,10 @@ flowchart LR
   Scope --> Style --> Proto
   Screens --> PRD
   Style --> PRD
+  PRD --> Structure
   PRD --> Stories
   Stories --> ADR["decisions/"]
+  Structure --> App
   ADR --> App
   Proto -.-> App
 ```

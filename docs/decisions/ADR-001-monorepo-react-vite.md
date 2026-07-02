@@ -93,7 +93,7 @@ Root scripts (target):
 **Follow-ups**
 
 - [US-0.2](../user-stories/00-foundation.md#us-02--initialize-the-application-monorepo) — scaffold packages
-- Document layout in `006-project-structure.md`
+- Document layout in [006-project-structure.md](../specs/006-project-structure.md)
 
 ---
 
