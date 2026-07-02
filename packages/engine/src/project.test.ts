@@ -1,9 +1,11 @@
 import { describe, it, expect } from "vitest";
 import type { EngineInput } from "@cashflow/core";
+import { getFixture } from "../fixtures/index.js";
 import { projectCashFlow } from "./project.js";
-import basicFixture from "../fixtures/basic-salary-rent.json";
 
 describe("projectCashFlow", () => {
+  const basicFixture = getFixture("basic-salary-rent");
+
   it("returns projection result shape", () => {
     const result = projectCashFlow(basicFixture as EngineInput, "2026-06-01");
 

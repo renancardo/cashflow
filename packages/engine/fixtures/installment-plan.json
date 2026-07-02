@@ -1,0 +1,165 @@
+{
+  "accounts": [
+    {
+      "id": "acct-checking",
+      "name": "Primary Checking",
+      "type": "checking",
+      "currency": "BRL",
+      "isWorking": true,
+      "anchorBalanceCents": 2000000,
+      "anchorDate": "2026-06-01"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx-loan-alpha-paid",
+      "type": "expense",
+      "amountCents": 18047,
+      "accountId": "acct-checking",
+      "categoryId": "cat-loans",
+      "description": "Loan Alpha installment #1",
+      "effectiveDate": "2026-06-03",
+      "settlesInstallmentId": "inst-loan-alpha-01"
+    },
+    {
+      "id": "tx-loan-beta-paid",
+      "type": "expense",
+      "amountCents": 22433,
+      "accountId": "acct-checking",
+      "categoryId": "cat-loans",
+      "description": "Loan Beta installment #1",
+      "effectiveDate": "2026-06-03",
+      "settlesInstallmentId": "inst-loan-beta-01"
+    }
+  ],
+  "plannedItems": [],
+  "plannedItemOverrides": [],
+  "creditCardStatements": [],
+  "installmentPlans": [
+    {
+      "id": "plan-loan-alpha",
+      "description": "Loan Alpha",
+      "accountId": "acct-checking",
+      "categoryId": "cat-loans",
+      "installmentAmountCents": 18047,
+      "installmentCount": 36,
+      "firstDueDate": "2025-08-10",
+      "dayOfMonth": 10,
+      "payoffDate": "2028-07-10",
+      "isActive": true
+    },
+    {
+      "id": "plan-loan-beta",
+      "description": "Loan Beta",
+      "accountId": "acct-checking",
+      "categoryId": "cat-loans",
+      "installmentAmountCents": 22433,
+      "installmentCount": 24,
+      "firstDueDate": "2025-09-03",
+      "dayOfMonth": 3,
+      "payoffDate": "2027-08-03",
+      "isActive": true
+    },
+    {
+      "id": "plan-loan-gamma",
+      "description": "Loan Gamma",
+      "accountId": "acct-checking",
+      "categoryId": "cat-loans",
+      "installmentAmountCents": 199098,
+      "installmentCount": 12,
+      "firstDueDate": "2026-06-16",
+      "dayOfMonth": 16,
+      "payoffDate": "2027-05-16",
+      "isActive": true
+    },
+    {
+      "id": "plan-loan-dormant",
+      "description": "Loan Delta (dormant)",
+      "accountId": "acct-checking",
+      "categoryId": "cat-loans",
+      "installmentAmountCents": 8900,
+      "installmentCount": 6,
+      "firstDueDate": "2026-08-01",
+      "dayOfMonth": 1,
+      "payoffDate": "2027-01-01",
+      "isActive": false
+    }
+  ],
+  "installments": [
+    {
+      "id": "inst-loan-alpha-01",
+      "installmentPlanId": "plan-loan-alpha",
+      "index": 1,
+      "dueDate": "2026-06-03",
+      "status": "paid",
+      "settledTransactionId": "tx-loan-alpha-paid"
+    },
+    {
+      "id": "inst-loan-alpha-02",
+      "installmentPlanId": "plan-loan-alpha",
+      "index": 2,
+      "dueDate": "2026-07-10",
+      "status": "scheduled"
+    },
+    {
+      "id": "inst-loan-alpha-03",
+      "installmentPlanId": "plan-loan-alpha",
+      "index": 3,
+      "dueDate": "2026-08-10",
+      "status": "scheduled"
+    },
+    {
+      "id": "inst-loan-beta-01",
+      "installmentPlanId": "plan-loan-beta",
+      "index": 1,
+      "dueDate": "2026-06-03",
+      "status": "paid",
+      "settledTransactionId": "tx-loan-beta-paid"
+    },
+    {
+      "id": "inst-loan-beta-02",
+      "installmentPlanId": "plan-loan-beta",
+      "index": 2,
+      "dueDate": "2026-07-03",
+      "status": "scheduled"
+    },
+    {
+      "id": "inst-loan-gamma-01",
+      "installmentPlanId": "plan-loan-gamma",
+      "index": 1,
+      "dueDate": "2026-06-16",
+      "status": "scheduled"
+    },
+    {
+      "id": "inst-loan-gamma-02",
+      "installmentPlanId": "plan-loan-gamma",
+      "index": 2,
+      "dueDate": "2026-07-16",
+      "status": "scheduled"
+    },
+    {
+      "id": "inst-loan-dormant-01",
+      "installmentPlanId": "plan-loan-dormant",
+      "index": 1,
+      "dueDate": "2026-08-01",
+      "status": "scheduled"
+    }
+  ],
+  "settings": {
+    "id": "singleton",
+    "language": "pt-BR",
+    "defaultCurrency": "BRL",
+    "negativeBufferCents": 0,
+    "largeOutflowThresholdCents": 50000,
+    "horizonMonths": 24,
+    "alertLeadTimeDays": 14,
+    "defaultWorkingForType": {
+      "checking": true,
+      "savings": true,
+      "wallet": true,
+      "credit_card": false,
+      "investment": false
+    },
+    "dateFormat": "DD/MM/YYYY"
+  }
+}

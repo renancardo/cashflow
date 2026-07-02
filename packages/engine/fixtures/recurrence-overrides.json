@@ -1,0 +1,116 @@
+{
+  "accounts": [
+    {
+      "id": "acct-checking",
+      "name": "Primary Checking",
+      "type": "checking",
+      "currency": "BRL",
+      "isWorking": true,
+      "anchorBalanceCents": 800000,
+      "anchorDate": "2026-06-01"
+    }
+  ],
+  "transactions": [],
+  "plannedItems": [
+    {
+      "id": "plan-salary",
+      "type": "income",
+      "amountCents": 1200000,
+      "accountId": "acct-checking",
+      "categoryId": "cat-salary",
+      "description": "Employer salary",
+      "recurrence": "monthly",
+      "interval": 1,
+      "dayOfMonth": 8,
+      "startDate": "2026-01-08",
+      "isSubscription": false,
+      "isActive": true
+    },
+    {
+      "id": "plan-streaming",
+      "type": "expense",
+      "amountCents": 5590,
+      "accountId": "acct-checking",
+      "categoryId": "cat-entertainment",
+      "description": "Streaming subscription",
+      "recurrence": "monthly",
+      "interval": 1,
+      "dayOfMonth": 15,
+      "startDate": "2026-01-15",
+      "isSubscription": true,
+      "isActive": true
+    },
+    {
+      "id": "plan-hoa",
+      "type": "expense",
+      "amountCents": 56819,
+      "accountId": "acct-checking",
+      "categoryId": "cat-housing",
+      "description": "HOA fee",
+      "recurrence": "monthly",
+      "interval": 1,
+      "dayOfMonth": 12,
+      "startDate": "2026-01-12",
+      "isSubscription": false,
+      "isActive": true
+    },
+    {
+      "id": "plan-vehicle-tax",
+      "type": "expense",
+      "amountCents": 45000,
+      "accountId": "acct-checking",
+      "categoryId": "cat-transport",
+      "description": "Vehicle tax installment",
+      "recurrence": "once",
+      "interval": 1,
+      "startDate": "2026-09-15",
+      "isSubscription": false,
+      "isActive": true
+    }
+  ],
+  "plannedItemOverrides": [
+    {
+      "id": "ovr-salary-skip-jul",
+      "plannedItemId": "plan-salary",
+      "occurrenceDate": "2026-07-08",
+      "status": "skipped",
+      "note": "No payroll in July (vacation)"
+    },
+    {
+      "id": "ovr-hoa-aug",
+      "plannedItemId": "plan-hoa",
+      "occurrenceDate": "2026-08-12",
+      "status": "modified",
+      "amountCentsOverride": 123511,
+      "note": "Back-due HOA included in August bill"
+    },
+    {
+      "id": "ovr-streaming-move",
+      "plannedItemId": "plan-streaming",
+      "occurrenceDate": "2026-06-15",
+      "status": "modified",
+      "dateOverride": "2026-06-18",
+      "note": "Billing date shifted"
+    }
+  ],
+  "creditCardStatements": [],
+  "installments": [],
+  "installmentPlans": [],
+  "settings": {
+    "id": "singleton",
+    "language": "pt-BR",
+    "defaultCurrency": "BRL",
+    "negativeBufferCents": 0,
+    "largeOutflowThresholdCents": 50000,
+    "horizonMonths": 24,
+    "alertLeadTimeDays": 14,
+    "defaultWorkingForType": {
+      "checking": true,
+      "savings": true,
+      "wallet": true,
+      "credit_card": false,
+      "investment": false
+    },
+    "dateFormat": "DD/MM/YYYY"
+  }
+}

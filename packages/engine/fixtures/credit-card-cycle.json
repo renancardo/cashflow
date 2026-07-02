@@ -1,0 +1,80 @@
+{
+  "accounts": [
+    {
+      "id": "acct-checking",
+      "name": "Primary Checking",
+      "type": "checking",
+      "currency": "BRL",
+      "isWorking": true,
+      "anchorBalanceCents": 1000000,
+      "anchorDate": "2026-06-01"
+    },
+    {
+      "id": "acct-card",
+      "name": "Main Credit Card",
+      "type": "credit_card",
+      "currency": "BRL",
+      "isWorking": false,
+      "anchorBalanceCents": 150000,
+      "anchorDate": "2026-06-01",
+      "closingDay": 26,
+      "dueDay": 1,
+      "defaultPayFromAccountId": "acct-checking",
+      "creditLimitCents": 500000
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx-card-purchase",
+      "type": "expense",
+      "amountCents": 8990,
+      "accountId": "acct-card",
+      "categoryId": "cat-shopping",
+      "description": "Online purchase",
+      "effectiveDate": "2026-06-27"
+    }
+  ],
+  "plannedItems": [],
+  "plannedItemOverrides": [],
+  "creditCardStatements": [
+    {
+      "id": "stmt-jun-jul",
+      "cardAccountId": "acct-card",
+      "periodStart": "2026-05-27",
+      "closingDate": "2026-06-26",
+      "dueDate": "2026-07-01",
+      "computedTotalCents": 150000,
+      "status": "closed",
+      "payFromAccountId": "acct-checking"
+    },
+    {
+      "id": "stmt-jul-aug",
+      "cardAccountId": "acct-card",
+      "periodStart": "2026-06-27",
+      "closingDate": "2026-07-26",
+      "dueDate": "2026-08-01",
+      "computedTotalCents": 158990,
+      "status": "open",
+      "payFromAccountId": "acct-checking"
+    }
+  ],
+  "installments": [],
+  "installmentPlans": [],
+  "settings": {
+    "id": "singleton",
+    "language": "pt-BR",
+    "defaultCurrency": "BRL",
+    "negativeBufferCents": 0,
+    "largeOutflowThresholdCents": 50000,
+    "horizonMonths": 24,
+    "alertLeadTimeDays": 14,
+    "defaultWorkingForType": {
+      "checking": true,
+      "savings": true,
+      "wallet": true,
+      "credit_card": false,
+      "investment": false
+    },
+    "dateFormat": "DD/MM/YYYY"
+  }
+}

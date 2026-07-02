@@ -1,0 +1,704 @@
+{
+  "accounts": [
+    {
+      "id": "acct-primary",
+      "name": "Primary Checking",
+      "type": "checking",
+      "currency": "BRL",
+      "isWorking": true,
+      "anchorBalanceCents": 350000,
+      "anchorDate": "2026-06-01",
+      "institution": "Bank A"
+    },
+    {
+      "id": "acct-secondary",
+      "name": "Secondary Checking",
+      "type": "checking",
+      "currency": "BRL",
+      "isWorking": true,
+      "anchorBalanceCents": 80000,
+      "anchorDate": "2026-06-01",
+      "institution": "Bank B"
+    },
+    {
+      "id": "acct-wallet",
+      "name": "Digital Wallet",
+      "type": "wallet",
+      "currency": "BRL",
+      "isWorking": true,
+      "anchorBalanceCents": 15000,
+      "anchorDate": "2026-06-01"
+    },
+    {
+      "id": "acct-savings",
+      "name": "Emergency Savings",
+      "type": "savings",
+      "currency": "BRL",
+      "isWorking": true,
+      "anchorBalanceCents": 500000,
+      "anchorDate": "2026-06-01"
+    },
+    {
+      "id": "acct-card-main",
+      "name": "Main Credit Card",
+      "type": "credit_card",
+      "currency": "BRL",
+      "isWorking": false,
+      "anchorBalanceCents": 120000,
+      "anchorDate": "2026-06-01",
+      "closingDay": 26,
+      "dueDay": 1,
+      "defaultPayFromAccountId": "acct-primary",
+      "creditLimitCents": 800000
+    },
+    {
+      "id": "acct-card-store",
+      "name": "Store Card",
+      "type": "credit_card",
+      "currency": "BRL",
+      "isWorking": false,
+      "anchorBalanceCents": 45000,
+      "anchorDate": "2026-06-01",
+      "closingDay": 10,
+      "dueDay": 15,
+      "defaultPayFromAccountId": "acct-primary"
+    },
+    {
+      "id": "acct-investment",
+      "name": "Brokerage",
+      "type": "investment",
+      "currency": "BRL",
+      "isWorking": false,
+      "anchorBalanceCents": 250000,
+      "anchorDate": "2026-06-01"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx-001",
+      "type": "expense",
+      "amountCents": 4590,
+      "accountId": "acct-primary",
+      "categoryId": "cat-food",
+      "description": "Grocery store",
+      "effectiveDate": "2026-06-01"
+    },
+    {
+      "id": "tx-002",
+      "type": "expense",
+      "amountCents": 2490,
+      "accountId": "acct-primary",
+      "categoryId": "cat-transport",
+      "description": "Ride share",
+      "effectiveDate": "2026-06-01"
+    },
+    {
+      "id": "tx-003",
+      "type": "income",
+      "amountCents": 750000,
+      "accountId": "acct-primary",
+      "categoryId": "cat-salary",
+      "description": "Payroll advance",
+      "effectiveDate": "2026-06-02"
+    },
+    {
+      "id": "tx-004",
+      "type": "transfer",
+      "amountCents": 100000,
+      "accountId": "acct-primary",
+      "toAccountId": "acct-investment",
+      "description": "Monthly investment contribution",
+      "effectiveDate": "2026-06-02"
+    },
+    {
+      "id": "tx-005",
+      "type": "expense",
+      "amountCents": 18047,
+      "accountId": "acct-primary",
+      "categoryId": "cat-loans",
+      "description": "Loan Alpha installment",
+      "effectiveDate": "2026-06-03",
+      "settlesInstallmentId": "inst-loan-alpha-06"
+    },
+    {
+      "id": "tx-006",
+      "type": "expense",
+      "amountCents": 22433,
+      "accountId": "acct-primary",
+      "categoryId": "cat-loans",
+      "description": "Loan Beta installment",
+      "effectiveDate": "2026-06-03",
+      "settlesInstallmentId": "inst-loan-beta-06"
+    },
+    {
+      "id": "tx-007",
+      "type": "expense",
+      "amountCents": 8990,
+      "accountId": "acct-card-main",
+      "categoryId": "cat-shopping",
+      "description": "Online subscription",
+      "effectiveDate": "2026-06-04"
+    },
+    {
+      "id": "tx-008",
+      "type": "transfer",
+      "amountCents": 50000,
+      "accountId": "acct-primary",
+      "toAccountId": "acct-wallet",
+      "description": "Wallet top-up",
+      "effectiveDate": "2026-06-05"
+    },
+    {
+      "id": "tx-009",
+      "type": "transfer",
+      "amountCents": 50000,
+      "accountId": "acct-wallet",
+      "toAccountId": "acct-primary",
+      "description": "Wallet refund",
+      "effectiveDate": "2026-06-05"
+    },
+    {
+      "id": "tx-010",
+      "type": "expense",
+      "amountCents": 3200,
+      "accountId": "acct-wallet",
+      "categoryId": "cat-food",
+      "description": "Café breakfast",
+      "effectiveDate": "2026-06-06"
+    },
+    {
+      "id": "tx-011",
+      "type": "expense",
+      "amountCents": 14990,
+      "accountId": "acct-card-main",
+      "categoryId": "cat-housing",
+      "description": "Home supplies",
+      "effectiveDate": "2026-06-06"
+    },
+    {
+      "id": "tx-012",
+      "type": "income",
+      "amountCents": 1200000,
+      "accountId": "acct-primary",
+      "categoryId": "cat-salary",
+      "description": "Employer A salary",
+      "effectiveDate": "2026-06-08"
+    },
+    {
+      "id": "tx-013",
+      "type": "expense",
+      "amountCents": 150000,
+      "accountId": "acct-primary",
+      "categoryId": "cat-support",
+      "description": "Family support payment",
+      "effectiveDate": "2026-06-08",
+      "settlesPlannedItemId": "plan-support-a",
+      "settlesPlannedOccurrenceDate": "2026-06-08"
+    },
+    {
+      "id": "tx-014",
+      "type": "expense",
+      "amountCents": 15347,
+      "accountId": "acct-primary",
+      "categoryId": "cat-housing",
+      "description": "Internet bill",
+      "effectiveDate": "2026-06-08"
+    },
+    {
+      "id": "tx-015",
+      "type": "expense",
+      "amountCents": 56819,
+      "accountId": "acct-primary",
+      "categoryId": "cat-housing",
+      "description": "HOA fee",
+      "effectiveDate": "2026-06-12",
+      "settlesPlannedItemId": "plan-hoa",
+      "settlesPlannedOccurrenceDate": "2026-06-12"
+    },
+    {
+      "id": "tx-016",
+      "type": "expense",
+      "amountCents": 11498,
+      "accountId": "acct-card-main",
+      "categoryId": "cat-work",
+      "description": "Software subscription",
+      "effectiveDate": "2026-06-12"
+    },
+    {
+      "id": "tx-017",
+      "type": "income",
+      "amountCents": 950000,
+      "accountId": "acct-primary",
+      "categoryId": "cat-salary",
+      "description": "Employer B salary",
+      "effectiveDate": "2026-06-16"
+    },
+    {
+      "id": "tx-018",
+      "type": "expense",
+      "amountCents": 200000,
+      "accountId": "acct-primary",
+      "categoryId": "cat-support",
+      "description": "Family support payment",
+      "effectiveDate": "2026-06-16"
+    },
+    {
+      "id": "tx-019",
+      "type": "expense",
+      "amountCents": 547475,
+      "accountId": "acct-primary",
+      "categoryId": "cat-taxes",
+      "description": "Annual income tax",
+      "effectiveDate": "2026-06-16"
+    },
+    {
+      "id": "tx-020",
+      "type": "expense",
+      "amountCents": 199098,
+      "accountId": "acct-primary",
+      "categoryId": "cat-loans",
+      "description": "Loan Gamma installment",
+      "effectiveDate": "2026-06-16",
+      "settlesInstallmentId": "inst-loan-gamma-01"
+    },
+    {
+      "id": "tx-021",
+      "type": "expense",
+      "amountCents": 137367,
+      "accountId": "acct-primary",
+      "categoryId": "cat-housing",
+      "description": "Mortgage payment",
+      "effectiveDate": "2026-06-17"
+    },
+    {
+      "id": "tx-022",
+      "type": "expense",
+      "amountCents": 8500,
+      "accountId": "acct-secondary",
+      "categoryId": "cat-utilities",
+      "description": "Mobile phone",
+      "effectiveDate": "2026-06-18"
+    },
+    {
+      "id": "tx-023",
+      "type": "income",
+      "amountCents": 850000,
+      "accountId": "acct-primary",
+      "categoryId": "cat-salary",
+      "description": "Employer A second deposit",
+      "effectiveDate": "2026-06-23"
+    },
+    {
+      "id": "tx-024",
+      "type": "expense",
+      "amountCents": 300000,
+      "accountId": "acct-primary",
+      "categoryId": "cat-support",
+      "description": "Family support payment",
+      "effectiveDate": "2026-06-23"
+    },
+    {
+      "id": "tx-025",
+      "type": "expense",
+      "amountCents": 120000,
+      "accountId": "acct-primary",
+      "categoryId": "cat-services",
+      "description": "Financial advisory fee",
+      "effectiveDate": "2026-06-23"
+    },
+    {
+      "id": "tx-026",
+      "type": "transfer",
+      "amountCents": 95000,
+      "accountId": "acct-primary",
+      "toAccountId": "acct-card-main",
+      "description": "Credit card statement payment",
+      "effectiveDate": "2026-06-25",
+      "paysStatementId": "stmt-main-may-jun"
+    },
+    {
+      "id": "tx-027",
+      "type": "income",
+      "amountCents": 82042,
+      "accountId": "acct-secondary",
+      "categoryId": "cat-bonus",
+      "description": "Employer severance fund",
+      "effectiveDate": "2026-06-26"
+    },
+    {
+      "id": "tx-028",
+      "type": "expense",
+      "amountCents": 5590,
+      "accountId": "acct-card-main",
+      "categoryId": "cat-entertainment",
+      "description": "Streaming service",
+      "effectiveDate": "2026-06-27"
+    },
+    {
+      "id": "tx-029",
+      "type": "expense",
+      "amountCents": 4500,
+      "accountId": "acct-secondary",
+      "categoryId": "cat-entertainment",
+      "description": "Weekend outing",
+      "effectiveDate": "2026-06-27"
+    },
+    {
+      "id": "tx-030",
+      "type": "expense",
+      "amountCents": 2987,
+      "accountId": "acct-secondary",
+      "categoryId": "cat-games",
+      "description": "Lottery ticket",
+      "effectiveDate": "2026-06-29"
+    },
+    {
+      "id": "tx-031",
+      "type": "income",
+      "amountCents": 250000,
+      "accountId": "acct-secondary",
+      "categoryId": "cat-bonus",
+      "description": "Employer severance fund",
+      "effectiveDate": "2026-07-01"
+    },
+    {
+      "id": "tx-032",
+      "type": "expense",
+      "amountCents": 470000,
+      "accountId": "acct-secondary",
+      "categoryId": "cat-education",
+      "description": "School tuition",
+      "effectiveDate": "2026-07-01"
+    },
+    {
+      "id": "tx-033",
+      "type": "expense",
+      "amountCents": 9000,
+      "accountId": "acct-card-main",
+      "categoryId": "cat-transport",
+      "description": "Fuel top-up",
+      "effectiveDate": "2026-07-01"
+    }
+  ],
+  "plannedItems": [
+    {
+      "id": "plan-salary-a",
+      "type": "income",
+      "amountCents": 1200000,
+      "accountId": "acct-primary",
+      "categoryId": "cat-salary",
+      "description": "Employer A salary",
+      "recurrence": "monthly",
+      "interval": 1,
+      "dayOfMonth": 8,
+      "startDate": "2026-01-08",
+      "isSubscription": false,
+      "isActive": true
+    },
+    {
+      "id": "plan-salary-b",
+      "type": "income",
+      "amountCents": 950000,
+      "accountId": "acct-primary",
+      "categoryId": "cat-salary",
+      "description": "Employer B salary",
+      "recurrence": "monthly",
+      "interval": 1,
+      "dayOfMonth": 16,
+      "startDate": "2026-01-16",
+      "isSubscription": false,
+      "isActive": true
+    },
+    {
+      "id": "plan-payroll-advance",
+      "type": "income",
+      "amountCents": 750000,
+      "accountId": "acct-primary",
+      "categoryId": "cat-salary",
+      "description": "Payroll advance",
+      "recurrence": "monthly",
+      "interval": 1,
+      "dayOfMonth": 2,
+      "startDate": "2026-01-02",
+      "isSubscription": false,
+      "isActive": true
+    },
+    {
+      "id": "plan-mortgage",
+      "type": "expense",
+      "amountCents": 137367,
+      "accountId": "acct-primary",
+      "categoryId": "cat-housing",
+      "description": "Mortgage payment",
+      "recurrence": "monthly",
+      "interval": 1,
+      "dayOfMonth": 17,
+      "startDate": "2026-01-17",
+      "isSubscription": false,
+      "isActive": true
+    },
+    {
+      "id": "plan-hoa",
+      "type": "expense",
+      "amountCents": 56819,
+      "accountId": "acct-primary",
+      "categoryId": "cat-housing",
+      "description": "HOA fee",
+      "recurrence": "monthly",
+      "interval": 1,
+      "dayOfMonth": 12,
+      "startDate": "2026-01-12",
+      "isSubscription": false,
+      "isActive": true
+    },
+    {
+      "id": "plan-rent-unit-b",
+      "type": "expense",
+      "amountCents": 240000,
+      "accountId": "acct-secondary",
+      "categoryId": "cat-housing",
+      "description": "Rental property B",
+      "recurrence": "monthly",
+      "interval": 1,
+      "dayOfMonth": 8,
+      "startDate": "2026-01-08",
+      "isSubscription": false,
+      "isActive": true
+    },
+    {
+      "id": "plan-support-a",
+      "type": "expense",
+      "amountCents": 150000,
+      "accountId": "acct-primary",
+      "categoryId": "cat-support",
+      "description": "Family support A",
+      "recurrence": "monthly",
+      "interval": 1,
+      "dayOfMonth": 8,
+      "startDate": "2026-01-08",
+      "isSubscription": false,
+      "isActive": true
+    },
+    {
+      "id": "plan-support-b",
+      "type": "expense",
+      "amountCents": 300000,
+      "accountId": "acct-primary",
+      "categoryId": "cat-support",
+      "description": "Family support B",
+      "recurrence": "monthly",
+      "interval": 1,
+      "dayOfMonth": 23,
+      "startDate": "2026-01-23",
+      "isSubscription": false,
+      "isActive": true
+    },
+    {
+      "id": "plan-education",
+      "type": "expense",
+      "amountCents": 470000,
+      "accountId": "acct-secondary",
+      "categoryId": "cat-education",
+      "description": "School tuition",
+      "recurrence": "monthly",
+      "interval": 1,
+      "dayOfMonth": 1,
+      "startDate": "2026-01-01",
+      "isSubscription": false,
+      "isActive": true
+    },
+    {
+      "id": "plan-advisory",
+      "type": "expense",
+      "amountCents": 120000,
+      "accountId": "acct-primary",
+      "categoryId": "cat-services",
+      "description": "Financial advisory fee",
+      "recurrence": "monthly",
+      "interval": 1,
+      "dayOfMonth": 23,
+      "startDate": "2026-01-23",
+      "isSubscription": false,
+      "isActive": true
+    },
+    {
+      "id": "plan-netflix",
+      "type": "expense",
+      "amountCents": 5590,
+      "accountId": "acct-card-main",
+      "categoryId": "cat-entertainment",
+      "description": "Streaming service",
+      "recurrence": "monthly",
+      "interval": 1,
+      "dayOfMonth": 15,
+      "startDate": "2026-01-15",
+      "isSubscription": true,
+      "isActive": true
+    },
+    {
+      "id": "plan-gym",
+      "type": "expense",
+      "amountCents": 12990,
+      "accountId": "acct-card-main",
+      "categoryId": "cat-health",
+      "description": "Gym membership",
+      "recurrence": "monthly",
+      "interval": 1,
+      "dayOfMonth": 1,
+      "startDate": "2026-01-01",
+      "isSubscription": true,
+      "isActive": true
+    },
+    {
+      "id": "plan-investment",
+      "type": "transfer",
+      "amountCents": 100000,
+      "accountId": "acct-primary",
+      "toAccountId": "acct-investment",
+      "categoryId": "cat-investment",
+      "description": "Monthly investment contribution",
+      "recurrence": "monthly",
+      "interval": 1,
+      "dayOfMonth": 2,
+      "startDate": "2026-01-02",
+      "isSubscription": false,
+      "isActive": true
+    }
+  ],
+  "plannedItemOverrides": [],
+  "creditCardStatements": [
+    {
+      "id": "stmt-main-may-jun",
+      "cardAccountId": "acct-card-main",
+      "periodStart": "2026-05-27",
+      "closingDate": "2026-06-26",
+      "dueDate": "2026-07-01",
+      "computedTotalCents": 95000,
+      "status": "paid",
+      "payFromAccountId": "acct-primary",
+      "paymentTransactionId": "tx-026"
+    },
+    {
+      "id": "stmt-main-jun-jul",
+      "cardAccountId": "acct-card-main",
+      "periodStart": "2026-06-27",
+      "closingDate": "2026-07-26",
+      "dueDate": "2026-08-01",
+      "computedTotalCents": 14480,
+      "status": "open",
+      "payFromAccountId": "acct-primary"
+    },
+    {
+      "id": "stmt-store-jun",
+      "cardAccountId": "acct-card-store",
+      "periodStart": "2026-05-11",
+      "closingDate": "2026-06-10",
+      "dueDate": "2026-06-15",
+      "computedTotalCents": 45000,
+      "status": "closed",
+      "payFromAccountId": "acct-primary"
+    }
+  ],
+  "installmentPlans": [
+    {
+      "id": "plan-loan-alpha",
+      "description": "Loan Alpha",
+      "accountId": "acct-primary",
+      "categoryId": "cat-loans",
+      "installmentAmountCents": 18047,
+      "installmentCount": 36,
+      "firstDueDate": "2025-08-10",
+      "dayOfMonth": 10,
+      "payoffDate": "2028-07-10",
+      "isActive": true
+    },
+    {
+      "id": "plan-loan-beta",
+      "description": "Loan Beta",
+      "accountId": "acct-primary",
+      "categoryId": "cat-loans",
+      "installmentAmountCents": 22433,
+      "installmentCount": 24,
+      "firstDueDate": "2025-09-03",
+      "dayOfMonth": 3,
+      "payoffDate": "2027-08-03",
+      "isActive": true
+    },
+    {
+      "id": "plan-loan-gamma",
+      "description": "Loan Gamma",
+      "accountId": "acct-primary",
+      "categoryId": "cat-loans",
+      "installmentAmountCents": 199098,
+      "installmentCount": 12,
+      "firstDueDate": "2026-06-16",
+      "dayOfMonth": 16,
+      "payoffDate": "2027-05-16",
+      "isActive": true
+    }
+  ],
+  "installments": [
+    {
+      "id": "inst-loan-alpha-06",
+      "installmentPlanId": "plan-loan-alpha",
+      "index": 11,
+      "dueDate": "2026-06-03",
+      "status": "paid",
+      "settledTransactionId": "tx-005"
+    },
+    {
+      "id": "inst-loan-alpha-07",
+      "installmentPlanId": "plan-loan-alpha",
+      "index": 12,
+      "dueDate": "2026-07-10",
+      "status": "scheduled"
+    },
+    {
+      "id": "inst-loan-beta-06",
+      "installmentPlanId": "plan-loan-beta",
+      "index": 10,
+      "dueDate": "2026-06-03",
+      "status": "paid",
+      "settledTransactionId": "tx-006"
+    },
+    {
+      "id": "inst-loan-beta-07",
+      "installmentPlanId": "plan-loan-beta",
+      "index": 11,
+      "dueDate": "2026-07-03",
+      "status": "scheduled"
+    },
+    {
+      "id": "inst-loan-gamma-01",
+      "installmentPlanId": "plan-loan-gamma",
+      "index": 1,
+      "dueDate": "2026-06-16",
+      "status": "paid",
+      "settledTransactionId": "tx-020"
+    },
+    {
+      "id": "inst-loan-gamma-02",
+      "installmentPlanId": "plan-loan-gamma",
+      "index": 2,
+      "dueDate": "2026-07-16",
+      "status": "scheduled"
+    }
+  ],
+  "settings": {
+    "id": "singleton",
+    "language": "pt-BR",
+    "defaultCurrency": "BRL",
+    "negativeBufferCents": 0,
+    "largeOutflowThresholdCents": 50000,
+    "horizonMonths": 24,
+    "alertLeadTimeDays": 14,
+    "defaultWorkingForType": {
+      "checking": true,
+      "savings": true,
+      "wallet": true,
+      "credit_card": false,
+      "investment": false
+    },
+    "dateFormat": "DD/MM/YYYY"
+  }
+}

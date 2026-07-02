@@ -1,8 +1,8 @@
 {
   "accounts": [
     {
-      "id": "acct-cora",
-      "name": "Cora",
+      "id": "acct-checking",
+      "name": "Primary Checking",
       "type": "checking",
       "currency": "BRL",
       "isWorking": true,
@@ -16,9 +16,9 @@
       "id": "plan-salary",
       "type": "income",
       "amountCents": 800000,
-      "accountId": "acct-cora",
+      "accountId": "acct-checking",
       "categoryId": "cat-salary",
-      "description": "Salary",
+      "description": "Monthly salary",
       "recurrence": "monthly",
       "interval": 1,
       "dayOfMonth": 5,
@@ -30,7 +30,7 @@
       "id": "plan-rent",
       "type": "expense",
       "amountCents": 250000,
-      "accountId": "acct-cora",
+      "accountId": "acct-checking",
       "categoryId": "cat-housing",
       "description": "Rent",
       "recurrence": "monthly",

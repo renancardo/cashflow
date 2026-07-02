@@ -1,0 +1,171 @@
+{
+  "accounts": [
+    {
+      "id": "acct-checking",
+      "name": "Primary Checking",
+      "type": "checking",
+      "currency": "BRL",
+      "isWorking": true,
+      "anchorBalanceCents": 1500000,
+      "anchorDate": "2026-06-01"
+    },
+    {
+      "id": "acct-card",
+      "name": "Main Credit Card",
+      "type": "credit_card",
+      "currency": "BRL",
+      "isWorking": false,
+      "anchorBalanceCents": 95000,
+      "anchorDate": "2026-06-01",
+      "closingDay": 26,
+      "dueDay": 1,
+      "defaultPayFromAccountId": "acct-checking"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx-support-settled",
+      "type": "expense",
+      "amountCents": 150000,
+      "accountId": "acct-checking",
+      "categoryId": "cat-support",
+      "description": "Family support payment",
+      "effectiveDate": "2026-06-08",
+      "settlesPlannedItemId": "plan-support",
+      "settlesPlannedOccurrenceDate": "2026-06-08"
+    },
+    {
+      "id": "tx-hoa-settled",
+      "type": "expense",
+      "amountCents": 56819,
+      "accountId": "acct-checking",
+      "categoryId": "cat-housing",
+      "description": "HOA fee",
+      "effectiveDate": "2026-06-12",
+      "settlesPlannedItemId": "plan-hoa",
+      "settlesPlannedOccurrenceDate": "2026-06-12"
+    },
+    {
+      "id": "tx-loan-settled",
+      "type": "expense",
+      "amountCents": 18047,
+      "accountId": "acct-checking",
+      "categoryId": "cat-loans",
+      "description": "Loan Alpha installment",
+      "effectiveDate": "2026-06-03",
+      "settlesInstallmentId": "inst-loan-alpha-jun"
+    },
+    {
+      "id": "tx-card-payment",
+      "type": "transfer",
+      "amountCents": 95000,
+      "accountId": "acct-checking",
+      "toAccountId": "acct-card",
+      "description": "Credit card statement payment",
+      "effectiveDate": "2026-06-25",
+      "paysStatementId": "stmt-jun"
+    }
+  ],
+  "plannedItems": [
+    {
+      "id": "plan-support",
+      "type": "expense",
+      "amountCents": 150000,
+      "accountId": "acct-checking",
+      "categoryId": "cat-support",
+      "description": "Family support payment",
+      "recurrence": "monthly",
+      "interval": 1,
+      "dayOfMonth": 8,
+      "startDate": "2026-01-08",
+      "isSubscription": false,
+      "isActive": true
+    },
+    {
+      "id": "plan-hoa",
+      "type": "expense",
+      "amountCents": 56819,
+      "accountId": "acct-checking",
+      "categoryId": "cat-housing",
+      "description": "HOA fee",
+      "recurrence": "monthly",
+      "interval": 1,
+      "dayOfMonth": 12,
+      "startDate": "2026-01-12",
+      "isSubscription": false,
+      "isActive": true
+    }
+  ],
+  "plannedItemOverrides": [],
+  "creditCardStatements": [
+    {
+      "id": "stmt-jun",
+      "cardAccountId": "acct-card",
+      "periodStart": "2026-05-27",
+      "closingDate": "2026-06-26",
+      "dueDate": "2026-07-01",
+      "computedTotalCents": 95000,
+      "status": "paid",
+      "payFromAccountId": "acct-checking",
+      "paymentTransactionId": "tx-card-payment"
+    },
+    {
+      "id": "stmt-jul",
+      "cardAccountId": "acct-card",
+      "periodStart": "2026-06-27",
+      "closingDate": "2026-07-26",
+      "dueDate": "2026-08-01",
+      "computedTotalCents": 45000,
+      "status": "open",
+      "payFromAccountId": "acct-checking"
+    }
+  ],
+  "installmentPlans": [
+    {
+      "id": "plan-loan-alpha",
+      "description": "Loan Alpha",
+      "accountId": "acct-checking",
+      "categoryId": "cat-loans",
+      "installmentAmountCents": 18047,
+      "installmentCount": 36,
+      "firstDueDate": "2025-08-10",
+      "dayOfMonth": 10,
+      "payoffDate": "2028-07-10",
+      "isActive": true
+    }
+  ],
+  "installments": [
+    {
+      "id": "inst-loan-alpha-jun",
+      "installmentPlanId": "plan-loan-alpha",
+      "index": 11,
+      "dueDate": "2026-06-03",
+      "status": "paid",
+      "settledTransactionId": "tx-loan-settled"
+    },
+    {
+      "id": "inst-loan-alpha-jul",
+      "installmentPlanId": "plan-loan-alpha",
+      "index": 12,
+      "dueDate": "2026-07-10",
+      "status": "scheduled"
+    }
+  ],
+  "settings": {
+    "id": "singleton",
+    "language": "pt-BR",
+    "defaultCurrency": "BRL",
+    "negativeBufferCents": 0,
+    "largeOutflowThresholdCents": 50000,
+    "horizonMonths": 24,
+    "alertLeadTimeDays": 14,
+    "defaultWorkingForType": {
+      "checking": true,
+      "savings": true,
+      "wallet": true,
+      "credit_card": false,
+      "investment": false
+    },
+    "dateFormat": "DD/MM/YYYY"
+  }
+}
