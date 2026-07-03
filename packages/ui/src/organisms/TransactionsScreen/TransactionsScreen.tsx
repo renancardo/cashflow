@@ -191,6 +191,7 @@ export function TransactionsScreen({
 }: Props) {
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dropTarget, setDropTarget] = useState<DropTarget | null>(null);
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
 
   const typeFilter: TypeFilter = filters.type ?? "all";
   const activeFilterCount = countActiveFilters(filters);
@@ -292,151 +293,189 @@ export function TransactionsScreen({
         ) : (
           <>
             <div className={styles.filtersCard}>
-              <div className={styles.typeFilters}>
-                <SegmentedControl
-                  aria-label="Filter by type"
-                  value={typeFilter}
-                  onChange={(type) =>
-                    patchFilters({ type: type === "all" ? undefined : type })
-                  }
-                  options={[
-                    { value: "all", label: "All types" },
-                    { value: "income", label: TX_TYPE_LABELS.income },
-                    { value: "expense", label: TX_TYPE_LABELS.expense },
-                    { value: "transfer", label: TX_TYPE_LABELS.transfer },
-                  ]}
-                />
-              </div>
-
-              <div className={styles.filterGrid} aria-label="Transaction filters">
-                <div className={styles.filterField}>
-                  <label className={styles.filterLabel} htmlFor="filter-account">
-                    Account
-                  </label>
-                  <select
-                    id="filter-account"
-                    className={styles.filterSelect}
-                    value={filters.accountId ?? ""}
-                    onChange={(e) =>
-                      patchFilters({ accountId: e.target.value || undefined })
+              <div className={styles.filtersHeader}>
+                <div className={styles.typeFilters}>
+                  <SegmentedControl
+                    aria-label="Filter by type"
+                    value={typeFilter}
+                    onChange={(type) =>
+                      patchFilters({ type: type === "all" ? undefined : type })
                     }
-                  >
-                    <option value="">All accounts</option>
-                    {accountOptions.map((option) => (
-                      <option key={option.id} value={option.id}>
-                        {option.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className={styles.filterField}>
-                  <label className={styles.filterLabel} htmlFor="filter-category">
-                    Category
-                  </label>
-                  <select
-                    id="filter-category"
-                    className={styles.filterSelect}
-                    value={filters.categoryId ?? ""}
-                    onChange={(e) =>
-                      patchFilters({ categoryId: e.target.value || undefined })
-                    }
-                  >
-                    <option value="">All categories</option>
-                    {categoryOptions.map((option) => (
-                      <option key={option.id} value={option.id}>
-                        {option.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className={styles.filterField}>
-                  <label className={styles.filterLabel} htmlFor="filter-from">
-                    From
-                  </label>
-                  <input
-                    id="filter-from"
-                    type="date"
-                    className={styles.filterInput}
-                    value={filters.dateFrom ?? ""}
-                    onChange={(e) => patchFilters({ dateFrom: e.target.value || undefined })}
+                    options={[
+                      { value: "all", label: "All types" },
+                      { value: "income", label: TX_TYPE_LABELS.income },
+                      { value: "expense", label: TX_TYPE_LABELS.expense },
+                      { value: "transfer", label: TX_TYPE_LABELS.transfer },
+                    ]}
                   />
                 </div>
 
-                <div className={styles.filterField}>
-                  <label className={styles.filterLabel} htmlFor="filter-to">
-                    To
-                  </label>
-                  <input
-                    id="filter-to"
-                    type="date"
-                    className={styles.filterInput}
-                    value={filters.dateTo ?? ""}
-                    onChange={(e) => patchFilters({ dateTo: e.target.value || undefined })}
-                  />
-                </div>
-              </div>
-
-              {activeFilterCount > 0 && (
-                <div className={styles.activeFilters} aria-label="Active filters">
-                  <span className={styles.activeFiltersLabel}>Active</span>
-                  <div className={styles.activePills}>
-                    {filters.type && (
-                      <button
-                        type="button"
-                        className={styles.activePill}
-                        onClick={() => patchFilters({ type: undefined })}
-                      >
-                        {TX_TYPE_LABELS[filters.type]}
-                        <span aria-hidden="true">×</span>
-                      </button>
-                    )}
-                    {filters.accountId && (
-                      <button
-                        type="button"
-                        className={styles.activePill}
-                        onClick={() => patchFilters({ accountId: undefined })}
-                      >
-                        {accountOptions.find((a) => a.id === filters.accountId)?.name ?? "Account"}
-                        <span aria-hidden="true">×</span>
-                      </button>
-                    )}
-                    {filters.categoryId && (
-                      <button
-                        type="button"
-                        className={styles.activePill}
-                        onClick={() => patchFilters({ categoryId: undefined })}
-                      >
-                        {categoryOptions.find((c) => c.id === filters.categoryId)?.name ??
-                          "Category"}
-                        <span aria-hidden="true">×</span>
-                      </button>
-                    )}
-                    {filters.dateFrom && (
-                      <button
-                        type="button"
-                        className={styles.activePill}
-                        onClick={() => patchFilters({ dateFrom: undefined })}
-                      >
-                        From {filters.dateFrom}
-                        <span aria-hidden="true">×</span>
-                      </button>
-                    )}
-                    {filters.dateTo && (
-                      <button
-                        type="button"
-                        className={styles.activePill}
-                        onClick={() => patchFilters({ dateTo: undefined })}
-                      >
-                        To {filters.dateTo}
-                        <span aria-hidden="true">×</span>
-                      </button>
-                    )}
-                  </div>
-                  <button type="button" className={styles.clearAll} onClick={clearFilters}>
-                    Clear all
+                <div className={styles.filtersMeta}>
+                  {!filtersExpanded && (
+                    <span className={styles.filtersSummary}>
+                      {activeFilterCount === 0
+                        ? "All transactions"
+                        : `${activeFilterCount} ${activeFilterCount === 1 ? "filter" : "filters"} active`}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    className={styles.filtersToggle}
+                    aria-expanded={filtersExpanded}
+                    aria-controls="transaction-filters-detail"
+                    aria-label={filtersExpanded ? "Collapse filters" : "Expand filters"}
+                    onClick={() => setFiltersExpanded((expanded) => !expanded)}
+                  >
+                    {filtersExpanded ? "Hide filters" : "More filters"}
+                    <span className={styles.filtersToggleIcon} aria-hidden="true">
+                      {filtersExpanded ? "▴" : "▾"}
+                    </span>
                   </button>
+                </div>
+              </div>
+
+              {filtersExpanded && (
+                <div
+                  id="transaction-filters-detail"
+                  className={styles.filtersDetail}
+                  aria-label="Transaction filters"
+                >
+                  <div className={styles.filterGrid}>
+                    <div className={styles.filterField}>
+                      <label className={styles.filterLabel} htmlFor="filter-account">
+                        Account
+                      </label>
+                      <select
+                        id="filter-account"
+                        className={styles.filterSelect}
+                        value={filters.accountId ?? ""}
+                        onChange={(e) =>
+                          patchFilters({ accountId: e.target.value || undefined })
+                        }
+                      >
+                        <option value="">All accounts</option>
+                        {accountOptions.map((option) => (
+                          <option key={option.id} value={option.id}>
+                            {option.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className={styles.filterField}>
+                      <label className={styles.filterLabel} htmlFor="filter-category">
+                        Category
+                      </label>
+                      <select
+                        id="filter-category"
+                        className={styles.filterSelect}
+                        value={filters.categoryId ?? ""}
+                        onChange={(e) =>
+                          patchFilters({ categoryId: e.target.value || undefined })
+                        }
+                      >
+                        <option value="">All categories</option>
+                        {categoryOptions.map((option) => (
+                          <option key={option.id} value={option.id}>
+                            {option.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className={styles.filterField}>
+                      <label className={styles.filterLabel} htmlFor="filter-from">
+                        From
+                      </label>
+                      <input
+                        id="filter-from"
+                        type="date"
+                        className={styles.filterInput}
+                        value={filters.dateFrom ?? ""}
+                        onChange={(e) =>
+                          patchFilters({ dateFrom: e.target.value || undefined })
+                        }
+                      />
+                    </div>
+
+                    <div className={styles.filterField}>
+                      <label className={styles.filterLabel} htmlFor="filter-to">
+                        To
+                      </label>
+                      <input
+                        id="filter-to"
+                        type="date"
+                        className={styles.filterInput}
+                        value={filters.dateTo ?? ""}
+                        onChange={(e) =>
+                          patchFilters({ dateTo: e.target.value || undefined })
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  {activeFilterCount > 0 && (
+                    <div className={styles.activeFilters} aria-label="Active filters">
+                      <span className={styles.activeFiltersLabel}>Active</span>
+                      <div className={styles.activePills}>
+                        {filters.type && (
+                          <button
+                            type="button"
+                            className={styles.activePill}
+                            onClick={() => patchFilters({ type: undefined })}
+                          >
+                            {TX_TYPE_LABELS[filters.type]}
+                            <span aria-hidden="true">×</span>
+                          </button>
+                        )}
+                        {filters.accountId && (
+                          <button
+                            type="button"
+                            className={styles.activePill}
+                            onClick={() => patchFilters({ accountId: undefined })}
+                          >
+                            {accountOptions.find((a) => a.id === filters.accountId)?.name ??
+                              "Account"}
+                            <span aria-hidden="true">×</span>
+                          </button>
+                        )}
+                        {filters.categoryId && (
+                          <button
+                            type="button"
+                            className={styles.activePill}
+                            onClick={() => patchFilters({ categoryId: undefined })}
+                          >
+                            {categoryOptions.find((c) => c.id === filters.categoryId)?.name ??
+                              "Category"}
+                            <span aria-hidden="true">×</span>
+                          </button>
+                        )}
+                        {filters.dateFrom && (
+                          <button
+                            type="button"
+                            className={styles.activePill}
+                            onClick={() => patchFilters({ dateFrom: undefined })}
+                          >
+                            From {filters.dateFrom}
+                            <span aria-hidden="true">×</span>
+                          </button>
+                        )}
+                        {filters.dateTo && (
+                          <button
+                            type="button"
+                            className={styles.activePill}
+                            onClick={() => patchFilters({ dateTo: undefined })}
+                          >
+                            To {filters.dateTo}
+                            <span aria-hidden="true">×</span>
+                          </button>
+                        )}
+                      </div>
+                      <button type="button" className={styles.clearAll} onClick={clearFilters}>
+                        Clear all
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

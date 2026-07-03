@@ -4,7 +4,7 @@ import {
   TransactionEditorPanel,
   type TransactionEditorValues,
 } from "../TransactionEditorPanel/TransactionEditorPanel.js";
-import { TransactionsScreen } from "./TransactionsScreen.js";
+import { TransactionsScreen, type TransactionFiltersState } from "./TransactionsScreen.js";
 import { DEMO_WORKING_BALANCE_CENTS } from "../../fixtures/accounts.js";
 import {
   DEMO_ACCOUNT_OPTIONS,
@@ -85,6 +85,31 @@ export const WithEditor: Story = {
             onDelete={() => setEditorOpen(false)}
           />
         }
+      />
+    );
+  },
+};
+
+export const WithActiveFiltersCollapsed: Story = {
+  render: function Render() {
+    const [filters, setFilters] = useState<TransactionFiltersState>({
+      accountId: "cora-checking",
+      categoryId: "cat-groceries",
+      dateFrom: "2026-06-01",
+    });
+
+    return (
+      <TransactionsScreen
+        transactions={DEMO_TRANSACTIONS.slice(0, 3)}
+        totalCount={3}
+        hasMore={false}
+        accountOptions={DEMO_ACCOUNT_OPTIONS}
+        categoryOptions={DEMO_CATEGORY_OPTIONS}
+        filters={filters}
+        workingBalanceCents={DEMO_WORKING_BALANCE_CENTS}
+        onFiltersChange={setFilters}
+        onAddTransaction={() => undefined}
+        onEdit={() => undefined}
       />
     );
   },

@@ -2,7 +2,7 @@
 
 Actual transaction ledger replacing the spreadsheet “Lançamentos” tab.
 
-**Status (2026-07-02):** The `/transactions` screen is implemented client-side — create/edit/delete, account and category links, instant filters (type pills + account/category/date), load-more pagination, and `EditorPanel`-based form. Data lives in an in-memory repo (`packages/db`); it resets on reload until persistent storage lands (ADR-006). Working balance in the header uses inclusive-through-today balances (`aggregateWorkingBalanceThrough`). Remaining gaps: manual list order + drag-and-drop (US-4.6), collapsible filter panel (US-4.7), shared segmented option control (US-4.8), settlement linking (US-4.4), bulk/CSV (US-4.5).
+**Status (2026-07-03):** The `/transactions` screen is implemented client-side — create/edit/delete, account and category links, instant filters (collapsible panel + shared `SegmentedControl` type filter + account/category/date), load-more pagination, manual same-day reorder via drag-and-drop, and `EditorPanel`-based form. Data lives in an in-memory repo (`packages/db`); it resets on reload until persistent storage lands (ADR-006). Working balance in the header uses inclusive-through-today balances (`aggregateWorkingBalanceThrough`). Remaining gaps: settlement linking (US-4.4), bulk/CSV (US-4.5).
 
 ---
 
@@ -36,9 +36,9 @@ Actual transaction ledger replacing the spreadsheet “Lançamentos” tab.
 ### Acceptance criteria
 
 - [x] Filters combine (AND); clear-all control — `transactionsRepo.query()`; dismissible active pills + “Clear all” in `TransactionsScreen`
-- [x] Chronological list, newest first (fixed default documented) — `query()` sorts `effectiveDate` desc; toolbar notes “newest first”. Secondary `sortOrder` tie-breaker deferred to US-4.6
+- [x] Chronological list, newest first (fixed default documented) — `query()` sorts `effectiveDate` desc, then `sortOrder` asc; toolbar notes “newest first”
 - [x] Empty filter result state — “No matching transactions” with clear-filters action
-- [ ] Collapsible filter panel — detailed filters hidden by default; see US-4.7
+- [x] Collapsible filter panel — detailed filters hidden by default; see US-4.7
 
 ---
 
@@ -104,13 +104,13 @@ Add to `Transaction` ([001-data-model.md](../specs/001-data-model.md) §3.4):
 
 ### Acceptance criteria
 
-- [ ] `sortOrder` on `Transaction` entity in `@cashflow/core`; persisted in `packages/db`
-- [ ] New transactions get a default `sortOrder` for their `effectiveDate`
-- [ ] List query sorts by `effectiveDate` desc, then `sortOrder` asc
-- [ ] Drag-and-drop on `TransactionsScreen` rows updates `sortOrder` for affected transactions (same `effectiveDate` only — no implicit date change)
-- [ ] Reorder persists via `transactionsRepo` update; list reflects new order without full reload
-- [ ] Drag handle
-- [ ] Filtered view: reorder applies to the transaction’s canonical order (not a view-local permutation)
+- [x] `sortOrder` on `Transaction` entity in `@cashflow/core`; persisted in `packages/db`
+- [x] New transactions get a default `sortOrder` for their `effectiveDate` — `nextSortOrderForDate()` on create (`max + 1`); date change on update assigns a new order for the new date
+- [x] List query sorts by `effectiveDate` desc, then `sortOrder` asc — `compareTransactions()` in `transactionsRepo`
+- [x] Drag-and-drop on `TransactionsScreen` rows updates `sortOrder` for affected transactions (same `effectiveDate` only — no implicit date change)
+- [x] Reorder persists via `transactionsRepo.reorderWithinDate()` + `useTransactionMutations.reorder`; list reflects new order via query invalidation (no page reload)
+- [x] Drag handle — `⠿` grip on each row; drag initiated from handle only
+- [x] Filtered view: reorder applies to the transaction’s canonical order (not a view-local permutation) — renumber all rows on that `effectiveDate` in the repo
 
 ---
 
@@ -132,11 +132,11 @@ Add to `Transaction` ([001-data-model.md](../specs/001-data-model.md) §3.4):
 
 ### Acceptance criteria
 
-- [ ] Filter card shows type control and expand/collapse affordance when collapsed
-- [ ] Account, category, and date filters hidden until expanded
-- [ ] Active filter count visible when collapsed and count > 0
-- [ ] Expanding does not reset active filters
-- [ ] `aria-expanded` on toggle; filter region labelled for screen readers
+- [x] Filter card shows type control and expand/collapse affordance when collapsed
+- [x] Account, category, and date filters hidden until expanded
+- [x] Active filter count visible when collapsed and count > 0
+- [x] Expanding does not reset active filters
+- [x] `aria-expanded` on toggle; filter region labelled for screen readers
 
 ---
 
@@ -163,11 +163,11 @@ Extract a shared primitive in `packages/ui` (suggested name: `OptionInput` or `S
 
 ### Acceptance criteria
 
-- [ ] Shared component with module CSS matching Categories toolbar segmented style
-- [ ] Storybook coverage for variants and interaction states
-- [ ] `CategoriesScreen` kind filter (All / Expense / Income) migrated to shared component
-- [ ] `TransactionsScreen` type filter migrated to shared component
-- [ ] Exported from `packages/ui` index
-- [ ] No duplicate `.chip` / `.typeChip` filter-button styles left in screen-level CSS after migration
+- [x] Shared component with module CSS matching Categories toolbar segmented style — `SegmentedControl` molecule
+- [x] Storybook coverage for variants and interaction states — `SegmentedControl.stories.tsx` (default, three/four options, disabled option)
+- [x] `CategoriesScreen` kind filter (All / Expense / Income) migrated to shared component
+- [x] `TransactionsScreen` type filter migrated to shared component
+- [x] Exported from `packages/ui` index
+- [x] No duplicate `.chip` / `.typeChip` filter-button styles left in screen-level CSS after migration
 
 ---
