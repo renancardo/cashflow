@@ -1,0 +1,85 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: rgba(17, 24, 39, 0.45);
+  cursor: pointer;
+}
+
+.panel {
+  position: relative;
+  width: min(28rem, 100%);
+  background: var(--color-paper);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0 0 var(--space-2);
+  color: var(--color-primary);
+}
+
+.desc {
+  margin: 0 0 var(--space-4);
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.option {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.option:has(input:checked) {
+  border-color: var(--color-secondary);
+  background: #f5f3ff;
+}
+
+.optionBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.optionTitle {
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+.optionHint {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

@@ -9,7 +9,7 @@ type StripProps = {
 type ItemProps = {
   label: string;
   children: ReactNode;
-  tone?: "default" | "working";
+  tone?: "default" | "working" | "warning" | "success";
   className?: string;
 };
 
@@ -22,7 +22,15 @@ export function SummaryStripItem({ label, children, tone = "default", className 
     <div className={[styles.item, className].filter(Boolean).join(" ")}>
       <span className={styles.label}>{label}</span>
       <span
-        className={[styles.value, tone === "working" && styles.working].filter(Boolean).join(" ")}
+        className={[
+          styles.value,
+          tone === "working" && styles.working,
+          tone === "warning" && styles.warning,
+          tone === "success" && styles.success,
+          className,
+        ]
+          .filter(Boolean)
+          .join(" ")}
       >
         {children}
       </span>

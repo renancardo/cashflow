@@ -33,6 +33,7 @@ export const DEMO_TRANSACTIONS: TransactionRowData[] = [
     accountName: "Cora Checking",
     toAccountId: "cora-card",
     toAccountName: "Cartão Cora",
+    settlement: { kind: "statement", label: "Jun statement" },
   },
   {
     id: "tx-uber",
@@ -55,6 +56,7 @@ export const DEMO_TRANSACTIONS: TransactionRowData[] = [
     accountName: "Cartão Cora",
     categoryId: "cat-entertainment",
     categoryName: "Entertainment",
+    settlement: { kind: "planned", label: "Netflix" },
   },
   {
     id: "tx-rent",
@@ -66,6 +68,7 @@ export const DEMO_TRANSACTIONS: TransactionRowData[] = [
     accountName: "Cora Checking",
     categoryId: "cat-housing",
     categoryName: "Housing",
+    settlement: { kind: "planned", label: "Aluguel" },
   },
   {
     id: "tx-salary",
@@ -77,6 +80,7 @@ export const DEMO_TRANSACTIONS: TransactionRowData[] = [
     accountName: "Cora Checking",
     categoryId: "cat-salary",
     categoryName: "Salary",
+    settlement: { kind: "planned", label: "Salary — Acme Corp" },
   },
   {
     id: "tx-investment",
@@ -99,6 +103,7 @@ export const DEMO_TRANSACTIONS: TransactionRowData[] = [
     accountName: "Cora Checking",
     categoryId: "cat-debt",
     categoryName: "Debt",
+    settlement: { kind: "installment", label: "Ipanema" },
   },
 ];
 

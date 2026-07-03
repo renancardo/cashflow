@@ -10,7 +10,7 @@ export const SIDE_NAV_ITEMS: NavItem[] = [
   { label: "Month Calendar", path: "/month", disabled: true },
   { label: "Transactions", path: "/transactions" },
   { label: "Accounts", path: "/accounts" },
-  { label: "Forecast Items", path: "/forecast", disabled: true },
+  { label: "Forecast Items", path: "/forecast" },
   { label: "Categories", path: "/categories" },
   { label: "Snapshots", path: "/snapshots", disabled: true },
   { label: "Settings", path: "/settings", disabled: true },

@@ -40,6 +40,8 @@ export function useTransactionMutations() {
     queryClient.invalidateQueries({ queryKey: ["transactions"] });
     queryClient.invalidateQueries({ queryKey: queryKeys.accounts });
     queryClient.invalidateQueries({ queryKey: ["categories"] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.forecast });
+    queryClient.invalidateQueries({ queryKey: queryKeys.installmentPlans });
     queryClient.invalidateQueries({ queryKey: ["projection"] });
   };
 

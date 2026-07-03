@@ -40,6 +40,8 @@ export const SEED_TRANSACTIONS: Transaction[] = [
     description: "Netflix subscription",
     effectiveDate: "2026-06-24",
     sortOrder: 0,
+    settlesPlannedItemId: "plan-netflix",
+    settlesPlannedOccurrenceDate: "2026-06-15",
   },
   {
     id: "tx-rent",
@@ -50,6 +52,8 @@ export const SEED_TRANSACTIONS: Transaction[] = [
     description: "Aluguel — Jun",
     effectiveDate: "2026-06-20",
     sortOrder: 0,
+    settlesPlannedItemId: "plan-rent",
+    settlesPlannedOccurrenceDate: "2026-06-10",
   },
   {
     id: "tx-salary",
@@ -60,6 +64,8 @@ export const SEED_TRANSACTIONS: Transaction[] = [
     description: "Salary — Acme Corp",
     effectiveDate: "2026-06-05",
     sortOrder: 0,
+    settlesPlannedItemId: "plan-salary",
+    settlesPlannedOccurrenceDate: "2026-06-05",
   },
   {
     id: "tx-investment",
@@ -80,5 +86,6 @@ export const SEED_TRANSACTIONS: Transaction[] = [
     description: "Parcela 12/36 — Ipanema",
     effectiveDate: "2026-06-02",
     sortOrder: 0,
+    settlesInstallmentId: "plan-ipanema-inst-12",
   },
 ];
