@@ -4,6 +4,7 @@ import { AppLayout } from "@cashflow/ui";
 const MOBILE_TITLES: Record<string, string> = {
   "/": "Year Calendar",
   "/accounts": "Accounts",
+  "/categories": "Categories",
 };
 
 export function AppShell() {
