@@ -6,20 +6,11 @@ import { RouterProvider } from "@tanstack/react-router";
 import { getDatabase, seedDatabase } from "@cashflow/db";
 import { router } from "./router";
 import { queryClient } from "./data/queryClient";
+import { SEED_ACCOUNTS } from "./data/seed/accounts";
 
 if (getDatabase().accounts.length === 0) {
   seedDatabase({
-    accounts: [
-      {
-        id: "demo-cora",
-        name: "Cora",
-        type: "checking",
-        currency: "BRL",
-        isWorking: true,
-        anchorBalanceCents: 500_000,
-        anchorDate: "2026-06-01",
-      },
-    ],
+    accounts: SEED_ACCOUNTS,
   });
 }
 

@@ -32,3 +32,16 @@ export function formatDate(isoDate: string, language: Language = PT_BR): string 
     day: "2-digit",
   }).format(date);
 }
+
+/** Decimal string for money input fields (e.g. "1850.00"). Empty when cents is undefined. */
+export function formatCents(cents: number | undefined): string {
+  return cents == null ? "" : (cents / 100).toFixed(2);
+}
+
+/** Parses a typed money string into integer cents. Accepts comma or dot decimals. */
+export function parseMoney(text: string): number | undefined {
+  const trimmed = text.trim();
+  if (!trimmed) return undefined;
+  const parsed = Number.parseFloat(trimmed.replace(",", "."));
+  return Number.isFinite(parsed) ? Math.round(Math.abs(parsed) * 100) : undefined;
+}

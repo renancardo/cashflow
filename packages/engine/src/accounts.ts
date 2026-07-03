@@ -23,6 +23,34 @@ export function transactionAccountDelta(tx: Transaction, accountId: string): num
   return 0;
 }
 
+/** Balance of one account at the start of `beforeDate` (exclusive). */
+export function accountBalanceAt(
+  account: Account,
+  transactions: Transaction[],
+  beforeDate: string,
+): number {
+  let balance = account.anchorBalanceCents;
+
+  for (const tx of transactions) {
+    if (tx.effectiveDate < account.anchorDate || tx.effectiveDate >= beforeDate) continue;
+
+    if (account.type === "credit_card") {
+      if (tx.accountId === account.id) {
+        if (tx.type === "expense") balance += tx.amountCents;
+        if (tx.type === "income") balance -= tx.amountCents;
+      }
+      if (tx.type === "transfer" && tx.toAccountId === account.id) {
+        balance -= tx.amountCents;
+      }
+      continue;
+    }
+
+    balance += transactionAccountDelta(tx, account.id);
+  }
+
+  return balance;
+}
+
 /** Balance of one working account at the start of `beforeDate` (exclusive). */
 export function workingAccountBalanceAt(
   account: Account,
