@@ -228,6 +228,10 @@ export type PlannedOccurrence = {
   amountCents: number;
 };
 
+export type ForecastScheduleOccurrence = PlannedOccurrence & {
+  isSettled: boolean;
+};
+
 export function listPlannedOccurrences(
   item: PlannedItem,
   overrides: PlannedItemOverride[],
@@ -277,6 +281,45 @@ export function previewUpcomingOccurrences(
 ): PlannedOccurrence[] {
   const horizonEnd = horizonEndDate(asOfDate, horizonMonths);
   return listPlannedOccurrences(item, overrides, settled, asOfDate, horizonEnd).slice(0, limit);
+}
+
+/**
+ * Occurrences shown in the forecast schedule expander.
+ * Includes settled one-off items so quick-add / mark-paid rows stay expandable.
+ */
+export function previewForecastSchedule(
+  item: PlannedItem,
+  overrides: PlannedItemOverride[],
+  settled: Set<string>,
+  asOfDate: string,
+  limit = 5,
+  horizonMonths = 24,
+): ForecastScheduleOccurrence[] {
+  const upcoming = previewUpcomingOccurrences(
+    item,
+    overrides,
+    settled,
+    asOfDate,
+    limit,
+    horizonMonths,
+  ).map((occ) => ({ ...occ, isSettled: false }));
+
+  if (upcoming.length > 0 || item.recurrence !== "once" || !item.isActive || item.archivedAt) {
+    return upcoming;
+  }
+
+  const overrideLookup = overrideMap(overrides);
+  const resolved = resolveOccurrence(item, item.startDate, overrideLookup);
+  if (!resolved) return [];
+
+  return [
+    {
+      occurrenceDate: item.startDate,
+      effectiveDate: resolved.date,
+      amountCents: resolved.amountCents,
+      isSettled: settled.has(plannedSettlementKey(item.id, item.startDate)),
+    },
+  ];
 }
 
 export type ForecastSummaryMetrics = {

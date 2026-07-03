@@ -69,6 +69,19 @@ export {
   RecurrenceScopeDialog,
   type RecurrenceScope,
 } from "./molecules/RecurrenceScopeDialog/RecurrenceScopeDialog.js";
+export { CalendarHeaderMetrics } from "./molecules/CalendarHeaderMetrics/CalendarHeaderMetrics.js";
+export { CalendarLegend } from "./molecules/CalendarLegend/CalendarLegend.js";
+export {
+  QuickAddCard,
+  validateQuickAddTransfer,
+  type QuickAddValues,
+} from "./molecules/QuickAddCard/QuickAddCard.js";
+export {
+  DayDetailPanel,
+  type DayDetailItem,
+} from "./organisms/DayDetailPanel/DayDetailPanel.js";
+export { YearCalendarScreen } from "./organisms/YearCalendarScreen/YearCalendarScreen.js";
+export { MonthCalendarScreen } from "./organisms/MonthCalendarScreen/MonthCalendarScreen.js";
 export { HeaderStrip } from "./organisms/HeaderStrip/HeaderStrip.js";
 export { MobileHeader } from "./organisms/MobileHeader/MobileHeader.js";
 export { PageHeader } from "./organisms/PageHeader/PageHeader.js";

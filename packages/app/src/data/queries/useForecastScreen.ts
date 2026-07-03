@@ -7,6 +7,7 @@ import {
   nextPlannedOccurrence,
   plannedItemGroup,
   previewUpcomingOccurrences,
+  previewForecastSchedule,
   todayIso,
 } from "@cashflow/core";
 import {
@@ -45,6 +46,7 @@ export type ForecastItemRowData = {
     occurrenceDate: string;
     effectiveDate: string;
     amountCents: number;
+    isSettled: boolean;
   }[];
 };
 
@@ -125,7 +127,7 @@ export function useForecastScreen(filter: ForecastFilter = "all") {
 
       const plannedRows: ForecastItemRowData[] = plannedItems.map((item) => {
         const next = nextPlannedOccurrence(item, overrides, settledPlanned, asOfDate);
-        const occurrences = previewUpcomingOccurrences(
+        const occurrences = previewForecastSchedule(
           item,
           overrides,
           settledPlanned,
@@ -135,6 +137,7 @@ export function useForecastScreen(filter: ForecastFilter = "all") {
           occurrenceDate: occ.occurrenceDate,
           effectiveDate: occ.effectiveDate,
           amountCents: occ.amountCents,
+          isSettled: occ.isSettled,
         }));
         return {
           id: item.id,

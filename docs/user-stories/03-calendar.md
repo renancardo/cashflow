@@ -112,18 +112,4 @@ Year and month calendar views driven by real engine output.
 
 ---
 
-## US-3.7 — Calendar keyboard navigation (baseline)
-
-**Persona:** User
-
-**Story:** As a user, I want **basic keyboard navigation** on the calendar grid so the app is usable without a mouse.
-
-**Priority:** P2  
-**Depends on:** US-3.1
-
-### Acceptance criteria
-
-- [ ] Arrow keys move focus between day cells
-- [ ] Enter opens day detail panel
-- [ ] Focus visible per style guide
-- [ ] Full WCAG audit deferred; baseline only per scope NFR
+## US-3.7 — Removed

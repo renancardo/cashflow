@@ -13,6 +13,7 @@ export type ForecastOccurrenceRow = {
   occurrenceDate: string;
   effectiveDate: string;
   amountCents: number;
+  isSettled?: boolean;
 };
 
 export type ForecastItemRowData = {
@@ -144,14 +145,18 @@ export function ForecastItemRow({
                 <MoneyAmount cents={occ.amountCents} tone={amountTone(row.type)} />
               </span>
               <span>
-                {onMarkPaid && (
-                  <Button
-                    variant="ghost"
-                    className={styles.markPaid}
-                    onClick={() => onMarkPaid(row.id, occ.occurrenceDate)}
-                  >
-                    {markPaidLabel(row.type)}
-                  </Button>
+                {occ.isSettled ? (
+                  <Chip variant="actual">Paid</Chip>
+                ) : (
+                  onMarkPaid && (
+                    <Button
+                      variant="ghost"
+                      className={styles.markPaid}
+                      onClick={() => onMarkPaid(row.id, occ.occurrenceDate)}
+                    >
+                      {markPaidLabel(row.type)}
+                    </Button>
+                  )
                 )}
               </span>
             </div>

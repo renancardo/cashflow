@@ -1,55 +1,93 @@
-import { createRootRoute, createRoute, createRouter } from "@tanstack/react-router";
-import { formatMoney } from "@cashflow/core";
-import { AppStatus, MoneyAmount } from "@cashflow/ui";
+import {
+  createRootRoute,
+  createRoute,
+  createRouter,
+  redirect,
+  useNavigate,
+  useParams,
+  useSearch,
+} from "@tanstack/react-router";
+import { todayIso } from "@cashflow/core";
 import { AppShell } from "./layout/AppShell";
-import { useProjection } from "./data/queries/useProjection";
+import { CalendarPage } from "./pages/CalendarPage";
+import { MonthCalendarPage } from "./pages/MonthCalendarPage";
 import { AccountsPage } from "./pages/AccountsPage";
 import { CategoriesPage } from "./pages/CategoriesPage";
 import { TransactionsPage } from "./pages/TransactionsPage";
 import { ForecastPage } from "./pages/ForecastPage";
 
+type DaySearch = {
+  day?: string;
+};
+
 const rootRoute = createRootRoute({
   component: AppShell,
 });
 
-function YearCalendarPage() {
-  const { data, isPending, isError, error } = useProjection();
-
-  if (isPending) {
-    return <AppStatus title="Year Calendar">Loading projection…</AppStatus>;
-  }
-
-  if (isError) {
-    return (
-      <AppStatus title="Year Calendar">
-        Failed to load: {error instanceof Error ? error.message : "Unknown error"}
-      </AppStatus>
-    );
-  }
-
-  const belowBufferDays = data.days.filter((d) => d.belowBuffer).length;
+function YearCalendarRoute() {
+  const navigate = useNavigate({ from: "/" });
+  const { day } = useSearch({ from: "/" });
 
   return (
-    <AppStatus title="Year Calendar">
-      <p>
-        Working balance today: <MoneyAmount cents={data.workingBalanceTodayCents} />
-      </p>
-      <p>Next negative date: {data.nextNegativeDate ? data.nextNegativeDate : "None in horizon"}</p>
-      <p>
-        Horizon: {data.days.length} days · Below buffer: {belowBufferDays} days
-      </p>
-      <p style={{ marginTop: "1rem", fontSize: "0.875rem" }}>
-        Monorepo scaffold (US-0.2). Engine stub — full logic in Epic 1. Example:{" "}
-        {formatMoney(500_000)}
-      </p>
-    </AppStatus>
+    <CalendarPage
+      selectedDay={day ?? null}
+      onSelectedDayChange={(date) =>
+        navigate({ search: date ? { day: date } : {}, replace: true })
+      }
+    />
+  );
+}
+
+function MonthCalendarRoute() {
+  const navigate = useNavigate({ from: "/month/$yearMonth" });
+  const { yearMonth } = useParams({ from: "/month/$yearMonth" });
+  const { day } = useSearch({ from: "/month/$yearMonth" });
+
+  return (
+    <MonthCalendarPage
+      month={yearMonth}
+      selectedDay={day ?? null}
+      onSelectedDayChange={(date) =>
+        navigate({ search: date ? { day: date } : {}, replace: true })
+      }
+      onMonthChange={(month) =>
+        navigate({
+          to: "/month/$yearMonth",
+          params: { yearMonth: month },
+          search: day ? { day } : {},
+        })
+      }
+    />
   );
 }
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
-  component: YearCalendarPage,
+  validateSearch: (search: Record<string, unknown>): DaySearch => ({
+    day: typeof search.day === "string" ? search.day : undefined,
+  }),
+  component: YearCalendarRoute,
+});
+
+const monthRedirectRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/month",
+  beforeLoad: () => {
+    throw redirect({
+      to: "/month/$yearMonth",
+      params: { yearMonth: todayIso().slice(0, 7) },
+    });
+  },
+});
+
+const monthRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/month/$yearMonth",
+  validateSearch: (search: Record<string, unknown>): DaySearch => ({
+    day: typeof search.day === "string" ? search.day : undefined,
+  }),
+  component: MonthCalendarRoute,
 });
 
 const accountsRoute = createRoute({
@@ -78,6 +116,8 @@ const forecastRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
+  monthRedirectRoute,
+  monthRoute,
   accountsRoute,
   categoriesRoute,
   transactionsRoute,
