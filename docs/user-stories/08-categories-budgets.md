@@ -2,6 +2,8 @@
 
 Category management and monthly expense budgets.
 
+**Status (2026-07-02):** The `/categories` screen is implemented client-side — list with expense budgets and income rows, create/edit/archive, monthly budget editor, actual-vs-budget with parent roll-up, month filter, and Storybook coverage. Data lives in an in-memory repo (`packages/db`); it resets on reload until persistent storage lands (ADR-006). Remaining gaps: snapshot variance overlay (Epic 9), transaction/forecast entry UIs that assign categories (Epics 4–5).
+
 ---
 
 ## US-8.1 — Manage categories
@@ -15,9 +17,9 @@ Category management and monthly expense budgets.
 
 ### Acceptance criteria
 
-- [ ] Expense and income categories; one-level parent/child max
-- [ ] Archive category (soft delete) preserves historical transactions
-- [ ] Categories used in transactions, planned items, and budgets
+- [x] Expense and income categories; one-level parent/child max — `CategoryEditorPanel` kind + parent select; root-only `parentOptions` from `CategoriesPage`
+- [x] Archive category (soft delete) preserves historical transactions — `categoriesRepo.archive()` sets `archivedAt`; archived cats hidden from list; editor tooltip notes history is preserved
+- [x] Categories used in transactions, planned items, and budgets — `categoryId` on all three entities; budgets fully wired in UI; transaction/forecast entry screens not built yet (Epics 4–5)
 
 ---
 
@@ -32,9 +34,9 @@ Category management and monthly expense budgets.
 
 ### Acceptance criteria
 
-- [ ] `CategoryBudget` with amount + `effectiveFromMonth`
-- [ ] Expense categories only
-- [ ] UI on Categories & Budgets screen
+- [x] `CategoryBudget` with amount + `effectiveFromMonth` — core entity + `categoryBudgetsRepo.upsertForMonth()`; editor month field
+- [x] Expense categories only — budget section hidden for income; `upsertBudget` / `removeBudget` gated on `kind === "expense"`
+- [x] UI on Categories & Budgets screen — `CategoriesScreen`, `CategoriesPage`, `/categories` route, nav link, Storybook stories
 
 ---
 
@@ -49,6 +51,6 @@ Category management and monthly expense budgets.
 
 ### Acceptance criteria
 
-- [ ] Progress bars and over/under amounts per category
-- [ ] Parent category rolls up child spend
-- [ ] When snapshot selected, variance also surfaced here (link to Epic 9)
+- [x] Progress bars and over/under amounts per category — per-row `ProgressBar`, variance column, summary-strip budget progress
+- [x] Parent category rolls up child spend — `useCategories` `buildRows()` sums child actuals/budgets into parent row
+- [ ] When snapshot selected, variance also surfaced here (link to Epic 9) — snapshots route disabled; no overlay on Categories screen yet
