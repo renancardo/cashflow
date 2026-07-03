@@ -69,6 +69,21 @@
   justify-content: center;
 }
 
+@media (max-width: 768px) {
+  .headerActions {
+    flex: 1 0 100%;
+    flex-wrap: nowrap;
+  }
+
+  .headerActions > * {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-left: var(--space-2);
+    padding-right: var(--space-2);
+    font-size: 0.8125rem;
+  }
+}
+
 .summary {
   margin-bottom: var(--space-4);
 }
@@ -173,4 +188,39 @@
 .listHeader span:nth-child(5),
 .listHeaderInstallments span:nth-child(5) {
   text-align: right;
+}
+
+@media (max-width: 768px) {
+  .summary {
+    margin-bottom: var(--space-3);
+  }
+
+  .filtersCard {
+    margin-bottom: var(--space-3);
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    overflow: visible;
+  }
+
+  .filtersHeader {
+    padding: 0;
+    background: transparent;
+  }
+
+  /* Table headers make no sense once rows collapse into cards */
+  .listHeader,
+  .listHeaderInstallments {
+    display: none;
+  }
+
+  .list {
+    overflow-x: visible;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .section {
+    margin-bottom: var(--space-5);
+  }
 }

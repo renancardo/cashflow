@@ -2,6 +2,10 @@
   border-bottom: 1px solid var(--color-border);
 }
 
+.item:last-child {
+  border-bottom: none;
+}
+
 .dormant {
   opacity: 0.65;
 }
@@ -16,7 +20,13 @@
 }
 
 .row:hover {
-  background: var(--color-surface);
+  background: var(--color-paper);
+}
+
+/* Desktop: flatten the grouping wrappers so cells align to the table grid */
+.details,
+.controls {
+  display: contents;
 }
 
 .info {
@@ -76,7 +86,13 @@
 
 .active {
   display: flex;
+  align-items: center;
   justify-content: center;
+  gap: var(--space-2);
+}
+
+.activeLabel {
+  display: none;
 }
 
 .actions {
@@ -87,7 +103,8 @@
 
 .schedule {
   padding: 0 var(--space-4) var(--space-3);
-  background: var(--color-surface);
+  background: var(--color-paper);
+  border-top: 1px solid var(--color-border);
 }
 
 .scheduleHeader,
@@ -109,29 +126,130 @@
   border-bottom: 1px solid var(--color-border);
 }
 
+.scheduleRow {
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.scheduleRow:last-child {
+  border-bottom: none;
+}
+
+.scheduleRow > span:last-child {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .markPaid {
   font-size: 0.75rem;
   padding: var(--space-1) var(--space-2);
+  min-height: 32px;
 }
 
 @media (max-width: 768px) {
+  .item {
+    border-bottom: none;
+  }
+
+  .item + .item {
+    border-top: 1px solid var(--color-border);
+  }
+
   .row {
-    grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "info amount"
+      "details details"
+      "controls controls";
+    gap: var(--space-2) var(--space-3);
+    align-items: start;
+    padding: var(--space-3) var(--space-4);
     min-width: 0;
+  }
+
+  .row:hover {
+    background: none;
+  }
+
+  .info {
+    grid-area: info;
+  }
+
+  .amount {
+    grid-area: amount;
+    justify-content: flex-end;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: var(--font-display);
+  }
+
+  .details {
+    grid-area: details;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: var(--space-2);
+    row-gap: 2px;
+    font-size: 0.8125rem;
   }
 
   .account,
   .recurrence,
-  .next,
-  .amount {
-    grid-column: 1;
+  .next {
+    font-size: 0.8125rem;
   }
 
-  .active,
-  .actions {
-    grid-column: 2;
-    grid-row: 1 / span 3;
-    align-self: start;
+  .recurrence::before,
+  .next::before {
+    content: "·";
+    margin-right: var(--space-2);
+    color: var(--color-text-muted);
+  }
+
+  .next:not(.muted)::before {
+    content: "· next";
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+  }
+
+  .next.muted {
+    display: none;
+  }
+
+  .controls {
+    grid-area: controls;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-top: var(--space-1);
+    padding-top: var(--space-2);
+    border-top: 1px dashed var(--color-border);
+  }
+
+  .active {
+    justify-content: flex-start;
+  }
+
+  .activeLabel {
+    display: inline;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+  }
+
+  .schedule {
+    padding: 0 var(--space-4) var(--space-3);
+  }
+
+  .scheduleHeader,
+  .scheduleRow {
+    grid-template-columns: 5.5rem 1fr auto;
+    gap: var(--space-2);
   }
 }

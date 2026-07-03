@@ -80,11 +80,12 @@ export function ForecastItemRow({
           </div>
         </div>
 
-        <div className={styles.account}>{accountLabel}</div>
-        <div className={styles.recurrence}>{row.recurrenceSummary}</div>
-
-        <div className={[styles.next, !row.nextDate && styles.muted].filter(Boolean).join(" ")}>
-          {row.nextDate ? <FormattedDate isoDate={row.nextDate} /> : "—"}
+        <div className={styles.details}>
+          <div className={styles.account}>{accountLabel}</div>
+          <div className={styles.recurrence}>{row.recurrenceSummary}</div>
+          <div className={[styles.next, !row.nextDate && styles.muted].filter(Boolean).join(" ")}>
+            {row.nextDate ? <FormattedDate isoDate={row.nextDate} /> : "—"}
+          </div>
         </div>
 
         <div className={[styles.amount, styles[`amount${row.type}`]].filter(Boolean).join(" ")}>
@@ -94,31 +95,36 @@ export function ForecastItemRow({
           <MoneyAmount cents={displayAmount} tone={amountTone(row.type)} />
         </div>
 
-        <div className={styles.active}>
-          <Toggle
-            checked={row.isActive}
-            aria-label={row.isActive ? "Active" : "Paused"}
-            onChange={(checked) => onActiveChange?.(row.id, checked)}
-          />
-        </div>
+        <div className={styles.controls}>
+          <div className={styles.active}>
+            <Toggle
+              checked={row.isActive}
+              aria-label={row.isActive ? "Active" : "Paused"}
+              onChange={(checked) => onActiveChange?.(row.id, checked)}
+            />
+            <span className={styles.activeLabel} aria-hidden="true">
+              {row.isActive ? "Active" : "Paused"}
+            </span>
+          </div>
 
-        <div className={styles.actions}>
-          {hasSchedule && (
+          <div className={styles.actions}>
+            {hasSchedule && (
+              <IconButton
+                title={expanded ? "Collapse schedule" : "Expand schedule"}
+                aria-expanded={expanded}
+                onClick={() => setExpanded((value) => !value)}
+              >
+                {expanded ? "▴" : "▾"}
+              </IconButton>
+            )}
             <IconButton
-              title={expanded ? "Collapse schedule" : "Expand schedule"}
-              aria-expanded={expanded}
-              onClick={() => setExpanded((value) => !value)}
+              title="Edit forecast item"
+              aria-label={`Edit ${row.description}`}
+              onClick={() => onEdit?.(row.id)}
             >
-              {expanded ? "▴" : "▾"}
+              ✎
             </IconButton>
-          )}
-          <IconButton
-            title="Edit forecast item"
-            aria-label={`Edit ${row.description}`}
-            onClick={() => onEdit?.(row.id)}
-          >
-            ✎
-          </IconButton>
+          </div>
         </div>
       </div>
 

@@ -74,15 +74,21 @@ export function InstallmentPlanRow({
             aria-valuemax={row.totalCount}
           />
           <span className={styles.progressText}>
-            {row.paidCount} / {row.totalCount}
+            {row.paidCount} / {row.totalCount} paid
           </span>
         </div>
 
         <div className={styles.payoff}>
+          <span className={styles.cellLabel} aria-hidden="true">
+            Payoff
+          </span>
           {row.isActive ? <FormattedDate isoDate={row.payoffDate} /> : "—"}
         </div>
 
         <div className={[styles.next, !row.nextDueDate && styles.muted].filter(Boolean).join(" ")}>
+          <span className={styles.cellLabel} aria-hidden="true">
+            Next
+          </span>
           {row.nextDueDate ? (
             <>
               <span className={styles.nextDate}>
@@ -99,29 +105,34 @@ export function InstallmentPlanRow({
           )}
         </div>
 
-        <div className={styles.active}>
-          <Toggle
-            checked={row.isActive}
-            aria-label={row.isActive ? "Active" : "Paused"}
-            onChange={(checked) => onActiveChange?.(row.id, checked)}
-          />
-        </div>
+        <div className={styles.controls}>
+          <div className={styles.active}>
+            <Toggle
+              checked={row.isActive}
+              aria-label={row.isActive ? "Active" : "Paused"}
+              onChange={(checked) => onActiveChange?.(row.id, checked)}
+            />
+            <span className={styles.activeLabel} aria-hidden="true">
+              {row.isActive ? "Active" : "Paused"}
+            </span>
+          </div>
 
-        <div className={styles.actions}>
-          <IconButton
-            title={expanded ? "Collapse schedule" : "Expand schedule"}
-            aria-expanded={expanded}
-            onClick={() => setExpanded((value) => !value)}
-          >
-            {expanded ? "▴" : "▾"}
-          </IconButton>
-          <IconButton
-            title="Edit installment plan"
-            aria-label={`Edit ${row.description}`}
-            onClick={() => onEdit?.(row.id)}
-          >
-            ✎
-          </IconButton>
+          <div className={styles.actions}>
+            <IconButton
+              title={expanded ? "Collapse schedule" : "Expand schedule"}
+              aria-expanded={expanded}
+              onClick={() => setExpanded((value) => !value)}
+            >
+              {expanded ? "▴" : "▾"}
+            </IconButton>
+            <IconButton
+              title="Edit installment plan"
+              aria-label={`Edit ${row.description}`}
+              onClick={() => onEdit?.(row.id)}
+            >
+              ✎
+            </IconButton>
+          </div>
         </div>
       </div>
 
