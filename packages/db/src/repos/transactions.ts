@@ -1,5 +1,6 @@
 import type { Transaction, TxType } from "@cashflow/core";
 import { getDatabase } from "../in-memory/database.js";
+import { installmentsRepo } from "./installments.js";
 
 export type TransactionQuery = {
   accountId?: string;
@@ -140,6 +141,16 @@ export const transactionsRepo = {
     if (index === -1) {
       throw new Error(`Transaction not found: ${id}`);
     }
+
+    const tx = db.transactions[index];
+    const installmentId =
+      tx.settlesInstallmentId ??
+      db.installments.find((row) => row.settledTransactionId === id)?.id;
+
+    if (installmentId) {
+      await installmentsRepo.markScheduled(installmentId);
+    }
+
     db.transactions.splice(index, 1);
   },
 };

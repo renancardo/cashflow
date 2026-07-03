@@ -1,0 +1,73 @@
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-primary);
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.toggleLabel {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.toggleHint {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+}
+
+.previewList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.previewItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.875rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.previewItem:last-child {
+  border-bottom: none;
+}
+
+.deleteButton {
+  color: var(--color-danger);
+}
+
+@media (max-width: 480px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}

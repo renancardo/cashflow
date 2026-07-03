@@ -5,6 +5,8 @@ const MOBILE_TITLES: Record<string, string> = {
   "/": "Year Calendar",
   "/accounts": "Accounts",
   "/categories": "Categories",
+  "/transactions": "Transactions",
+  "/forecast": "Forecast",
 };
 
 export function AppShell() {

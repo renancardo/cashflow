@@ -6,6 +6,7 @@ import { useProjection } from "./data/queries/useProjection";
 import { AccountsPage } from "./pages/AccountsPage";
 import { CategoriesPage } from "./pages/CategoriesPage";
 import { TransactionsPage } from "./pages/TransactionsPage";
+import { ForecastPage } from "./pages/ForecastPage";
 
 const rootRoute = createRootRoute({
   component: AppShell,
@@ -69,11 +70,18 @@ const transactionsRoute = createRoute({
   component: TransactionsPage,
 });
 
+const forecastRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/forecast",
+  component: ForecastPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   accountsRoute,
   categoriesRoute,
   transactionsRoute,
+  forecastRoute,
 ]);
 
 export const router = createRouter({

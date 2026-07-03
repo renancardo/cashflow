@@ -12,6 +12,11 @@ import { HeaderStrip } from "../HeaderStrip/HeaderStrip.js";
 import { PageHeader } from "../PageHeader/PageHeader.js";
 import styles from "./TransactionsScreen.module.css";
 
+export type TransactionSettlement = {
+  kind: "planned" | "installment" | "statement";
+  label: string;
+};
+
 export type TransactionRowData = {
   id: string;
   type: TxType;
@@ -24,6 +29,7 @@ export type TransactionRowData = {
   toAccountName?: string;
   categoryId?: string;
   categoryName?: string;
+  settlement?: TransactionSettlement;
 };
 
 export type TransactionFiltersState = {
@@ -164,6 +170,26 @@ function TransactionRow({
           {amountPrefix}
         </span>
         <MoneyAmount cents={row.amountCents} tone={amountTone} />
+      </div>
+
+      <div className={styles.rowSettles}>
+        {row.settlement && (
+          <Chip
+            variant={
+              row.settlement.kind === "planned"
+                ? "planned"
+                : row.settlement.kind === "installment"
+                  ? "installment"
+                  : "statement"
+            }
+          >
+            {row.settlement.kind === "planned"
+              ? "Planned"
+              : row.settlement.kind === "installment"
+                ? "Installment"
+                : "Statement"}
+          </Chip>
+        )}
       </div>
 
       <div className={styles.rowActions}>
@@ -512,6 +538,7 @@ export function TransactionsScreen({
                     <span>Account</span>
                     <span>To</span>
                     <span>Amount</span>
+                    <span>Settles</span>
                     <span />
                   </div>
 

@@ -8,6 +8,8 @@ import { router } from "./router";
 import { queryClient } from "./data/queryClient";
 import { SEED_ACCOUNTS } from "./data/seed/accounts";
 import { SEED_CATEGORIES, SEED_CATEGORY_BUDGETS } from "./data/seed/categories";
+import { SEED_INSTALLMENTS, SEED_INSTALLMENT_PLANS } from "./data/seed/installmentPlans";
+import { SEED_PLANNED_ITEMS } from "./data/seed/plannedItems";
 import { SEED_TRANSACTIONS } from "./data/seed/transactions";
 
 if (getDatabase().accounts.length === 0) {
@@ -16,6 +18,9 @@ if (getDatabase().accounts.length === 0) {
     categories: SEED_CATEGORIES,
     categoryBudgets: SEED_CATEGORY_BUDGETS,
     transactions: SEED_TRANSACTIONS,
+    plannedItems: SEED_PLANNED_ITEMS,
+    installmentPlans: SEED_INSTALLMENT_PLANS,
+    installments: SEED_INSTALLMENTS,
   });
 }
 

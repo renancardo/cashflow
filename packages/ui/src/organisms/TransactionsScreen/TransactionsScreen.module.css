@@ -268,10 +268,10 @@
 .listHeader,
 .row {
   display: grid;
-  grid-template-columns: 1.75rem 5.5rem 4.5rem minmax(8rem, 1.4fr) 6rem 7rem 6rem 6.5rem 2rem;
+  grid-template-columns: 1.75rem 5.5rem 4.5rem minmax(8rem, 1.4fr) 6rem 7rem 6rem 6.5rem 5rem 2rem;
   gap: var(--space-3);
   align-items: center;
-  min-width: 840px;
+  min-width: 900px;
 }
 
 .listHeader {
@@ -285,8 +285,12 @@
   color: var(--color-text-muted);
 }
 
-.listHeader span:nth-child(8) {
+.listHeader span:nth-child(9) {
   text-align: right;
+}
+
+.rowSettles {
+  min-height: 1.25rem;
 }
 
 .rowHandle {
