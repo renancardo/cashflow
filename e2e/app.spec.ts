@@ -10,7 +10,7 @@ test.describe("app shell", () => {
     await expect(page.getByText("Next below buffer")).toBeVisible();
     await expect(page.getByRole("button", { name: "Month view" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Jump to today" })).toBeVisible();
-    await expect(page.getByText("Jan")).toBeVisible();
+    await expect(page.getByText("Jan").first()).toBeVisible();
   });
 
   test("opens day detail panel with quick add card", async ({ page }) => {
