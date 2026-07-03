@@ -1,4 +1,5 @@
 import type { Account, Transaction } from "@cashflow/core";
+import { addDays } from "./dates.js";
 
 export type AccountMap = Map<string, Account>;
 
@@ -76,4 +77,22 @@ export function aggregateWorkingBalanceAt(
   return accounts
     .filter(isWorkingAccount)
     .reduce((sum, account) => sum + workingAccountBalanceAt(account, transactions, beforeDate), 0);
+}
+
+/** Working balance through `throughDate` inclusive (matches end-of-day on that date). */
+export function aggregateWorkingBalanceThrough(
+  accounts: Account[],
+  transactions: Transaction[],
+  throughDate: string,
+): number {
+  return aggregateWorkingBalanceAt(accounts, transactions, addDays(throughDate, 1));
+}
+
+/** Account balance through `throughDate` inclusive. */
+export function accountBalanceThrough(
+  account: Account,
+  transactions: Transaction[],
+  throughDate: string,
+): number {
+  return accountBalanceAt(account, transactions, addDays(throughDate, 1));
 }

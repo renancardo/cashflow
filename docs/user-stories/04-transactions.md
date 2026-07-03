@@ -39,19 +39,7 @@ Actual transaction ledger replacing the spreadsheet “Lançamentos” tab.
 
 ---
 
-## US-4.3 — Per-account running balance column
-
-**Persona:** User
-
-**Story:** As a user, I want a **running balance per account** in the ledger so I can reconcile like my spreadsheet.
-
-**Priority:** P0  
-**Depends on:** US-4.1, US-1.2
-
-### Acceptance criteria
-
-- [ ] Running balance derived from anchor + filtered transactions
-- [ ] Matches engine per-account logic for same account and date range
+## US-4.3 — Removed
 
 ---
 
@@ -78,7 +66,7 @@ Actual transaction ledger replacing the spreadsheet “Lançamentos” tab.
 
 **Story:** As a user, I want **bulk entry and CSV import** so onboarding isn’t one row at a time.
 
-**Priority:** P1  
+**Priority:** P4  
 **Depends on:** US-4.1
 
 ### Acceptance criteria

@@ -8,12 +8,14 @@ import { router } from "./router";
 import { queryClient } from "./data/queryClient";
 import { SEED_ACCOUNTS } from "./data/seed/accounts";
 import { SEED_CATEGORIES, SEED_CATEGORY_BUDGETS } from "./data/seed/categories";
+import { SEED_TRANSACTIONS } from "./data/seed/transactions";
 
 if (getDatabase().accounts.length === 0) {
   seedDatabase({
     accounts: SEED_ACCOUNTS,
     categories: SEED_CATEGORIES,
     categoryBudgets: SEED_CATEGORY_BUDGETS,
+    transactions: SEED_TRANSACTIONS,
   });
 }
 

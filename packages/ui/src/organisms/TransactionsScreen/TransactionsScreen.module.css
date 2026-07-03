@@ -1,0 +1,428 @@
+.page {
+  flex: 1;
+  padding: var(--space-4);
+  overflow: auto;
+}
+
+@media (min-width: 769px) {
+  .page {
+    padding: var(--space-5);
+  }
+}
+
+/* ── Status ──────────────────────────────────────────────── */
+
+.statusPage {
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.statusTitle {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin: 0 0 var(--space-2);
+}
+
+/* ── Empty state ─────────────────────────────────────────── */
+
+.empty,
+.noResults {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-10) var(--space-6);
+  text-align: center;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.emptyIcon {
+  font-size: 2.5rem;
+  opacity: 0.35;
+}
+
+.emptyTitle,
+.noResultsTitle {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.emptyDesc,
+.noResultsDesc {
+  max-width: 36ch;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ── Filters card ────────────────────────────────────────── */
+
+.filtersCard {
+  margin-bottom: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.typeFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-paper);
+}
+
+.typeChip {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.typeChip:hover {
+  border-color: var(--color-text-muted);
+  color: var(--color-text);
+}
+
+.typeChipActive {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-surface);
+}
+
+.filterGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3) var(--space-4);
+  padding: var(--space-4);
+  align-items: end;
+}
+
+.filterField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.filterLabel {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.filterSelect,
+.filterInput {
+  width: 100%;
+  height: 36px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.filterSelect:focus,
+.filterInput:focus {
+  outline: none;
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.15);
+}
+
+.activeFilters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-paper);
+}
+
+.activeFiltersLabel {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.activePills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 0;
+}
+
+.activePill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  background: #eff6ff;
+  font-size: 0.75rem;
+  color: #1e40af;
+  cursor: pointer;
+}
+
+.activePill:hover {
+  background: #dbeafe;
+}
+
+.clearAll {
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 0.8125rem;
+  color: var(--color-secondary);
+  cursor: pointer;
+  text-decoration: underline;
+  flex-shrink: 0;
+}
+
+.clearAll:hover {
+  color: var(--color-primary);
+}
+
+/* ── Toolbar ─────────────────────────────────────────────── */
+
+.toolbar {
+  margin-bottom: var(--space-3);
+}
+
+.toolbarCount {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.toolbarCount strong {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+/* ── Transaction list ────────────────────────────────────── */
+
+.list {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+}
+
+.listHeader,
+.row {
+  display: grid;
+  grid-template-columns: 5.5rem 4.5rem minmax(8rem, 1.4fr) 6rem 7rem 6rem 6.5rem 2rem;
+  gap: var(--space-3);
+  align-items: center;
+  min-width: 820px;
+}
+
+.listHeader {
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-paper);
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.listHeader span:nth-child(7) {
+  text-align: right;
+}
+
+.row {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  transition: background 0.15s;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.row:hover {
+  background: var(--color-paper);
+}
+
+.rowDate {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+
+.rowDescription {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rowCategory,
+.rowTo {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rowAccount {
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cellEmpty {
+  color: var(--color-border);
+}
+
+.rowAmount {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.amountPrefix {
+  font-weight: 600;
+}
+
+.amounttransfer {
+  color: var(--color-text-muted);
+}
+
+.rowActions {
+  display: flex;
+  justify-content: center;
+}
+
+.loadMore {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-4) 0 var(--space-2);
+}
+
+@media (max-width: 960px) {
+  .filterGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .filterGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    background: transparent;
+    border: none;
+    overflow: visible;
+  }
+
+  .listHeader {
+    display: none;
+  }
+
+  .row {
+    position: relative;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto auto auto auto;
+    min-width: 0;
+    padding: var(--space-4);
+    padding-top: var(--space-5);
+    padding-right: calc(var(--space-4) + var(--touch-min));
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  .row:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .rowDescription {
+    grid-column: 1 / 3;
+    grid-row: 1;
+    white-space: normal;
+  }
+
+  .rowAmount {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: start;
+  }
+
+  .rowDate {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .row > div:nth-child(2) {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: center;
+    justify-self: start;
+  }
+
+  .rowCategory,
+  .rowAccount {
+    display: none;
+  }
+
+  .rowTo:not(.cellEmpty) {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    font-size: 0.75rem;
+  }
+
+  .rowTo.cellEmpty {
+    display: none;
+  }
+
+  .rowActions {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-3);
+  }
+}
