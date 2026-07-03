@@ -22,9 +22,7 @@ function buildRows(
 ): CategoryRowData[] {
   function getApplicableBudgetCents(categoryId: string): number | undefined {
     const applicable = budgets
-      .filter(
-        (b) => b.categoryId === categoryId && b.effectiveFromMonth <= selectedMonth,
-      )
+      .filter((b) => b.categoryId === categoryId && b.effectiveFromMonth <= selectedMonth)
       .sort((a, b) => b.effectiveFromMonth.localeCompare(a.effectiveFromMonth));
     return applicable[0]?.amountCents;
   }

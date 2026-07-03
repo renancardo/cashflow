@@ -74,8 +74,7 @@ function BudgetRow({
   depth?: number;
   onEdit?: (id: string) => void;
 }) {
-  const variance =
-    row.budgetCents !== undefined ? row.budgetCents - row.actualCents : undefined;
+  const variance = row.budgetCents !== undefined ? row.budgetCents - row.actualCents : undefined;
   const over = variance !== undefined && variance < 0;
   const under = variance !== undefined && variance >= 0;
   const hasChildren = row.children.length > 0;
@@ -83,22 +82,14 @@ function BudgetRow({
   return (
     <>
       <article
-        className={[
-          styles.row,
-          depth > 0 && styles.rowChild,
-          hasChildren && styles.rowParent,
-        ]
+        className={[styles.row, depth > 0 && styles.rowChild, hasChildren && styles.rowParent]
           .filter(Boolean)
           .join(" ")}
         data-id={row.id}
       >
         <div className={styles.rowInfo}>
           {row.color && (
-            <span
-              className={styles.rowDot}
-              style={{ background: row.color }}
-              aria-hidden="true"
-            />
+            <span className={styles.rowDot} style={{ background: row.color }} aria-hidden="true" />
           )}
           <div>
             <div className={styles.rowName}>{row.name}</div>
@@ -130,9 +121,15 @@ function BudgetRow({
           {variance === undefined ? (
             "—"
           ) : over ? (
-            <>−&nbsp;<MoneyAmount cents={Math.abs(variance)} /></>
+            <>
+              −&nbsp;
+              <MoneyAmount cents={Math.abs(variance)} />
+            </>
           ) : (
-            <>+&nbsp;<MoneyAmount cents={variance} /></>
+            <>
+              +&nbsp;
+              <MoneyAmount cents={variance} />
+            </>
           )}
         </div>
 
@@ -168,16 +165,14 @@ function IncomeRow({ row, onEdit }: { row: CategoryRowData; onEdit?: (id: string
     <article className={[styles.row, styles.rowIncome].filter(Boolean).join(" ")} data-id={row.id}>
       <div className={styles.rowInfo}>
         {row.color && (
-          <span
-            className={styles.rowDot}
-            style={{ background: row.color }}
-            aria-hidden="true"
-          />
+          <span className={styles.rowDot} style={{ background: row.color }} aria-hidden="true" />
         )}
         <div className={styles.rowName}>{row.name}</div>
       </div>
 
-      <div className={[styles.cell, !row.actualCents && styles.cellMuted].filter(Boolean).join(" ")}>
+      <div
+        className={[styles.cell, !row.actualCents && styles.cellMuted].filter(Boolean).join(" ")}
+      >
         <MoneyAmount cents={row.actualCents} />
       </div>
 
@@ -239,10 +234,10 @@ export function CategoriesScreen({
   const showIncome = kindFilter === "all" || kindFilter === "income";
 
   const [filterY, filterM] = selectedMonth.split("-");
-  const monthLabel = new Date(Number(filterY), Number(filterM) - 1, 1).toLocaleDateString(
-    "en-US",
-    { month: "long", year: "numeric" },
-  );
+  const monthLabel = new Date(Number(filterY), Number(filterM) - 1, 1).toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
 
   const budgetUsedPct =
     totalBudgetedCents > 0
@@ -362,10 +357,7 @@ export function CategoriesScreen({
 
             {/* Expense budget section */}
             {showExpense && expenseCategories.length > 0 && (
-              <section
-                className={styles.section}
-                aria-label="Expense categories and budgets"
-              >
+              <section className={styles.section} aria-label="Expense categories and budgets">
                 <h2 className={styles.sectionTitle}>Expense budgets</h2>
 
                 <div className={styles.budgetList}>

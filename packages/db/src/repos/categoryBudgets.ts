@@ -33,7 +33,8 @@ export const categoryBudgetsRepo = {
   ): Promise<CategoryBudget> {
     const db = getDatabase();
     const existing = db.categoryBudgets.find(
-      (b) => b.categoryId === categoryId && b.effectiveFromMonth === effectiveFromMonth && !b.archivedAt,
+      (b) =>
+        b.categoryId === categoryId && b.effectiveFromMonth === effectiveFromMonth && !b.archivedAt,
     );
     if (existing) {
       return this.update(existing.id, { amountCents });

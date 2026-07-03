@@ -49,7 +49,11 @@ export function useCategoryMutations() {
 
   const upsertBudget = useMutation({
     mutationFn: (input: CategoryBudgetInput) =>
-      categoryBudgetsRepo.upsertForMonth(input.categoryId, input.effectiveFromMonth, input.amountCents),
+      categoryBudgetsRepo.upsertForMonth(
+        input.categoryId,
+        input.effectiveFromMonth,
+        input.amountCents,
+      ),
     onSuccess: invalidate,
   });
 

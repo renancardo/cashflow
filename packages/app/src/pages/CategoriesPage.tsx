@@ -93,9 +93,7 @@ export function CategoriesPage() {
 
     setEditorMode("edit");
     setEditingId(id);
-    setEditorValues(
-      toEditorValues(category, row?.budgetCents, selectedMonth),
-    );
+    setEditorValues(toEditorValues(category, row?.budgetCents, selectedMonth));
     setEditorOpen(true);
   };
 

@@ -124,7 +124,9 @@ export function AccountEditorPanel({
       title={mode === "create" ? "Add account" : "Edit account"}
       subtitle={subtitle}
       onClose={onClose}
-      onSubmit={() => { if (canSave) onSave(); }}
+      onSubmit={() => {
+        if (canSave) onSave();
+      }}
       footer={
         <>
           {mode === "edit" && onArchive && (

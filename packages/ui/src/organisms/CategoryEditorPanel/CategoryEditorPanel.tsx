@@ -97,7 +97,9 @@ export function CategoryEditorPanel({
       title={mode === "create" ? "Add category" : "Edit category"}
       subtitle={subtitle}
       onClose={onClose}
-      onSubmit={() => { if (canSave) onSave(); }}
+      onSubmit={() => {
+        if (canSave) onSave();
+      }}
       footer={
         <>
           {mode === "edit" && onArchive && (
@@ -105,11 +107,7 @@ export function CategoryEditorPanel({
               align="start"
               content="Archiving preserves historical transactions using this category."
             >
-              <Button
-                variant="ghost"
-                className={styles.archiveButton}
-                onClick={onArchive}
-              >
+              <Button variant="ghost" className={styles.archiveButton} onClick={onArchive}>
                 Archive
               </Button>
             </Tooltip>
@@ -145,7 +143,9 @@ export function CategoryEditorPanel({
           label="Kind"
           inputType="select"
           value={values.kind}
-          onChange={(event) => onChange({ kind: event.target.value as CategoryKind, parentId: undefined })}
+          onChange={(event) =>
+            onChange({ kind: event.target.value as CategoryKind, parentId: undefined })
+          }
         >
           <option value="expense">Expense</option>
           <option value="income">Income</option>

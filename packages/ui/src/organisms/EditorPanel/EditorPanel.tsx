@@ -42,12 +42,7 @@ export function EditorPanel({
         aria-label="Close editor"
         onClick={onClose}
       />
-      <aside
-        className={styles.panel}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={labelId}
-      >
+      <aside className={styles.panel} role="dialog" aria-modal="true" aria-labelledby={labelId}>
         <div className={styles.header}>
           <div className={styles.headerTop}>
             <div>
