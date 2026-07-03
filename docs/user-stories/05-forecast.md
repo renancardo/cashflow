@@ -2,6 +2,8 @@
 
 Planned income/expense, recurrence, subscriptions, and investment outflows.
 
+**Status (2026-07-03):** The `/forecast` screen is implemented client-side — planned items and installment plans with create/edit/delete, `PlannedItemEditorPanel` / `InstallmentPlanEditorPanel`, type filters (including Subscriptions), active/dormant grouping, recurrence scope dialog (this / this+future), and “mark paid” settlement. Saves invalidate projection. Data lives in an in-memory repo (`packages/db`); it resets on reload until persistent storage lands (ADR-006). Remaining gaps: year calendar UI (US-3.1 — items project but are not shown on a grid), skip single occurrence UI (US-5.2), and credit-card subscription accrual via engine (US-5.3 / US-1.4).
+
 ---
 
 ## US-5.1 — Create planned income and expense
@@ -15,9 +17,9 @@ Planned income/expense, recurrence, subscriptions, and investment outflows.
 
 ### Acceptance criteria
 
-- [ ] `PlannedItem` with type, amount, account, category, recurrence, start/end
-- [ ] Monthly recurrence uses `dayOfMonth`
-- [ ] One-off uses `recurrence: once` + `startDate`
+- [x] `PlannedItem` with type, amount, account, category, recurrence, start/end
+- [x] Monthly recurrence uses `dayOfMonth`
+- [x] One-off uses `recurrence: once` + `startDate`
 - [ ] Items appear in projection and calendar after save
 
 ---
@@ -33,9 +35,9 @@ Planned income/expense, recurrence, subscriptions, and investment outflows.
 
 ### Acceptance criteria
 
-- [ ] Dialog offers “This occurrence only” and “This and future” only (no “all”)
-- [ ] This occurrence → `PlannedItemOverride`
-- [ ] This and future → split rule (`endDate` on old + new `PlannedItem`)
+- [x] Dialog offers “This occurrence only” and “This and future” only (no “all”)
+- [x] This occurrence → `PlannedItemOverride`
+- [x] This and future → split rule (`endDate` on old + new `PlannedItem`)
 - [ ] Delete single occurrence → override with `skipped`
 
 ---
@@ -51,8 +53,8 @@ Planned income/expense, recurrence, subscriptions, and investment outflows.
 
 ### Acceptance criteria
 
-- [ ] `isSubscription` flag on `PlannedItem`
-- [ ] Filter chip on Forecast Items screen
+- [x] `isSubscription` flag on `PlannedItem`
+- [x] Filter chip on Forecast Items screen
 - [ ] Subscriptions on credit card accrue via engine (US-1.4), not direct working hit
 
 ---
@@ -68,9 +70,9 @@ Planned income/expense, recurrence, subscriptions, and investment outflows.
 
 ### Acceptance criteria
 
-- [ ] `isActive = false` excludes from projection
-- [ ] Dormant items visible in separate group/filter
-- [ ] Reactivation restores projection from recompute
+- [x] `isActive = false` excludes from projection
+- [x] Dormant items visible in separate group/filter
+- [x] Reactivation restores projection from recompute
 
 ---
 
@@ -85,5 +87,5 @@ Planned income/expense, recurrence, subscriptions, and investment outflows.
 
 ### Acceptance criteria
 
-- [ ] Planned transfer: `accountId` (working) + `toAccountId` (investment)
-- [ ] Working balance decreases on effective date; no portfolio analytics in Phase 1
+- [x] Planned transfer: `accountId` (working) + `toAccountId` (investment)
+- [x] Working balance decreases on effective date; no portfolio analytics in Phase 1

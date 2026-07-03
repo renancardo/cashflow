@@ -2,7 +2,7 @@
 
 Actual transaction ledger replacing the spreadsheet “Lançamentos” tab.
 
-**Status (2026-07-03):** The `/transactions` screen is implemented client-side — create/edit/delete, account and category links, instant filters (collapsible panel + shared `SegmentedControl` type filter + account/category/date), load-more pagination, manual same-day reorder via drag-and-drop, and `EditorPanel`-based form. Data lives in an in-memory repo (`packages/db`); it resets on reload until persistent storage lands (ADR-006). Working balance in the header uses inclusive-through-today balances (`aggregateWorkingBalanceThrough`). Remaining gaps: settlement linking (US-4.4), bulk/CSV (US-4.5).
+**Status (2026-07-03):** The `/transactions` screen is implemented client-side — create/edit/delete, account and category links, instant filters (collapsible panel + shared `SegmentedControl` type filter + account/category/date), load-more pagination, manual same-day reorder via drag-and-drop, and `EditorPanel`-based form. Data lives in an in-memory repo (`packages/db`); it resets on reload until persistent storage lands (ADR-006). Working balance in the header uses inclusive-through-today balances (`aggregateWorkingBalanceThrough`). Planned-item settlement (US-4.4) works via “mark paid” on Forecast (`settlePlannedItem`); settled rows show a badge on the ledger. Linking from the transaction editor is not built yet. Remaining gap: bulk/CSV (US-4.5).
 
 ---
 
@@ -57,9 +57,9 @@ Actual transaction ledger replacing the spreadsheet “Lançamentos” tab.
 
 ### Acceptance criteria
 
-- [ ] Transaction can set `settlesPlannedItemId` + `settlesPlannedOccurrenceDate`
-- [ ] Settled occurrence no longer projects
-- [ ] UI: “mark as paid” from forecast or link from transaction form
+- [x] Transaction can set `settlesPlannedItemId` + `settlesPlannedOccurrenceDate`
+- [x] Settled occurrence no longer projects
+- [x] UI: “mark as paid” from forecast or link from transaction form
 
 ---
 
