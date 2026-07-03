@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { accountsRepo, getDatabase } from "@cashflow/db";
-import { accountBalanceAt, aggregateWorkingBalanceAt } from "@cashflow/engine";
+import { accountBalanceThrough, aggregateWorkingBalanceThrough } from "@cashflow/engine";
 import { todayIso } from "@cashflow/core";
 import { queryKeys } from "../keys";
 
@@ -18,10 +18,10 @@ export function useAccounts() {
         type: account.type,
         isWorking: account.isWorking,
         anchorDate: account.anchorDate,
-        balanceCents: accountBalanceAt(account, transactions, asOfDate),
+        balanceCents: accountBalanceThrough(account, transactions, asOfDate),
       }));
 
-      const workingBalanceCents = aggregateWorkingBalanceAt(accounts, transactions, asOfDate);
+      const workingBalanceCents = aggregateWorkingBalanceThrough(accounts, transactions, asOfDate);
 
       return { accounts: rows, workingBalanceCents, rawAccounts: accounts };
     },

@@ -5,6 +5,7 @@ import { AppShell } from "./layout/AppShell";
 import { useProjection } from "./data/queries/useProjection";
 import { AccountsPage } from "./pages/AccountsPage";
 import { CategoriesPage } from "./pages/CategoriesPage";
+import { TransactionsPage } from "./pages/TransactionsPage";
 
 const rootRoute = createRootRoute({
   component: AppShell,
@@ -62,7 +63,18 @@ const categoriesRoute = createRoute({
   component: CategoriesPage,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, accountsRoute, categoriesRoute]);
+const transactionsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/transactions",
+  component: TransactionsPage,
+});
+
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  accountsRoute,
+  categoriesRoute,
+  transactionsRoute,
+]);
 
 export const router = createRouter({
   routeTree,

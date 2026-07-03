@@ -16,6 +16,10 @@
   --color-paper: #faf8f5;
   --color-paper-shadow: #ebe6df;
 
+  --color-selected-bg: var(--color-surface);
+  --color-selected-text: var(--color-text);
+  --color-control-track: var(--color-paper);
+
   --font-display: "Montserrat", system-ui, sans-serif;
   --font-body: "Roboto", system-ui, sans-serif;
   --font-mono: "PT Mono", ui-monospace, monospace;

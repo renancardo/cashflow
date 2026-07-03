@@ -52,6 +52,8 @@ export interface Transaction {
   categoryId?: string;
   description: string;
   effectiveDate: string;
+  /** Display order within the same effectiveDate (lower = higher in newest-first list). */
+  sortOrder: number;
   settlesPlannedItemId?: string;
   settlesPlannedOccurrenceDate?: string;
   settlesInstallmentId?: string;

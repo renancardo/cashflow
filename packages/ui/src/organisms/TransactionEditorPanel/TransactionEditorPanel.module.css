@@ -1,0 +1,52 @@
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.typeGroup {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-1);
+  padding: 3px;
+  background: var(--color-paper);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.typeBtn {
+  padding: var(--space-2);
+  border: none;
+  border-radius: calc(var(--radius-sm) - 2px);
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.typeBtnActive {
+  background: var(--color-primary);
+  color: var(--color-surface);
+}
+
+.saveButton {
+  min-width: 9rem;
+}
+
+.deleteButton {
+  color: var(--color-danger);
+  border-color: transparent;
+}
+
+.deleteButton:hover:not(:disabled) {
+  border-color: var(--color-danger);
+  background: rgba(220, 38, 38, 0.05);
+}
+
+@media (max-width: 768px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}

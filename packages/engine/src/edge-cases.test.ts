@@ -56,6 +56,7 @@ describe("projection edge cases (US-1.8)", () => {
         categoryId: "cat-other",
         description: "Expense before re-anchor",
         effectiveDate: "2026-06-05",
+        sortOrder: 0,
       };
 
       const withoutReanchor: EngineInput = {
@@ -115,6 +116,7 @@ describe("projection edge cases (US-1.8)", () => {
             toAccountId: "acct-secondary",
             description: "Move funds between working accounts",
             effectiveDate: "2026-06-15",
+            sortOrder: 0,
           },
         ],
       };
