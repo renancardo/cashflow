@@ -122,7 +122,12 @@ export function TransactionEditorPanel({
             <Button variant="ghost" onClick={onClose}>
               Cancel
             </Button>
-            <Button variant="primary" type="submit" disabled={!canSave} className={styles.saveButton}>
+            <Button
+              variant="primary"
+              type="submit"
+              disabled={!canSave}
+              className={styles.saveButton}
+            >
               {mode === "create" ? "Add transaction" : "Save changes"}
             </Button>
           </EditorPanelFooterActions>
@@ -207,8 +212,7 @@ export function TransactionEditorPanel({
             const accountId = event.target.value;
             onChange({
               accountId,
-              toAccountId:
-                values.toAccountId === accountId ? undefined : values.toAccountId,
+              toAccountId: values.toAccountId === accountId ? undefined : values.toAccountId,
             });
           }}
         >

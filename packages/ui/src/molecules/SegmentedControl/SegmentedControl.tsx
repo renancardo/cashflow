@@ -107,11 +107,7 @@ export function SegmentedControl<V extends string = string>({
     <div
       role="radiogroup"
       aria-label={ariaLabel}
-      className={[
-        styles.control,
-        fullWidth && styles.fullWidth,
-        className,
-      ]
+      className={[styles.control, fullWidth && styles.fullWidth, className]
         .filter(Boolean)
         .join(" ")}
     >
@@ -129,9 +125,7 @@ export function SegmentedControl<V extends string = string>({
             aria-checked={selected}
             disabled={option.disabled}
             tabIndex={selected ? 0 : -1}
-            className={[styles.segment, selected && styles.segmentActive]
-              .filter(Boolean)
-              .join(" ")}
+            className={[styles.segment, selected && styles.segmentActive].filter(Boolean).join(" ")}
             onClick={() => selectAtIndex(index)}
             onKeyDown={(event) => handleKeyDown(event, index)}
           >

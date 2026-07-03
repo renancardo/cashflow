@@ -1,9 +1,6 @@
 import { describe, it, expect } from "vitest";
 import type { Account, Transaction } from "@cashflow/core";
-import {
-  aggregateWorkingBalanceAt,
-  aggregateWorkingBalanceThrough,
-} from "./accounts.js";
+import { aggregateWorkingBalanceAt, aggregateWorkingBalanceThrough } from "./accounts.js";
 
 const checking: Account = {
   id: "acct-checking",

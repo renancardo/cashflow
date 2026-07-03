@@ -92,7 +92,8 @@ function TransactionRow({
   onDragOver: (event: DragEvent<HTMLElement>, id: string) => void;
   onDrop: (event: DragEvent<HTMLElement>, id: string) => void;
 }) {
-  const amountTone = row.type === "income" ? "income" : row.type === "expense" ? "danger" : "default";
+  const amountTone =
+    row.type === "income" ? "income" : row.type === "expense" ? "danger" : "default";
   const amountPrefix = row.type === "income" ? "+" : "−";
   const isDragging = draggingId === row.id;
   const isDropBefore = dropTarget?.id === row.id && dropTarget.position === "before";
@@ -142,13 +143,19 @@ function TransactionRow({
 
       <div className={styles.rowDescription}>{row.description}</div>
 
-      <div className={[styles.rowCategory, !row.categoryName && styles.cellEmpty].filter(Boolean).join(" ")}>
+      <div
+        className={[styles.rowCategory, !row.categoryName && styles.cellEmpty]
+          .filter(Boolean)
+          .join(" ")}
+      >
         {row.categoryName ?? "—"}
       </div>
 
       <div className={styles.rowAccount}>{row.accountName}</div>
 
-      <div className={[styles.rowTo, !row.toAccountName && styles.cellEmpty].filter(Boolean).join(" ")}>
+      <div
+        className={[styles.rowTo, !row.toAccountName && styles.cellEmpty].filter(Boolean).join(" ")}
+      >
         {row.toAccountName ?? "—"}
       </div>
 
@@ -298,9 +305,7 @@ export function TransactionsScreen({
                   <SegmentedControl
                     aria-label="Filter by type"
                     value={typeFilter}
-                    onChange={(type) =>
-                      patchFilters({ type: type === "all" ? undefined : type })
-                    }
+                    onChange={(type) => patchFilters({ type: type === "all" ? undefined : type })}
                     options={[
                       { value: "all", label: "All types" },
                       { value: "income", label: TX_TYPE_LABELS.income },
@@ -349,9 +354,7 @@ export function TransactionsScreen({
                         id="filter-account"
                         className={styles.filterSelect}
                         value={filters.accountId ?? ""}
-                        onChange={(e) =>
-                          patchFilters({ accountId: e.target.value || undefined })
-                        }
+                        onChange={(e) => patchFilters({ accountId: e.target.value || undefined })}
                       >
                         <option value="">All accounts</option>
                         {accountOptions.map((option) => (
@@ -370,9 +373,7 @@ export function TransactionsScreen({
                         id="filter-category"
                         className={styles.filterSelect}
                         value={filters.categoryId ?? ""}
-                        onChange={(e) =>
-                          patchFilters({ categoryId: e.target.value || undefined })
-                        }
+                        onChange={(e) => patchFilters({ categoryId: e.target.value || undefined })}
                       >
                         <option value="">All categories</option>
                         {categoryOptions.map((option) => (
@@ -392,9 +393,7 @@ export function TransactionsScreen({
                         type="date"
                         className={styles.filterInput}
                         value={filters.dateFrom ?? ""}
-                        onChange={(e) =>
-                          patchFilters({ dateFrom: e.target.value || undefined })
-                        }
+                        onChange={(e) => patchFilters({ dateFrom: e.target.value || undefined })}
                       />
                     </div>
 
@@ -407,9 +406,7 @@ export function TransactionsScreen({
                         type="date"
                         className={styles.filterInput}
                         value={filters.dateTo ?? ""}
-                        onChange={(e) =>
-                          patchFilters({ dateTo: e.target.value || undefined })
-                        }
+                        onChange={(e) => patchFilters({ dateTo: e.target.value || undefined })}
                       />
                     </div>
                   </div>
