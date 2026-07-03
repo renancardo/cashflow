@@ -22,6 +22,15 @@ export {
 export { AccountList } from "./organisms/AccountList/AccountList.js";
 export { AccountRow, type AccountRowData } from "./organisms/AccountRow/AccountRow.js";
 export { AccountsScreen } from "./organisms/AccountsScreen/AccountsScreen.js";
+export {
+  CategoryEditorPanel,
+  type CategoryEditorValues,
+} from "./organisms/CategoryEditorPanel/CategoryEditorPanel.js";
+export {
+  CategoriesScreen,
+  type CategoryRowData,
+} from "./organisms/CategoriesScreen/CategoriesScreen.js";
+export { EditorPanel, EditorPanelFooterActions } from "./organisms/EditorPanel/EditorPanel.js";
 export { HeaderStrip } from "./organisms/HeaderStrip/HeaderStrip.js";
 export { MobileHeader } from "./organisms/MobileHeader/MobileHeader.js";
 export { PageHeader } from "./organisms/PageHeader/PageHeader.js";

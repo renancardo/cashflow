@@ -4,6 +4,7 @@ import { AppStatus, MoneyAmount } from "@cashflow/ui";
 import { AppShell } from "./layout/AppShell";
 import { useProjection } from "./data/queries/useProjection";
 import { AccountsPage } from "./pages/AccountsPage";
+import { CategoriesPage } from "./pages/CategoriesPage";
 
 const rootRoute = createRootRoute({
   component: AppShell,
@@ -55,7 +56,13 @@ const accountsRoute = createRoute({
   component: AccountsPage,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, accountsRoute]);
+const categoriesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/categories",
+  component: CategoriesPage,
+});
+
+const routeTree = rootRoute.addChildren([indexRoute, accountsRoute, categoriesRoute]);
 
 export const router = createRouter({
   routeTree,

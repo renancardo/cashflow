@@ -10,15 +10,16 @@ type ItemProps = {
   label: string;
   children: ReactNode;
   tone?: "default" | "working";
+  className?: string;
 };
 
 export function SummaryStrip({ children, className }: StripProps) {
   return <div className={[styles.strip, className].filter(Boolean).join(" ")}>{children}</div>;
 }
 
-export function SummaryStripItem({ label, children, tone = "default" }: ItemProps) {
+export function SummaryStripItem({ label, children, tone = "default", className }: ItemProps) {
   return (
-    <div className={styles.item}>
+    <div className={[styles.item, className].filter(Boolean).join(" ")}>
       <span className={styles.label}>{label}</span>
       <span
         className={[styles.value, tone === "working" && styles.working].filter(Boolean).join(" ")}
