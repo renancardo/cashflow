@@ -11,15 +11,13 @@ import {
   formatMonthYear,
   getDayEntryLines,
   getDayIndicators,
-  getDayTemporalState,
   indexProjectionDays,
-  isWeekend,
   shiftMonth,
 } from "../../lib/calendar.js";
 import { HeaderStrip } from "../HeaderStrip/HeaderStrip.js";
 import styles from "./MonthCalendarScreen.module.css";
 
-const WEEKDAY_HEADERS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+const WEEKDAY_HEADERS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 type Props = {
   month: string;
@@ -170,7 +168,6 @@ export function MonthCalendarScreen({
               }
 
               const day = daysByDate.get(cell.date);
-              const temporal = getDayTemporalState(cell.date, today);
               const indicators = day ? getDayIndicators(day) : [];
               const entries = day ? getDayEntryLines(day, today) : [];
 
@@ -180,8 +177,6 @@ export function MonthCalendarScreen({
                   type="button"
                   className={[
                     styles.dayCell,
-                    styles[temporal],
-                    isWeekend(cell.date) && styles.weekend,
                     day?.belowBuffer && styles.belowBuffer,
                     selectedDate === cell.date && styles.selected,
                   ]
@@ -189,19 +184,21 @@ export function MonthCalendarScreen({
                     .join(" ")}
                   onClick={() => onDaySelect?.(cell.date!)}
                 >
-                  <span className={styles.dayNumber}>{String(cell.day).padStart(2, "0")}</span>
-                  {day && (
-                    <span
-                      className={[
-                        styles.balance,
-                        day.belowBuffer && styles.balanceDanger,
-                      ]
-                        .filter(Boolean)
-                        .join(" ")}
-                    >
-                      {formatMoney(day.closingBalanceCents)}
-                    </span>
-                  )}
+                  <span className={styles.dayNumberContainer}>
+                    <span className={styles.dayNumber}>{String(cell.day).padStart(2, "0")} - </span>
+                    {day && (
+                      <span
+                        className={[
+                          styles.balance,
+                          day.belowBuffer && styles.balanceDanger,
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
+                      >
+                        {formatMoney(day.closingBalanceCents)}
+                      </span>
+                    )}
+                  </span>
                   {entries.length > 0 && (
                     <span className={styles.entries}>
                       {entries.map((entry) => (
@@ -217,7 +214,11 @@ export function MonthCalendarScreen({
                   {indicators.length > 0 && (
                     <span className={styles.indicators}>
                       {indicators.map((kind, indicatorIndex) => (
-                        <Indicator key={`${kind}-${indicatorIndex}`} kind={kind} />
+                        <Indicator
+                          key={`${kind}-${indicatorIndex}`}
+                          kind={kind}
+                          className={kind === "card" ? styles.indicatorCard : styles.indicatorDot}
+                        />
                       ))}
                     </span>
                   )}
