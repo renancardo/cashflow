@@ -215,6 +215,9 @@ export function ForecastPage() {
         onMarkInstallmentPaid={(installmentId) =>
           installmentMutations.markPaid.mutate(installmentId)
         }
+        onMarkPlannedPaid={(plannedItemId, occurrenceDate) =>
+          plannedMutations.markPaid.mutate({ plannedItemId, occurrenceDate })
+        }
         editor={
           editorKind === "planned" ? (
             <PlannedItemEditorPanel
@@ -224,6 +227,15 @@ export function ForecastPage() {
               accountOptions={data?.accountOptions ?? []}
               categoryOptions={data?.categoryOptions ?? []}
               occurrencePreview={occurrencePreview}
+              onMarkOccurrencePaid={
+                editingPlannedId
+                  ? (occurrenceDate) =>
+                      plannedMutations.markPaid.mutate({
+                        plannedItemId: editingPlannedId,
+                        occurrenceDate,
+                      })
+                  : undefined
+              }
               onChange={(patch) => setPlannedValues((current) => ({ ...current, ...patch }))}
               onClose={() => setEditorOpen(false)}
               onSave={handlePlannedSave}

@@ -16,6 +16,7 @@ export {
 export { installmentPlansRepo, type InstallmentPlanInput } from "./repos/installmentPlans.js";
 export { installmentsRepo } from "./repos/installments.js";
 export { settleInstallment, type SettleInstallmentResult } from "./settlements/installment.js";
+export { settlePlannedItem } from "./settlements/planned.js";
 export {
   createEmptyState,
   getDatabase,

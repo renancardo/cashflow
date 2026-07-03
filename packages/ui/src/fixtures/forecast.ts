@@ -24,6 +24,10 @@ export const DEMO_PLANNED_ROWS: ForecastItemRowData[] = [
     nextAmountCents: 850_000,
     isSubscription: false,
     isActive: true,
+    occurrences: [
+      { occurrenceDate: "2026-07-05", effectiveDate: "2026-07-05", amountCents: 850_000 },
+      { occurrenceDate: "2026-08-05", effectiveDate: "2026-08-05", amountCents: 850_000 },
+    ],
   },
   {
     id: "plan-rent",
@@ -38,6 +42,9 @@ export const DEMO_PLANNED_ROWS: ForecastItemRowData[] = [
     nextAmountCents: 240_000,
     isSubscription: false,
     isActive: true,
+    occurrences: [
+      { occurrenceDate: "2026-07-10", effectiveDate: "2026-07-10", amountCents: 240_000 },
+    ],
   },
   {
     id: "plan-netflix",
@@ -52,6 +59,9 @@ export const DEMO_PLANNED_ROWS: ForecastItemRowData[] = [
     nextAmountCents: 5_590,
     isSubscription: true,
     isActive: true,
+    occurrences: [
+      { occurrenceDate: "2026-07-15", effectiveDate: "2026-07-15", amountCents: 5_590 },
+    ],
   },
   {
     id: "plan-investment",
@@ -66,6 +76,9 @@ export const DEMO_PLANNED_ROWS: ForecastItemRowData[] = [
     nextAmountCents: 500_000,
     isSubscription: false,
     isActive: true,
+    occurrences: [
+      { occurrenceDate: "2026-08-15", effectiveDate: "2026-08-15", amountCents: 500_000 },
+    ],
   },
   {
     id: "plan-tim",
@@ -78,6 +91,7 @@ export const DEMO_PLANNED_ROWS: ForecastItemRowData[] = [
     group: "recurring",
     isSubscription: false,
     isActive: false,
+    occurrences: [],
   },
 ];
 

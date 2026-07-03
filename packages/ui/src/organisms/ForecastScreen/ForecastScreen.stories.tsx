@@ -98,9 +98,10 @@ export const WithPlannedEditor: Story = {
             accountOptions={DEMO_ACCOUNT_OPTIONS}
             categoryOptions={DEMO_CATEGORY_OPTIONS}
             occurrencePreview={[
-              { effectiveDate: "2026-07-15", amountCents: 5_590 },
-              { effectiveDate: "2026-08-15", amountCents: 5_590 },
+              { occurrenceDate: "2026-07-15", effectiveDate: "2026-07-15", amountCents: 5_590 },
+              { occurrenceDate: "2026-08-15", effectiveDate: "2026-08-15", amountCents: 5_590 },
             ]}
+            onMarkOccurrencePaid={() => undefined}
             onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
             onClose={() => setEditorOpen(false)}
             onSave={() => setEditorOpen(false)}

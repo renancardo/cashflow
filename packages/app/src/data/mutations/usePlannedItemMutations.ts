@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { PlannedItem, Recurrence } from "@cashflow/core";
-import { dayBefore, isRecurring } from "@cashflow/core";
-import { plannedItemsRepo, plannedItemOverridesRepo, type PlannedItemInput } from "@cashflow/db";
+import { dayBefore, isRecurring, todayIso } from "@cashflow/core";
+import { plannedItemsRepo, plannedItemOverridesRepo, settlePlannedItem, type PlannedItemInput } from "@cashflow/db";
 import { queryKeys } from "../keys";
 
 export type { PlannedItemInput };
@@ -57,6 +57,8 @@ export function usePlannedItemMutations() {
     queryClient.invalidateQueries({ queryKey: queryKeys.plannedItems });
     queryClient.invalidateQueries({ queryKey: queryKeys.installmentPlans });
     queryClient.invalidateQueries({ queryKey: queryKeys.forecast });
+    queryClient.invalidateQueries({ queryKey: queryKeys.accounts });
+    queryClient.invalidateQueries({ queryKey: ["transactions"] });
     queryClient.invalidateQueries({ queryKey: ["projection"] });
   };
 
@@ -127,7 +129,13 @@ export function usePlannedItemMutations() {
     onSuccess: invalidate,
   });
 
-  return { create, update, setActive, remove, archive, saveWithScope };
+  const markPaid = useMutation({
+    mutationFn: ({ plannedItemId, occurrenceDate }: { plannedItemId: string; occurrenceDate: string }) =>
+      settlePlannedItem(plannedItemId, occurrenceDate, todayIso()),
+    onSuccess: invalidate,
+  });
+
+  return { create, update, setActive, remove, archive, saveWithScope, markPaid };
 }
 
 export function createEmptyPlannedItemInput(defaultAccountId?: string): PlannedItemEditorInput {

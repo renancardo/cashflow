@@ -41,6 +41,11 @@ export type ForecastItemRowData = {
   isSubscription: boolean;
   isActive: boolean;
   recurrence: PlannedItem["recurrence"];
+  occurrences: {
+    occurrenceDate: string;
+    effectiveDate: string;
+    amountCents: number;
+  }[];
 };
 
 export type InstallmentPlanRowData = {
@@ -120,6 +125,17 @@ export function useForecastScreen(filter: ForecastFilter = "all") {
 
       const plannedRows: ForecastItemRowData[] = plannedItems.map((item) => {
         const next = nextPlannedOccurrence(item, overrides, settledPlanned, asOfDate);
+        const occurrences = previewUpcomingOccurrences(
+          item,
+          overrides,
+          settledPlanned,
+          asOfDate,
+          5,
+        ).map((occ) => ({
+          occurrenceDate: occ.occurrenceDate,
+          effectiveDate: occ.effectiveDate,
+          amountCents: occ.amountCents,
+        }));
         return {
           id: item.id,
           type: item.type,
@@ -138,6 +154,7 @@ export function useForecastScreen(filter: ForecastFilter = "all") {
           isActive: item.isActive,
           recurrence: item.recurrence,
           group: plannedItemGroup(item.recurrence),
+          occurrences,
         };
       });
 

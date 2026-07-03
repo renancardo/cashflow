@@ -29,6 +29,7 @@ export type PlannedItemEditorValues = {
 };
 
 type OccurrencePreview = {
+  occurrenceDate: string;
   effectiveDate: string;
   amountCents: number;
 };
@@ -44,6 +45,7 @@ type Props = {
   accountOptions: AccountOption[];
   categoryOptions: CategoryOption[];
   occurrencePreview?: OccurrencePreview[];
+  onMarkOccurrencePaid?: (occurrenceDate: string) => void;
   onChange: (patch: Partial<PlannedItemEditorValues>) => void;
   onClose: () => void;
   onSave: () => void;
@@ -121,6 +123,7 @@ export function PlannedItemEditorPanel({
   accountOptions,
   categoryOptions,
   occurrencePreview = [],
+  onMarkOccurrencePaid,
   onChange,
   onClose,
   onSave,
@@ -154,6 +157,10 @@ export function PlannedItemEditorPanel({
     mode === "edit"
       ? `${values.description || "Forecast item"} · ${values.recurrence}`
       : `New ${TX_TYPE_LABELS[values.type].toLowerCase()} forecast item`;
+
+  const markPaidLabel = values.type === "income" ? "Mark as received" : "Mark paid";
+  const previewAmountTone =
+    values.type === "income" ? "income" : values.type === "expense" ? "danger" : "default";
 
   return (
     <EditorPanel
@@ -383,14 +390,25 @@ export function PlannedItemEditorPanel({
         />
       </div>
 
-      {occurrencePreview.length > 0 && values.recurrence !== "once" && (
+      {occurrencePreview.length > 0 && (
         <div className={styles.section}>
           <h3 className={styles.sectionTitle}>Upcoming occurrences</h3>
           <ul className={styles.previewList}>
             {occurrencePreview.map((occ) => (
-              <li key={occ.effectiveDate} className={styles.previewItem}>
+              <li key={occ.occurrenceDate} className={styles.previewItem}>
                 <FormattedDate isoDate={occ.effectiveDate} />
-                <MoneyAmount cents={occ.amountCents} tone="danger" />
+                <div className={styles.previewActions}>
+                  <MoneyAmount cents={occ.amountCents} tone={previewAmountTone} />
+                  {onMarkOccurrencePaid && (
+                    <Button
+                      variant="ghost"
+                      className={styles.markPaid}
+                      onClick={() => onMarkOccurrencePaid(occ.occurrenceDate)}
+                    >
+                      {markPaidLabel}
+                    </Button>
+                  )}
+                </div>
               </li>
             ))}
           </ul>

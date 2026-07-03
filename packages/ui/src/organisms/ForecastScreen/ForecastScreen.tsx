@@ -3,6 +3,7 @@ import { Button } from "../../atoms/Button/Button.js";
 import { FormattedDate } from "../../atoms/FormattedDate/FormattedDate.js";
 import { MoneyAmount } from "../../atoms/MoneyAmount/MoneyAmount.js";
 import { Metric } from "../../molecules/Metric/Metric.js";
+import { SegmentedControl } from "../../molecules/SegmentedControl/SegmentedControl.js";
 import { SummaryStrip, SummaryStripItem } from "../../molecules/SummaryStrip/SummaryStrip.js";
 import { HeaderStrip } from "../HeaderStrip/HeaderStrip.js";
 import { PageHeader } from "../PageHeader/PageHeader.js";
@@ -51,6 +52,7 @@ type Props = {
   onEditPlanned?: (id: string) => void;
   onEditInstallment?: (id: string) => void;
   onMarkInstallmentPaid?: (installmentId: string) => void;
+  onMarkPlannedPaid?: (plannedItemId: string, occurrenceDate: string) => void;
 };
 
 function ForecastGroup({
@@ -66,6 +68,7 @@ function ForecastGroup({
   onEditPlanned,
   onEditInstallment,
   onMarkInstallmentPaid,
+  onMarkPlannedPaid,
 }: {
   title: string;
   plannedHeader: boolean;
@@ -79,6 +82,7 @@ function ForecastGroup({
   onEditPlanned?: (id: string) => void;
   onEditInstallment?: (id: string) => void;
   onMarkInstallmentPaid?: (installmentId: string) => void;
+  onMarkPlannedPaid?: (plannedItemId: string, occurrenceDate: string) => void;
 }) {
   const hasContent = recurring.length > 0 || oneOff.length > 0 || installments.length > 0;
   if (!hasContent) return null;
@@ -114,6 +118,7 @@ function ForecastGroup({
                 dormant={dormant}
                 onActiveChange={onPlannedActiveChange}
                 onEdit={onEditPlanned}
+                onMarkPaid={onMarkPlannedPaid}
               />
             ))}
           </div>
@@ -142,6 +147,7 @@ function ForecastGroup({
                 dormant={dormant}
                 onActiveChange={onPlannedActiveChange}
                 onEdit={onEditPlanned}
+                onMarkPaid={onMarkPlannedPaid}
               />
             ))}
           </div>
@@ -199,6 +205,7 @@ export function ForecastScreen({
   onEditPlanned,
   onEditInstallment,
   onMarkInstallmentPaid,
+  onMarkPlannedPaid,
 }: Props) {
   if (status === "loading") {
     return (
@@ -308,19 +315,17 @@ export function ForecastScreen({
               </SummaryStripItem>
             </SummaryStrip>
 
-            <div className={styles.filters} aria-label="Forecast filters">
-              {FILTER_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  className={[styles.filterChip, filter === option.value && styles.filterChipActive]
-                    .filter(Boolean)
-                    .join(" ")}
-                  onClick={() => onFilterChange?.(option.value)}
-                >
-                  {option.label}
-                </button>
-              ))}
+            <div className={styles.filtersCard}>
+              <div className={styles.filtersHeader}>
+                <div className={styles.typeFilters}>
+                  <SegmentedControl
+                    aria-label="Filter by type"
+                    value={filter}
+                    onChange={(value) => onFilterChange?.(value)}
+                    options={FILTER_OPTIONS}
+                  />
+                </div>
+              </div>
             </div>
 
             <ForecastGroup
@@ -336,6 +341,7 @@ export function ForecastScreen({
               onEditPlanned={onEditPlanned}
               onEditInstallment={onEditInstallment}
               onMarkInstallmentPaid={onMarkInstallmentPaid}
+              onMarkPlannedPaid={onMarkPlannedPaid}
             />
 
             <ForecastGroup
@@ -351,6 +357,7 @@ export function ForecastScreen({
               onEditPlanned={onEditPlanned}
               onEditInstallment={onEditInstallment}
               onMarkInstallmentPaid={onMarkInstallmentPaid}
+              onMarkPlannedPaid={onMarkPlannedPaid}
             />
           </>
         )}
