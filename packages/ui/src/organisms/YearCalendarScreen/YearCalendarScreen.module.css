@@ -97,7 +97,9 @@
 
 .weekdayBand {
   display: grid;
-  grid-template-columns: var(--month-label-width) repeat(37, var(--day-cell-size)) var(--month-label-width);
+  grid-template-columns: var(--month-label-width) repeat(37, var(--day-cell-size)) var(
+      --month-label-width
+    );
   margin-bottom: var(--space-2);
   position: sticky;
   top: 0;
@@ -145,7 +147,9 @@
 
 .monthRow {
   display: grid;
-  grid-template-columns: var(--month-label-width) repeat(37, var(--day-cell-size)) var(--month-label-width);
+  grid-template-columns: var(--month-label-width) repeat(37, var(--day-cell-size)) var(
+      --month-label-width
+    );
   align-items: stretch;
   margin-bottom: var(--space-1);
 }

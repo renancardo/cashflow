@@ -188,10 +188,7 @@ export function MonthCalendarScreen({
                     <span className={styles.dayNumber}>{String(cell.day).padStart(2, "0")} - </span>
                     {day && (
                       <span
-                        className={[
-                          styles.balance,
-                          day.belowBuffer && styles.balanceDanger,
-                        ]
+                        className={[styles.balance, day.belowBuffer && styles.balanceDanger]
                           .filter(Boolean)
                           .join(" ")}
                       >

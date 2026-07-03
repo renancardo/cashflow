@@ -23,14 +23,21 @@ const ENTRY_ITEMS = [
 export function CalendarLegend({ variant = "year" }: Props) {
   return (
     <div className={styles.root}>
-      <Button type="button" variant="ghost" className={styles.trigger} aria-describedby="calendar-legend-tip">
+      <Button
+        type="button"
+        variant="ghost"
+        className={styles.trigger}
+        aria-describedby="calendar-legend-tip"
+      >
         <span className={styles.icon} aria-hidden>
           ?
         </span>
         Legend
       </Button>
       <div
-        className={[styles.panel, variant === "month" && styles.panelMonth].filter(Boolean).join(" ")}
+        className={[styles.panel, variant === "month" && styles.panelMonth]
+          .filter(Boolean)
+          .join(" ")}
         id="calendar-legend-tip"
         role="tooltip"
       >

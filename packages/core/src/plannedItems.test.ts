@@ -33,9 +33,7 @@ describe("previewForecastSchedule", () => {
       },
     ]);
 
-    expect(
-      previewForecastSchedule(onceItem, [], settled, "2026-07-03"),
-    ).toEqual([
+    expect(previewForecastSchedule(onceItem, [], settled, "2026-07-03")).toEqual([
       {
         occurrenceDate: "2026-07-11",
         effectiveDate: "2026-07-11",

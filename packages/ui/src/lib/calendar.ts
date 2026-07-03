@@ -11,11 +11,7 @@ export type CalendarCell = {
 };
 
 export type EntryLineTone =
-  | "actual-income"
-  | "projected-income"
-  | "actual-outflow"
-  | "projected-outflow"
-  | "past-due";
+  "actual-income" | "projected-income" | "actual-outflow" | "projected-outflow" | "past-due";
 
 export type DayEntryLine = {
   id: string;
@@ -98,11 +94,7 @@ export function getEntryLineTone(
   return isIncome ? "actual-income" : "actual-outflow";
 }
 
-export function getDayEntryLines(
-  day: ProjectionDay,
-  today: string,
-  maxLines = 3,
-): DayEntryLine[] {
+export function getDayEntryLines(day: ProjectionDay, today: string, maxLines = 3): DayEntryLine[] {
   return day.items.slice(0, maxLines).map((item) => ({
     id: `${item.source}-${item.refId}`,
     label: item.description,

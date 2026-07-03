@@ -88,7 +88,12 @@ export function DayDetailPanel({
       className={[styles.overlay, open && styles.open].filter(Boolean).join(" ")}
       aria-hidden={!open}
     >
-      <button type="button" className={styles.backdrop} aria-label="Close day detail" onClick={onClose} />
+      <button
+        type="button"
+        className={styles.backdrop}
+        aria-label="Close day detail"
+        onClick={onClose}
+      />
       <aside
         className={styles.panel}
         role="dialog"
@@ -105,7 +110,12 @@ export function DayDetailPanel({
                   </h2>
                   <p className={styles.subtitle}>{formatWeekdayLong(day.date)}</p>
                 </div>
-                <button type="button" className={styles.close} aria-label="Close day detail" onClick={onClose}>
+                <button
+                  type="button"
+                  className={styles.close}
+                  aria-label="Close day detail"
+                  onClick={onClose}
+                >
                   ×
                 </button>
               </div>
@@ -135,7 +145,9 @@ export function DayDetailPanel({
 
             <div className={styles.body}>
               {GROUPS.map((group) => {
-                const items = day.items.filter((item) => group.sources.includes(item.source)) as DayDetailItem[];
+                const items = day.items.filter((item) =>
+                  group.sources.includes(item.source),
+                ) as DayDetailItem[];
                 if (items.length === 0) return null;
 
                 return (

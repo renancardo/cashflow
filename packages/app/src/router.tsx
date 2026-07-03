@@ -31,9 +31,7 @@ function YearCalendarRoute() {
   return (
     <CalendarPage
       selectedDay={day ?? null}
-      onSelectedDayChange={(date) =>
-        navigate({ search: date ? { day: date } : {}, replace: true })
-      }
+      onSelectedDayChange={(date) => navigate({ search: date ? { day: date } : {}, replace: true })}
     />
   );
 }
@@ -47,9 +45,7 @@ function MonthCalendarRoute() {
     <MonthCalendarPage
       month={yearMonth}
       selectedDay={day ?? null}
-      onSelectedDayChange={(date) =>
-        navigate({ search: date ? { day: date } : {}, replace: true })
-      }
+      onSelectedDayChange={(date) => navigate({ search: date ? { day: date } : {}, replace: true })}
       onMonthChange={(month) =>
         navigate({
           to: "/month/$yearMonth",

@@ -1,11 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { todayIso } from "@cashflow/core";
-import {
-  DayDetailPanel,
-  YearCalendarScreen,
-  type QuickAddValues,
-} from "@cashflow/ui";
+import { DayDetailPanel, YearCalendarScreen, type QuickAddValues } from "@cashflow/ui";
 import { validateCalendarQuickAdd } from "../data/mutations/calendarQuickAdd";
 import { useCalendarQuickAdd } from "../data/mutations/useCalendarQuickAdd";
 import { createEmptyTransactionInput } from "../data/mutations/useTransactionMutations";
@@ -106,9 +102,7 @@ export function CalendarPage({ selectedDay = null, onSelectedDayChange }: Props)
           open={Boolean(selectedDay)}
           day={selectedDayData}
           quickAddValues={
-            selectedDay
-              ? { ...quickAddValues, effectiveDate: selectedDay }
-              : quickAddValues
+            selectedDay ? { ...quickAddValues, effectiveDate: selectedDay } : quickAddValues
           }
           currency={data?.settings.defaultCurrency ?? "BRL"}
           accountOptions={data?.accountOptions ?? []}

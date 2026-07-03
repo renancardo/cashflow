@@ -76,10 +76,7 @@ export {
   validateQuickAddTransfer,
   type QuickAddValues,
 } from "./molecules/QuickAddCard/QuickAddCard.js";
-export {
-  DayDetailPanel,
-  type DayDetailItem,
-} from "./organisms/DayDetailPanel/DayDetailPanel.js";
+export { DayDetailPanel, type DayDetailItem } from "./organisms/DayDetailPanel/DayDetailPanel.js";
 export { YearCalendarScreen } from "./organisms/YearCalendarScreen/YearCalendarScreen.js";
 export { MonthCalendarScreen } from "./organisms/MonthCalendarScreen/MonthCalendarScreen.js";
 export { HeaderStrip } from "./organisms/HeaderStrip/HeaderStrip.js";

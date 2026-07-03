@@ -24,7 +24,13 @@ export function CalendarDayCell({
 
   return (
     <div
-      className={[styles.cell, styles[state], weekend && styles.weekend, selected && styles.selected, className]
+      className={[
+        styles.cell,
+        styles[state],
+        weekend && styles.weekend,
+        selected && styles.selected,
+        className,
+      ]
         .filter(Boolean)
         .join(" ")}
     >

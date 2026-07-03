@@ -3,10 +3,7 @@ import { compareIso } from "@cashflow/core";
 import { plannedItemsRepo, transactionsRepo } from "@cashflow/db";
 import type { QuickAddValues } from "@cashflow/ui";
 import { validateQuickAddTransfer } from "@cashflow/ui";
-import {
-  type PlannedItemEditorInput,
-  toPlannedItemPayload,
-} from "./usePlannedItemMutations";
+import { type PlannedItemEditorInput, toPlannedItemPayload } from "./usePlannedItemMutations";
 
 type AccountOption = { id: string; name: string; type: AccountType };
 
