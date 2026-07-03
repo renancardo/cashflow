@@ -6,8 +6,8 @@ export type NavItem = {
 };
 
 export const SIDE_NAV_ITEMS: NavItem[] = [
-  { label: "Year Calendar", path: "/" },
-  { label: "Month Calendar", path: "/month", disabled: true },
+  { label: "Year Calendar", path: "/year" },
+  { label: "Month Calendar", path: "/month" },
   { label: "Transactions", path: "/transactions" },
   { label: "Accounts", path: "/accounts" },
   { label: "Forecast Items", path: "/forecast" },

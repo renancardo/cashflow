@@ -8,6 +8,7 @@ type Props = {
   state?: DayTemporalState;
   indicators?: IndicatorKind[];
   selected?: boolean;
+  weekend?: boolean;
   className?: string;
 };
 
@@ -16,13 +17,20 @@ export function CalendarDayCell({
   state = "future",
   indicators = [],
   selected = false,
+  weekend = false,
   className,
 }: Props) {
   const paddedDay = String(day).padStart(2, "0");
 
   return (
     <div
-      className={[styles.cell, styles[state], selected && styles.selected, className]
+      className={[
+        styles.cell,
+        styles[state],
+        weekend && styles.weekend,
+        selected && styles.selected,
+        className,
+      ]
         .filter(Boolean)
         .join(" ")}
     >

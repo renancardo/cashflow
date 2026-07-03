@@ -12,7 +12,7 @@ type Props = {
 
 export function SideNav({
   items = SIDE_NAV_ITEMS,
-  activePath = "/",
+  activePath = "/year",
   open = false,
   onNavigate,
   onClose,
@@ -36,7 +36,7 @@ export function SideNav({
           <div className={styles.label}>Screens</div>
           <ul className={styles.list}>
             {items.map((item) => {
-              const isActive = item.path === activePath;
+              const isActive = activePath.startsWith(item.path);
               const className = item.disabled
                 ? styles.linkDisabled
                 : isActive

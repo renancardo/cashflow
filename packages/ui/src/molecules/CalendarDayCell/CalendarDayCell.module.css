@@ -25,6 +25,14 @@
   background: #f3f4f6;
 }
 
+.weekend {
+  background: var(--color-weekend);
+}
+
+.past.weekend {
+  background: #eceff2;
+}
+
 .past .indicators {
   opacity: 0.45;
 }

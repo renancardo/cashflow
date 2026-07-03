@@ -1,0 +1,202 @@
+.page {
+  flex: 1;
+  padding: var(--space-4);
+  overflow: auto;
+}
+
+@media (min-width: 769px) {
+  .page {
+    padding: var(--space-5);
+  }
+}
+
+.status {
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.statusTitle {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin: 0 0 var(--space-2);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+}
+
+.toolbarActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.yearNav {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.yearLabel {
+  min-width: 3.5rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--color-primary);
+  letter-spacing: -0.03em;
+}
+
+.iconButton {
+  min-width: var(--touch-min);
+  padding: var(--space-2);
+  justify-content: center;
+}
+
+.scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: var(--space-2) 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.scroll::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+}
+
+.calendar {
+  min-width: max-content;
+  padding: var(--space-2) 0;
+  --day-cell-size: 28px;
+  --month-label-width: 2.25rem;
+}
+
+@media (min-width: 769px) {
+  .calendar {
+    padding: var(--space-4) 0;
+    --day-cell-size: 35px;
+    --month-label-width: 3rem;
+  }
+}
+
+.weekdayBand {
+  display: grid;
+  grid-template-columns: var(--month-label-width) repeat(37, var(--day-cell-size)) var(
+      --month-label-width
+    );
+  margin-bottom: var(--space-2);
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--color-surface);
+  padding-top: var(--space-1);
+}
+
+.weekdayBandBottom {
+  margin-top: var(--space-2);
+  margin-bottom: 0;
+  top: auto;
+}
+
+.weekdayCell {
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: var(--space-1) 0;
+}
+
+@media (min-width: 769px) {
+  .weekdayCell {
+    font-size: 0.625rem;
+  }
+}
+
+.weekdayCell:nth-child(7n + 2),
+.weekdayCell:nth-child(7n + 8) {
+  background: var(--color-weekend);
+  border-radius: 2px;
+}
+
+.corner {
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.monthRow {
+  display: grid;
+  grid-template-columns: var(--month-label-width) repeat(37, var(--day-cell-size)) var(
+      --month-label-width
+    );
+  align-items: stretch;
+  margin-bottom: var(--space-1);
+}
+
+.monthLabel {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: sticky;
+  z-index: 2;
+  background: var(--color-surface);
+}
+
+.monthLabel:first-child {
+  left: 0;
+}
+
+.monthLabel:last-child {
+  right: 0;
+}
+
+@media (min-width: 769px) {
+  .monthLabel {
+    font-size: 0.6875rem;
+  }
+}
+
+.monthDays {
+  grid-column: 2 / -2;
+  display: grid;
+  grid-template-columns: repeat(37, var(--day-cell-size));
+}
+
+.dayButton {
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.emptyCell {
+  width: var(--day-cell-size);
+  height: var(--day-cell-size);
+}

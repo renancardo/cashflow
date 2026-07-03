@@ -31,7 +31,7 @@ export type PlannedItemEditorInput = {
 
 export type RecurrenceScope = "this" | "future";
 
-function toPlannedItemPayload(input: PlannedItemEditorInput): PlannedItemInput {
+export function toPlannedItemPayload(input: PlannedItemEditorInput): PlannedItemInput {
   const isTransfer = input.type === "transfer";
   return {
     type: input.type,
