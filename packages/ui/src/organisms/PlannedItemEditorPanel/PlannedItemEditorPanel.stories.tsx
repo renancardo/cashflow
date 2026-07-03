@@ -1,9 +1,6 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import {
-  PlannedItemEditorPanel,
-  type PlannedItemEditorValues,
-} from "./PlannedItemEditorPanel.js";
+import { PlannedItemEditorPanel, type PlannedItemEditorValues } from "./PlannedItemEditorPanel.js";
 import { DEMO_ACCOUNT_OPTIONS, DEMO_CATEGORY_OPTIONS } from "../../fixtures/transactions.js";
 
 const meta: Meta<typeof PlannedItemEditorPanel> = {

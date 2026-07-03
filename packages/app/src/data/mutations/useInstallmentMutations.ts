@@ -1,11 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { InstallmentPlan } from "@cashflow/core";
 import { todayIso } from "@cashflow/core";
-import {
-  installmentPlansRepo,
-  settleInstallment,
-  type InstallmentPlanInput,
-} from "@cashflow/db";
+import { installmentPlansRepo, settleInstallment, type InstallmentPlanInput } from "@cashflow/db";
 import { queryKeys } from "../keys";
 
 export type { InstallmentPlanInput };

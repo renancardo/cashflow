@@ -1,7 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { PlannedItem, Recurrence } from "@cashflow/core";
 import { dayBefore, isRecurring, todayIso } from "@cashflow/core";
-import { plannedItemsRepo, plannedItemOverridesRepo, settlePlannedItem, type PlannedItemInput } from "@cashflow/db";
+import {
+  plannedItemsRepo,
+  plannedItemOverridesRepo,
+  settlePlannedItem,
+  type PlannedItemInput,
+} from "@cashflow/db";
 import { queryKeys } from "../keys";
 
 export type { PlannedItemInput };
@@ -130,8 +135,13 @@ export function usePlannedItemMutations() {
   });
 
   const markPaid = useMutation({
-    mutationFn: ({ plannedItemId, occurrenceDate }: { plannedItemId: string; occurrenceDate: string }) =>
-      settlePlannedItem(plannedItemId, occurrenceDate, todayIso()),
+    mutationFn: ({
+      plannedItemId,
+      occurrenceDate,
+    }: {
+      plannedItemId: string;
+      occurrenceDate: string;
+    }) => settlePlannedItem(plannedItemId, occurrenceDate, todayIso()),
     onSuccess: invalidate,
   });
 

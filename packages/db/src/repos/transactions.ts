@@ -144,8 +144,7 @@ export const transactionsRepo = {
 
     const tx = db.transactions[index];
     const installmentId =
-      tx.settlesInstallmentId ??
-      db.installments.find((row) => row.settledTransactionId === id)?.id;
+      tx.settlesInstallmentId ?? db.installments.find((row) => row.settledTransactionId === id)?.id;
 
     if (installmentId) {
       await installmentsRepo.markScheduled(installmentId);
