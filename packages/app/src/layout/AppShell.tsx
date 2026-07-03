@@ -2,7 +2,7 @@ import { Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { AppLayout } from "@cashflow/ui";
 
 const MOBILE_TITLES: Record<string, string> = {
-  "/": "Year Calendar",
+  "/year": "Year Calendar",
   "/accounts": "Accounts",
   "/categories": "Categories",
   "/transactions": "Transactions",

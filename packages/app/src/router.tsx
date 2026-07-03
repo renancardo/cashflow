@@ -25,8 +25,8 @@ const rootRoute = createRootRoute({
 });
 
 function YearCalendarRoute() {
-  const navigate = useNavigate({ from: "/" });
-  const { day } = useSearch({ from: "/" });
+  const navigate = useNavigate({ from: "/year" });
+  const { day } = useSearch({ from: "/year" });
 
   return (
     <CalendarPage
@@ -61,9 +61,19 @@ function MonthCalendarRoute() {
   );
 }
 
-const indexRoute = createRoute({
+const indexRedirectRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
+  beforeLoad: () => {
+    throw redirect({
+      to: "/year",
+    });
+  },
+});
+
+const yearCalendarRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/year",
   validateSearch: (search: Record<string, unknown>): DaySearch => ({
     day: typeof search.day === "string" ? search.day : undefined,
   }),
@@ -115,7 +125,8 @@ const forecastRoute = createRoute({
 });
 
 const routeTree = rootRoute.addChildren([
-  indexRoute,
+  indexRedirectRoute,
+  yearCalendarRoute,
   monthRedirectRoute,
   monthRoute,
   accountsRoute,
