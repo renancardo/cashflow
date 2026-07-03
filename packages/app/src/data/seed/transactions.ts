@@ -9,6 +9,7 @@ export const SEED_TRANSACTIONS: Transaction[] = [
     categoryId: "cat-groceries",
     description: "Supermercado Extra",
     effectiveDate: "2026-06-28",
+    sortOrder: 0,
   },
   {
     id: "tx-card-payment",
@@ -18,6 +19,7 @@ export const SEED_TRANSACTIONS: Transaction[] = [
     toAccountId: "acct-cora-card",
     description: "Card payment — Jun statement",
     effectiveDate: "2026-06-27",
+    sortOrder: 0,
   },
   {
     id: "tx-uber",
@@ -27,6 +29,7 @@ export const SEED_TRANSACTIONS: Transaction[] = [
     categoryId: "cat-transport",
     description: "Uber — airport",
     effectiveDate: "2026-06-25",
+    sortOrder: 0,
   },
   {
     id: "tx-netflix",
@@ -36,6 +39,7 @@ export const SEED_TRANSACTIONS: Transaction[] = [
     categoryId: "cat-entertainment",
     description: "Netflix subscription",
     effectiveDate: "2026-06-24",
+    sortOrder: 0,
   },
   {
     id: "tx-rent",
@@ -45,6 +49,7 @@ export const SEED_TRANSACTIONS: Transaction[] = [
     categoryId: "cat-housing",
     description: "Aluguel — Jun",
     effectiveDate: "2026-06-20",
+    sortOrder: 0,
   },
   {
     id: "tx-salary",
@@ -54,6 +59,7 @@ export const SEED_TRANSACTIONS: Transaction[] = [
     categoryId: "cat-salary",
     description: "Salary — Acme Corp",
     effectiveDate: "2026-06-05",
+    sortOrder: 0,
   },
   {
     id: "tx-investment",
@@ -63,6 +69,7 @@ export const SEED_TRANSACTIONS: Transaction[] = [
     toAccountId: "acct-xp",
     description: "Investment — XP",
     effectiveDate: "2026-06-03",
+    sortOrder: 0,
   },
   {
     id: "tx-installment",
@@ -72,5 +79,6 @@ export const SEED_TRANSACTIONS: Transaction[] = [
     categoryId: "cat-debt",
     description: "Parcela 12/36 — Ipanema",
     effectiveDate: "2026-06-02",
+    sortOrder: 0,
   },
 ];

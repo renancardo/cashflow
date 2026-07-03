@@ -45,7 +45,7 @@ export function TransactionsPage() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const { data, isPending, isError, error } = useTransactions(filters);
   const { data: accountsData } = useAccounts();
-  const { create, update, remove } = useTransactionMutations();
+  const { create, update, remove, reorder } = useTransactionMutations();
 
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorMode, setEditorMode] = useState<"create" | "edit">("create");
@@ -103,6 +103,14 @@ export function TransactionsPage() {
     setEditorOpen(false);
   };
 
+  const handleReorder = async (
+    draggedId: string,
+    targetId: string,
+    position: "before" | "after",
+  ) => {
+    await reorder.mutateAsync({ draggedId, targetId, position });
+  };
+
   return (
     <TransactionsScreen
       transactions={visibleRows}
@@ -118,6 +126,7 @@ export function TransactionsPage() {
       onLoadMore={() => setVisibleCount((count) => count + PAGE_SIZE)}
       onAddTransaction={openCreate}
       onEdit={openEdit}
+      onReorder={handleReorder}
       editor={
         <TransactionEditorPanel
           open={editorOpen}

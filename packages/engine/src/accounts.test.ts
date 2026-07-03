@@ -25,6 +25,7 @@ describe("aggregateWorkingBalanceThrough", () => {
       categoryId: "cat-food",
       description: "Today's expense",
       effectiveDate: "2026-07-02",
+      sortOrder: 0,
     };
 
     const accounts = [checking];

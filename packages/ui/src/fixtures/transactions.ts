@@ -13,6 +13,17 @@ export const DEMO_TRANSACTIONS: TransactionRowData[] = [
     categoryName: "Groceries",
   },
   {
+    id: "tx-grocery-2",
+    type: "expense",
+    amountCents: 12_500,
+    description: "Padaria — same day",
+    effectiveDate: "2026-06-28",
+    accountId: "cora-checking",
+    accountName: "Cora Checking",
+    categoryId: "cat-groceries",
+    categoryName: "Groceries",
+  },
+  {
     id: "tx-card-payment",
     type: "transfer",
     amountCents: 185_000,

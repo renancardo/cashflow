@@ -13,6 +13,10 @@ export {
 export { FormField } from "./molecules/FormField/FormField.js";
 export { IconButton } from "./molecules/IconButton/IconButton.js";
 export { Metric } from "./molecules/Metric/Metric.js";
+export {
+  SegmentedControl,
+  type SegmentedControlOption,
+} from "./molecules/SegmentedControl/SegmentedControl.js";
 export { SummaryStrip, SummaryStripItem } from "./molecules/SummaryStrip/SummaryStrip.js";
 export { AppStatus } from "./organisms/AppStatus/AppStatus.js";
 export {

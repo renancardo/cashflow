@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Transaction, TxType } from "@cashflow/core";
-import { transactionsRepo } from "@cashflow/db";
+import { transactionsRepo, type ReorderPosition } from "@cashflow/db";
 import { queryKeys } from "../keys";
 
 export type TransactionInput = {
@@ -13,7 +13,13 @@ export type TransactionInput = {
   effectiveDate: string;
 };
 
-function toTransactionPayload(input: TransactionInput): Omit<Transaction, "id"> {
+export type ReorderTransactionInput = {
+  draggedId: string;
+  targetId: string;
+  position: ReorderPosition;
+};
+
+function toTransactionPayload(input: TransactionInput): Omit<Transaction, "id" | "sortOrder"> {
   const isTransfer = input.type === "transfer";
 
   return {
@@ -53,7 +59,13 @@ export function useTransactionMutations() {
     onSuccess: invalidate,
   });
 
-  return { create, update, remove };
+  const reorder = useMutation({
+    mutationFn: (input: ReorderTransactionInput) =>
+      transactionsRepo.reorderWithinDate(input.draggedId, input.targetId, input.position),
+    onSuccess: invalidate,
+  });
+
+  return { create, update, remove, reorder };
 }
 
 export function createEmptyTransactionInput(

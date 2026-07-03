@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type DragEvent, type ReactNode } from "react";
 import type { TxType } from "@cashflow/core";
 import { TX_TYPE_LABELS, txTypeChipVariant } from "@cashflow/core";
 import { Button } from "../../atoms/Button/Button.js";
@@ -7,6 +7,7 @@ import { FormattedDate } from "../../atoms/FormattedDate/FormattedDate.js";
 import { MoneyAmount } from "../../atoms/MoneyAmount/MoneyAmount.js";
 import { Metric } from "../../molecules/Metric/Metric.js";
 import { IconButton } from "../../molecules/IconButton/IconButton.js";
+import { SegmentedControl } from "../../molecules/SegmentedControl/SegmentedControl.js";
 import { HeaderStrip } from "../HeaderStrip/HeaderStrip.js";
 import { PageHeader } from "../PageHeader/PageHeader.js";
 import styles from "./TransactionsScreen.module.css";
@@ -35,6 +36,13 @@ export type TransactionFiltersState = {
 
 type Option = { id: string; name: string };
 
+type ReorderPosition = "before" | "after";
+
+type DropTarget = {
+  id: string;
+  position: ReorderPosition;
+};
+
 type Props = {
   transactions: TransactionRowData[];
   totalCount: number;
@@ -50,6 +58,7 @@ type Props = {
   onLoadMore?: () => void;
   onAddTransaction?: () => void;
   onEdit?: (id: string) => void;
+  onReorder?: (draggedId: string, targetId: string, position: ReorderPosition) => void;
 };
 
 type TypeFilter = "all" | TxType;
@@ -66,16 +75,63 @@ function countActiveFilters(filters: TransactionFiltersState): number {
 
 function TransactionRow({
   row,
+  draggingId,
+  dropTarget,
   onEdit,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  onDrop,
 }: {
   row: TransactionRowData;
+  draggingId: string | null;
+  dropTarget: DropTarget | null;
   onEdit?: (id: string) => void;
+  onDragStart: (id: string) => void;
+  onDragEnd: () => void;
+  onDragOver: (event: DragEvent<HTMLElement>, id: string) => void;
+  onDrop: (event: DragEvent<HTMLElement>, id: string) => void;
 }) {
   const amountTone = row.type === "income" ? "income" : row.type === "expense" ? "danger" : "default";
   const amountPrefix = row.type === "income" ? "+" : "−";
+  const isDragging = draggingId === row.id;
+  const isDropBefore = dropTarget?.id === row.id && dropTarget.position === "before";
+  const isDropAfter = dropTarget?.id === row.id && dropTarget.position === "after";
 
   return (
-    <article className={styles.row} data-type={row.type}>
+    <article
+      className={[
+        styles.row,
+        isDragging && styles.rowDragging,
+        isDropBefore && styles.rowDropBefore,
+        isDropAfter && styles.rowDropAfter,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      data-type={row.type}
+      onDragOver={(event) => onDragOver(event, row.id)}
+      onDrop={(event) => onDrop(event, row.id)}
+    >
+      <div className={styles.rowHandle}>
+        <button
+          type="button"
+          className={styles.dragHandle}
+          draggable
+          aria-label={`Reorder ${row.description}`}
+          title="Drag to reorder within the same day"
+          onDragStart={(event) => {
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData("text/plain", row.id);
+            onDragStart(row.id);
+          }}
+          onDragEnd={onDragEnd}
+        >
+          <span className={styles.dragHandleIcon} aria-hidden="true">
+            ⠿
+          </span>
+        </button>
+      </div>
+
       <div className={styles.rowDate}>
         <FormattedDate isoDate={row.effectiveDate} />
       </div>
@@ -131,7 +187,11 @@ export function TransactionsScreen({
   onLoadMore,
   onAddTransaction,
   onEdit,
+  onReorder,
 }: Props) {
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [dropTarget, setDropTarget] = useState<DropTarget | null>(null);
+
   const typeFilter: TypeFilter = filters.type ?? "all";
   const activeFilterCount = countActiveFilters(filters);
   const hasLedger = totalCount > 0 || activeFilterCount > 0;
@@ -142,6 +202,40 @@ export function TransactionsScreen({
   };
 
   const clearFilters = () => onFiltersChange?.({});
+
+  const clearDragState = () => {
+    setDraggingId(null);
+    setDropTarget(null);
+  };
+
+  const canDropOn = (draggedId: string | null, targetId: string): boolean => {
+    if (!draggedId || draggedId === targetId) return false;
+    const draggedRow = transactions.find((row) => row.id === draggedId);
+    const targetRow = transactions.find((row) => row.id === targetId);
+    return Boolean(draggedRow && targetRow && draggedRow.effectiveDate === targetRow.effectiveDate);
+  };
+
+  const handleDragOver = (event: DragEvent<HTMLElement>, targetId: string) => {
+    if (!canDropOn(draggingId, targetId)) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const position: ReorderPosition =
+      event.clientY < rect.top + rect.height / 2 ? "before" : "after";
+    setDropTarget({ id: targetId, position });
+  };
+
+  const handleDrop = (event: DragEvent<HTMLElement>, targetId: string) => {
+    event.preventDefault();
+    if (!draggingId || !dropTarget || !canDropOn(draggingId, targetId)) {
+      clearDragState();
+      return;
+    }
+
+    onReorder?.(draggingId, dropTarget.id, dropTarget.position);
+    clearDragState();
+  };
 
   if (status === "loading") {
     return (
@@ -198,21 +292,20 @@ export function TransactionsScreen({
         ) : (
           <>
             <div className={styles.filtersCard}>
-              <div className={styles.typeFilters} role="group" aria-label="Filter by type">
-                {(["all", "income", "expense", "transfer"] as TypeFilter[]).map((type) => (
-                  <button
-                    key={type}
-                    type="button"
-                    className={[styles.typeChip, typeFilter === type && styles.typeChipActive]
-                      .filter(Boolean)
-                      .join(" ")}
-                    onClick={() =>
-                      patchFilters({ type: type === "all" ? undefined : type })
-                    }
-                  >
-                    {type === "all" ? "All types" : TX_TYPE_LABELS[type]}
-                  </button>
-                ))}
+              <div className={styles.typeFilters}>
+                <SegmentedControl
+                  aria-label="Filter by type"
+                  value={typeFilter}
+                  onChange={(type) =>
+                    patchFilters({ type: type === "all" ? undefined : type })
+                  }
+                  options={[
+                    { value: "all", label: "All types" },
+                    { value: "income", label: TX_TYPE_LABELS.income },
+                    { value: "expense", label: TX_TYPE_LABELS.expense },
+                    { value: "transfer", label: TX_TYPE_LABELS.transfer },
+                  ]}
+                />
               </div>
 
               <div className={styles.filterGrid} aria-label="Transaction filters">
@@ -375,6 +468,7 @@ export function TransactionsScreen({
               <>
                 <section className={styles.list} aria-label="Transaction list">
                   <div className={styles.listHeader}>
+                    <span aria-hidden="true" />
                     <span>Date</span>
                     <span>Type</span>
                     <span>Description</span>
@@ -386,7 +480,17 @@ export function TransactionsScreen({
                   </div>
 
                   {transactions.map((row) => (
-                    <TransactionRow key={row.id} row={row} onEdit={onEdit} />
+                    <TransactionRow
+                      key={row.id}
+                      row={row}
+                      draggingId={draggingId}
+                      dropTarget={dropTarget}
+                      onEdit={onEdit}
+                      onDragStart={setDraggingId}
+                      onDragEnd={clearDragState}
+                      onDragOver={handleDragOver}
+                      onDrop={handleDrop}
+                    />
                   ))}
                 </section>
 

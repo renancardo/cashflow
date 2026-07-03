@@ -3,6 +3,7 @@ import type { CategoryKind } from "@cashflow/core";
 import { Button } from "../../atoms/Button/Button.js";
 import { MoneyAmount } from "../../atoms/MoneyAmount/MoneyAmount.js";
 import { Metric } from "../../molecules/Metric/Metric.js";
+import { SegmentedControl } from "../../molecules/SegmentedControl/SegmentedControl.js";
 import { SummaryStrip, SummaryStripItem } from "../../molecules/SummaryStrip/SummaryStrip.js";
 import { HeaderStrip } from "../HeaderStrip/HeaderStrip.js";
 import { PageHeader } from "../PageHeader/PageHeader.js";
@@ -338,20 +339,17 @@ export function CategoriesScreen({
                   />
                 </div>
 
-                <div className={styles.toolbarFilters} role="group" aria-label="Filter by kind">
-                  {(["all", "expense", "income"] as KindFilter[]).map((k) => (
-                    <button
-                      key={k}
-                      type="button"
-                      className={[styles.chip, kindFilter === k && styles.chipActive]
-                        .filter(Boolean)
-                        .join(" ")}
-                      onClick={() => setKindFilter(k)}
-                    >
-                      {k === "all" ? "All" : k === "expense" ? "Expense" : "Income"}
-                    </button>
-                  ))}
-                </div>
+                <SegmentedControl
+                  className={styles.toolbarFilters}
+                  aria-label="Filter by kind"
+                  value={kindFilter}
+                  onChange={setKindFilter}
+                  options={[
+                    { value: "all", label: "All" },
+                    { value: "expense", label: "Expense" },
+                    { value: "income", label: "Income" },
+                  ]}
+                />
               </div>
             </div>
 

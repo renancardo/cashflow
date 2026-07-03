@@ -9,6 +9,20 @@ export type TransactionQuery = {
   dateTo?: string;
 };
 
+export type ReorderPosition = "before" | "after";
+
+function compareTransactions(a: Transaction, b: Transaction): number {
+  const dateCmp = b.effectiveDate.localeCompare(a.effectiveDate);
+  if (dateCmp !== 0) return dateCmp;
+  return a.sortOrder - b.sortOrder;
+}
+
+function nextSortOrderForDate(effectiveDate: string): number {
+  const sameDay = getDatabase().transactions.filter((tx) => tx.effectiveDate === effectiveDate);
+  if (sameDay.length === 0) return 0;
+  return Math.max(...sameDay.map((tx) => tx.sortOrder)) + 1;
+}
+
 function matchesQuery(tx: Transaction, query: TransactionQuery): boolean {
   if (query.type && tx.type !== query.type) return false;
 
@@ -29,7 +43,7 @@ function matchesQuery(tx: Transaction, query: TransactionQuery): boolean {
 
 export const transactionsRepo = {
   async getAll(): Promise<Transaction[]> {
-    return [...getDatabase().transactions];
+    return [...getDatabase().transactions].sort(compareTransactions);
   },
 
   async getById(id: string): Promise<Transaction | null> {
@@ -40,11 +54,14 @@ export const transactionsRepo = {
   async query(filters: TransactionQuery = {}): Promise<Transaction[]> {
     return getDatabase()
       .transactions.filter((tx) => matchesQuery(tx, filters))
-      .sort((a, b) => b.effectiveDate.localeCompare(a.effectiveDate) || b.id.localeCompare(a.id));
+      .sort(compareTransactions);
   },
 
-  async create(transaction: Omit<Transaction, "id">): Promise<Transaction> {
-    const row: Transaction = { ...transaction, id: crypto.randomUUID() };
+  async create(
+    transaction: Omit<Transaction, "id" | "sortOrder"> & { sortOrder?: number },
+  ): Promise<Transaction> {
+    const sortOrder = transaction.sortOrder ?? nextSortOrderForDate(transaction.effectiveDate);
+    const row: Transaction = { ...transaction, sortOrder, id: crypto.randomUUID() };
     getDatabase().transactions.push(row);
     return row;
   },
@@ -55,8 +72,66 @@ export const transactionsRepo = {
     if (index === -1) {
       throw new Error(`Transaction not found: ${id}`);
     }
-    db.transactions[index] = { ...db.transactions[index], ...patch };
+
+    const current = db.transactions[index];
+    const nextPatch = { ...patch };
+
+    if (
+      patch.effectiveDate &&
+      patch.effectiveDate !== current.effectiveDate &&
+      patch.sortOrder === undefined
+    ) {
+      nextPatch.sortOrder = nextSortOrderForDate(patch.effectiveDate);
+    }
+
+    db.transactions[index] = { ...current, ...nextPatch };
     return db.transactions[index];
+  },
+
+  async reorderWithinDate(
+    draggedId: string,
+    targetId: string,
+    position: ReorderPosition,
+  ): Promise<Transaction[]> {
+    const db = getDatabase();
+    const dragged = db.transactions.find((t) => t.id === draggedId);
+    const target = db.transactions.find((t) => t.id === targetId);
+
+    if (!dragged) {
+      throw new Error(`Transaction not found: ${draggedId}`);
+    }
+    if (!target) {
+      throw new Error(`Transaction not found: ${targetId}`);
+    }
+    if (dragged.effectiveDate !== target.effectiveDate) {
+      throw new Error("Cannot reorder transactions across different dates");
+    }
+
+    const sameDay = db.transactions
+      .filter((tx) => tx.effectiveDate === dragged.effectiveDate)
+      .sort((a, b) => a.sortOrder - b.sortOrder);
+
+    const withoutDragged = sameDay.filter((tx) => tx.id !== draggedId);
+    const targetIndex = withoutDragged.findIndex((tx) => tx.id === targetId);
+    if (targetIndex === -1) {
+      throw new Error(`Target transaction not found on ${dragged.effectiveDate}`);
+    }
+
+    const insertIndex = position === "before" ? targetIndex : targetIndex + 1;
+    const reordered = [
+      ...withoutDragged.slice(0, insertIndex),
+      dragged,
+      ...withoutDragged.slice(insertIndex),
+    ];
+
+    const updated: Transaction[] = [];
+    for (const [index, tx] of reordered.entries()) {
+      const rowIndex = db.transactions.findIndex((row) => row.id === tx.id);
+      db.transactions[rowIndex] = { ...db.transactions[rowIndex], sortOrder: index };
+      updated.push(db.transactions[rowIndex]);
+    }
+
+    return updated;
   },
 
   async delete(id: string): Promise<void> {
