@@ -423,7 +423,6 @@
 
 @media (max-width: 768px) {
   .filtersHeader {
-    flex-direction: column;
     align-items: stretch;
   }
 
