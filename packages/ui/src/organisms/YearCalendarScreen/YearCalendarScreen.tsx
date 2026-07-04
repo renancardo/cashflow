@@ -155,13 +155,13 @@ export function YearCalendarScreen({
         <div className={styles.scroll} ref={scrollRef}>
           <div className={styles.calendar}>
             <div className={styles.weekdayBand}>
-              <div />
+              <div className={styles.corner} />
               {weekdayBand.map((label, index) => (
                 <div key={`top-${label}-${index}`} className={styles.weekdayCell}>
                   {label}
                 </div>
               ))}
-              <div className={styles.corner}>{year}</div>
+
             </div>
 
             {MONTH_LABELS.map((label, monthIndex) => {
@@ -201,19 +201,18 @@ export function YearCalendarScreen({
                       );
                     })}
                   </div>
-                  <div className={styles.monthLabel}>{label}</div>
                 </div>
               );
             })}
 
             <div className={[styles.weekdayBand, styles.weekdayBandBottom].join(" ")}>
-              <div />
+              <div className={styles.corner} />
               {weekdayBand.map((label, index) => (
                 <div key={`bottom-${label}-${index}`} className={styles.weekdayCell}>
                   {label}
                 </div>
               ))}
-              <div className={styles.corner}>{year}</div>
+
             </div>
           </div>
         </div>
