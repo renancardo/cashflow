@@ -1,5 +1,7 @@
 import type { Transaction, TxType } from "@cashflow/core";
 import { getDatabase } from "../in-memory/database.js";
+import { recomputeAllStatementTotals } from "../materialize/statements.js";
+import { creditCardStatementsRepo } from "./creditCardStatements.js";
 import { installmentsRepo } from "./installments.js";
 
 export type TransactionQuery = {
@@ -64,6 +66,7 @@ export const transactionsRepo = {
     const sortOrder = transaction.sortOrder ?? nextSortOrderForDate(transaction.effectiveDate);
     const row: Transaction = { ...transaction, sortOrder, id: crypto.randomUUID() };
     getDatabase().transactions.push(row);
+    recomputeAllStatementTotals();
     return row;
   },
 
@@ -86,6 +89,7 @@ export const transactionsRepo = {
     }
 
     db.transactions[index] = { ...current, ...nextPatch };
+    recomputeAllStatementTotals();
     return db.transactions[index];
   },
 
@@ -145,11 +149,19 @@ export const transactionsRepo = {
     const tx = db.transactions[index];
     const installmentId =
       tx.settlesInstallmentId ?? db.installments.find((row) => row.settledTransactionId === id)?.id;
+    const statementId =
+      tx.paysStatementId ??
+      db.creditCardStatements.find((row) => row.paymentTransactionId === id)?.id;
 
     if (installmentId) {
       await installmentsRepo.markScheduled(installmentId);
     }
 
+    if (statementId) {
+      await creditCardStatementsRepo.markUnpaid(statementId);
+    }
+
     db.transactions.splice(index, 1);
+    recomputeAllStatementTotals();
   },
 };

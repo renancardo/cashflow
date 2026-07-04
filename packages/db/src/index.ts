@@ -1,5 +1,6 @@
 export { loadEngineInput } from "./loadEngineInput.js";
-export { accountsRepo } from "./repos/accounts.js";
+export { accountsRepo, materializeAllCreditCardStatements, recomputeAllStatementTotals } from "./repos/accounts.js";
+export { creditCardStatementsRepo } from "./repos/creditCardStatements.js";
 export { categoriesRepo } from "./repos/categories.js";
 export { categoryBudgetsRepo } from "./repos/categoryBudgets.js";
 export {
@@ -17,6 +18,12 @@ export { installmentPlansRepo, type InstallmentPlanInput } from "./repos/install
 export { installmentsRepo } from "./repos/installments.js";
 export { settleInstallment, type SettleInstallmentResult } from "./settlements/installment.js";
 export { settlePlannedItem } from "./settlements/planned.js";
+export { settleStatement, type SettleStatementResult } from "./settlements/statement.js";
+export {
+  computeDueDate,
+  generateStatementCycles,
+  materializeStatementsForCard,
+} from "./materialize/statements.js";
 export {
   createEmptyState,
   getDatabase,

@@ -1,5 +1,26 @@
 import type { Account } from "@cashflow/core";
 import { getDatabase } from "../in-memory/database.js";
+import {
+  materializeAllCreditCardStatements,
+  materializeStatementsForCard,
+  recomputeAllStatementTotals,
+  recomputeStatementTotalsForCard,
+} from "../materialize/statements.js";
+
+function isCreditCard(account: Account): boolean {
+  return account.type === "credit_card";
+}
+
+function creditCardCycleChanged(patch: Partial<Account>): boolean {
+  return (
+    patch.closingDay !== undefined ||
+    patch.dueDay !== undefined ||
+    patch.defaultPayFromAccountId !== undefined ||
+    patch.anchorBalanceCents !== undefined ||
+    patch.anchorDate !== undefined ||
+    patch.type !== undefined
+  );
+}
 
 export const accountsRepo = {
   async getAll(): Promise<Account[]> {
@@ -14,6 +35,11 @@ export const accountsRepo = {
   async create(account: Omit<Account, "id">): Promise<Account> {
     const row: Account = { ...account, id: crypto.randomUUID() };
     getDatabase().accounts.push(row);
+
+    if (isCreditCard(row)) {
+      materializeStatementsForCard(row.id);
+    }
+
     return row;
   },
 
@@ -23,8 +49,22 @@ export const accountsRepo = {
     if (index === -1) {
       throw new Error(`Account not found: ${id}`);
     }
-    db.accounts[index] = { ...db.accounts[index], ...patch };
-    return db.accounts[index];
+
+    const previous = db.accounts[index];
+    db.accounts[index] = { ...previous, ...patch };
+    const updated = db.accounts[index];
+
+    if (isCreditCard(updated) && creditCardCycleChanged(patch)) {
+      materializeStatementsForCard(updated.id);
+    } else if (isCreditCard(updated)) {
+      recomputeStatementTotalsForCard(updated.id);
+    } else if (isCreditCard(previous) && !isCreditCard(updated)) {
+      db.creditCardStatements = db.creditCardStatements.filter(
+        (row) => row.cardAccountId !== id,
+      );
+    }
+
+    return updated;
   },
 
   async archive(id: string): Promise<Account> {
@@ -32,3 +72,5 @@ export const accountsRepo = {
     return this.update(id, { archivedAt: today });
   },
 };
+
+export { materializeAllCreditCardStatements, recomputeAllStatementTotals };
