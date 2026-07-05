@@ -37,7 +37,12 @@ type Props = {
   onViewItems?: (statementId: string) => void;
 };
 
-function statusLabel(status: StatementStatus, hasOverride: boolean, payAmountCents: number, computedTotalCents: number): string {
+function statusLabel(
+  status: StatementStatus,
+  hasOverride: boolean,
+  payAmountCents: number,
+  computedTotalCents: number,
+): string {
   if (status === "paid") return "Paid";
   if (hasOverride && payAmountCents < computedTotalCents) return "Partial";
   if (status === "closed") return "Closed";
@@ -132,12 +137,12 @@ export function CreditCardStatementRow({ row, onEdit, onMarkPaid, onViewItems }:
                 </span>
                 <span className={styles.schedulePay}>
                   <MoneyAmount cents={stmt.payAmountCents} />
-                  {stmt.hasOverride && !paid && (
-                    <Chip variant="statement">Override</Chip>
-                  )}
+                  {stmt.hasOverride && !paid && <Chip variant="statement">Override</Chip>}
                 </span>
                 <span className={styles.scheduleStatus}>
-                  <Chip variant={paid ? "actual" : stmt.status === "open" ? "statement" : "default"}>
+                  <Chip
+                    variant={paid ? "actual" : stmt.status === "open" ? "statement" : "default"}
+                  >
                     {statusLabel(
                       stmt.status,
                       stmt.hasOverride,

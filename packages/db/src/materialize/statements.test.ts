@@ -190,7 +190,9 @@ describe("statement materialization", () => {
 
     materializeStatementsForCard(card.id, "2026-06-28");
 
-    const preserved = getDatabase().creditCardStatements.find((row) => row.id === paidStatement!.id);
+    const preserved = getDatabase().creditCardStatements.find(
+      (row) => row.id === paidStatement!.id,
+    );
     expect(preserved?.status).toBe("paid");
     expect(preserved?.paymentTransactionId).toBe("tx-paid");
   });

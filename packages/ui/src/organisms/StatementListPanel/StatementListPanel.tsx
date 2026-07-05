@@ -44,9 +44,7 @@ function hasPaymentOverride(row: StatementListRow): boolean {
 
 function isPartialPayment(row: StatementListRow): boolean {
   if (isPaid(row)) return false;
-  return (
-    row.plannedPaymentCents != null && row.plannedPaymentCents < row.computedTotalCents
-  );
+  return row.plannedPaymentCents != null && row.plannedPaymentCents < row.computedTotalCents;
 }
 
 function statusLabel(row: StatementListRow): string {
@@ -55,7 +53,10 @@ function statusLabel(row: StatementListRow): string {
   return row.status;
 }
 
-function PeriodRange({ periodStart, closingDate }: Pick<StatementListRow, "periodStart" | "closingDate">) {
+function PeriodRange({
+  periodStart,
+  closingDate,
+}: Pick<StatementListRow, "periodStart" | "closingDate">) {
   const label = formatStatementPeriod(periodStart, closingDate);
 
   return (

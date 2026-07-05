@@ -279,8 +279,7 @@ export function useForecastScreen(filter: ForecastFilter = "all") {
       const filteredPlanned = filterPlannedRows(plannedRows, filter);
       const filteredInstallments =
         filter === "all" || filter === "installment" ? installmentRows : [];
-      const filteredStatements =
-        filter === "all" || filter === "statement" ? statementRows : [];
+      const filteredStatements = filter === "all" || filter === "statement" ? statementRows : [];
 
       return {
         plannedRows: filteredPlanned,

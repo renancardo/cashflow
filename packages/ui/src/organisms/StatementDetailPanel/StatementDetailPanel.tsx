@@ -74,9 +74,7 @@ export function StatementDetailPanel({
   if (!open) return null;
 
   const periodLabel =
-    periodStart && closingDate
-      ? formatStatementPeriod(periodStart, closingDate)
-      : cardName;
+    periodStart && closingDate ? formatStatementPeriod(periodStart, closingDate) : cardName;
   const payAmountCents = plannedPaymentCents ?? computedTotalCents;
   const isPaid = status === "paid";
 

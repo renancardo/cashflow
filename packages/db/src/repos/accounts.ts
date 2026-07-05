@@ -59,9 +59,7 @@ export const accountsRepo = {
     } else if (isCreditCard(updated)) {
       recomputeStatementTotalsForCard(updated.id);
     } else if (isCreditCard(previous) && !isCreditCard(updated)) {
-      db.creditCardStatements = db.creditCardStatements.filter(
-        (row) => row.cardAccountId !== id,
-      );
+      db.creditCardStatements = db.creditCardStatements.filter((row) => row.cardAccountId !== id);
     }
 
     return updated;

@@ -84,7 +84,9 @@ export function TransactionsPage() {
     setEditorOpen(true);
   };
 
-  const editingTx = editingId ? data?.rawTransactions.find((row) => row.id === editingId) : undefined;
+  const editingTx = editingId
+    ? data?.rawTransactions.find((row) => row.id === editingId)
+    : undefined;
 
   const handleSave = async () => {
     const input = toTransactionInput(editorValues);

@@ -1,5 +1,9 @@
 export { loadEngineInput } from "./loadEngineInput.js";
-export { accountsRepo, materializeAllCreditCardStatements, recomputeAllStatementTotals } from "./repos/accounts.js";
+export {
+  accountsRepo,
+  materializeAllCreditCardStatements,
+  recomputeAllStatementTotals,
+} from "./repos/accounts.js";
 export { creditCardStatementsRepo } from "./repos/creditCardStatements.js";
 export { categoriesRepo } from "./repos/categories.js";
 export { categoryBudgetsRepo } from "./repos/categoryBudgets.js";

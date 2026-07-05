@@ -55,7 +55,8 @@ export function ForecastPage() {
   const [detailStatementId, setDetailStatementId] = useState<string | null>(null);
   const { data, isPending, isError, error } = useForecastScreen(filter);
   const { data: accountsData } = useAccounts();
-  const { data: statementDetail, isPending: isDetailPending } = useStatementDetail(detailStatementId);
+  const { data: statementDetail, isPending: isDetailPending } =
+    useStatementDetail(detailStatementId);
 
   const plannedMutations = usePlannedItemMutations();
   const installmentMutations = useInstallmentMutations();
@@ -296,7 +297,9 @@ export function ForecastPage() {
           plannedMutations.markPaid.mutate({ plannedItemId, occurrenceDate })
         }
         onEditStatement={openEditStatement}
-        onMarkStatementPaid={(statementId) => statementMutations.markPaid.mutate({ id: statementId })}
+        onMarkStatementPaid={(statementId) =>
+          statementMutations.markPaid.mutate({ id: statementId })
+        }
         onViewStatementItems={setDetailStatementId}
         editor={
           editorKind === "planned" ? (

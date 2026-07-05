@@ -278,9 +278,7 @@ export function ForecastScreen({
   }
 
   const isEmpty =
-    allPlannedRows.length === 0 &&
-    allInstallmentRows.length === 0 &&
-    allStatementRows.length === 0;
+    allPlannedRows.length === 0 && allInstallmentRows.length === 0 && allStatementRows.length === 0;
 
   const activePlanned = plannedRows.filter((row) => row.isActive);
   const dormantPlanned = plannedRows.filter((row) => !row.isActive);

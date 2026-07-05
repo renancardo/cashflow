@@ -167,9 +167,7 @@ export function StatementEditorPanel({
               label="Pay from"
               inputType="select"
               value={values.payFromAccountId ?? ""}
-              onChange={(event) =>
-                onChange({ payFromAccountId: event.target.value || undefined })
-              }
+              onChange={(event) => onChange({ payFromAccountId: event.target.value || undefined })}
             >
               <option value="">Default account</option>
               {payFromOptions.map((option) => (

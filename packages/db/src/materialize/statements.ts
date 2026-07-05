@@ -102,8 +102,7 @@ function findOpeningDebtStatement(
   return [...statements]
     .filter(
       (stmt) =>
-        compareIso(stmt.dueDate, anchorDate) >= 0 &&
-        compareIso(stmt.closingDate, anchorDate) >= 0,
+        compareIso(stmt.dueDate, anchorDate) >= 0 && compareIso(stmt.closingDate, anchorDate) >= 0,
     )
     .sort((a, b) => compareIso(a.dueDate, b.dueDate))[0];
 }
@@ -228,8 +227,7 @@ export function listStatementCharges(
   const horizonEnd = horizonEndDate(asOfDate, db.settings.horizonMonths);
   const statements = db.creditCardStatements.filter((row) => row.cardAccountId === card.id);
   const openingDebtStatement = findOpeningDebtStatement(statements, card.anchorDate);
-  const isOpeningDebt =
-    statement.id === openingDebtStatement?.id && card.anchorBalanceCents > 0;
+  const isOpeningDebt = statement.id === openingDebtStatement?.id && card.anchorBalanceCents > 0;
 
   const charges = collectChargesInPeriod(
     card,

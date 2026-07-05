@@ -63,7 +63,8 @@ export function AccountsPage() {
   const [detailStatementId, setDetailStatementId] = useState<string | null>(null);
   const [editorValues, setEditorValues] = useState<AccountEditorValues>(createEmptyAccountInput());
   const { data: statements = [] } = useStatements(statementsCardId);
-  const { data: statementDetail, isPending: isDetailPending } = useStatementDetail(detailStatementId);
+  const { data: statementDetail, isPending: isDetailPending } =
+    useStatementDetail(detailStatementId);
 
   const payFromOptions = useMemo(
     () =>

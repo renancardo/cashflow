@@ -150,7 +150,7 @@ function TransactionRow({
       </div>
 
       <div className={styles.rowDescription}>
-        {isStatementPayment ? row.settlement?.label ?? row.description : row.description}
+        {isStatementPayment ? (row.settlement?.label ?? row.description) : row.description}
       </div>
 
       <div

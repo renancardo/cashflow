@@ -161,7 +161,6 @@ export function YearCalendarScreen({
                   {label}
                 </div>
               ))}
-
             </div>
 
             {MONTH_LABELS.map((label, monthIndex) => {
@@ -212,7 +211,6 @@ export function YearCalendarScreen({
                   {label}
                 </div>
               ))}
-
             </div>
           </div>
         </div>
