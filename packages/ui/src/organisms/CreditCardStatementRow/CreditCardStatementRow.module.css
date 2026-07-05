@@ -1,0 +1,208 @@
+.plan {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.plan:last-child {
+  border-bottom: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(10rem, 1.2fr) 7rem 5rem 7rem 4.5rem;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  min-width: 640px;
+}
+
+.row:hover {
+  background: var(--color-paper);
+}
+
+.info {
+  min-width: 0;
+}
+
+.name {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  margin-bottom: var(--space-1);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.payFrom {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.horizon,
+.next {
+  font-size: 0.875rem;
+}
+
+.next {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nextAmount {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+.cellLabel {
+  display: none;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-1);
+}
+
+.schedule {
+  padding: 0 var(--space-4) var(--space-3);
+  background: var(--color-paper);
+  border-top: 1px solid var(--color-border);
+}
+
+.scheduleHeader,
+.scheduleRow {
+  display: grid;
+  grid-template-columns: 7rem 5rem 5rem 5rem 6rem 1fr;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2) 0;
+  font-size: 0.8125rem;
+}
+
+.scheduleHeader {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.scheduleRow {
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.scheduleRow:last-child {
+  border-bottom: none;
+}
+
+.scheduleRow > span:last-child {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-1);
+}
+
+.scheduleRowPaid {
+  opacity: 0.7;
+}
+
+.actionButton {
+  font-size: 0.75rem;
+  padding: var(--space-1) var(--space-2);
+  min-height: 32px;
+}
+
+@media (max-width: 768px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "info info"
+      "payFrom payFrom"
+      "horizon next"
+      "actions actions";
+    gap: var(--space-2) var(--space-3);
+    min-width: 0;
+  }
+
+  .info {
+    grid-area: info;
+  }
+
+  .payFrom {
+    grid-area: payFrom;
+  }
+
+  .horizon {
+    grid-area: horizon;
+  }
+
+  .next {
+    grid-area: next;
+  }
+
+  .actions {
+    grid-area: actions;
+    justify-content: flex-end;
+    margin-top: var(--space-1);
+    padding-top: var(--space-2);
+    border-top: 1px dashed var(--color-border);
+  }
+
+  .cellLabel {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-muted);
+    margin-bottom: 2px;
+  }
+
+  .scheduleHeader,
+  .scheduleRow {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "period status"
+      "due pay"
+      "actions actions";
+  }
+
+  .scheduleHeader {
+    display: none;
+  }
+
+  .schedulePeriod {
+    grid-area: period;
+  }
+
+  .scheduleDue {
+    grid-area: due;
+    color: var(--color-text-muted);
+  }
+
+  .scheduleTotal {
+    display: none;
+  }
+
+  .schedulePay {
+    grid-area: pay;
+    justify-self: end;
+  }
+
+  .scheduleStatus {
+    grid-area: status;
+    justify-self: end;
+  }
+
+  .scheduleActions {
+    grid-area: actions;
+    justify-self: end;
+  }
+}

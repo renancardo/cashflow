@@ -108,11 +108,11 @@ export const DEMO_TRANSACTIONS: TransactionRowData[] = [
 ];
 
 export const DEMO_ACCOUNT_OPTIONS = [
-  { id: "cora-checking", name: "Cora Checking" },
-  { id: "nubank-savings", name: "Nubank Savings" },
-  { id: "cora-card", name: "Cartão Cora" },
-  { id: "wallet", name: "Carteira" },
-  { id: "xp", name: "XP Investimentos" },
+  { id: "cora-checking", name: "Cora Checking", type: "checking" as const },
+  { id: "nubank-savings", name: "Nubank Savings", type: "savings" as const },
+  { id: "cora-card", name: "Cartão Cora", type: "credit_card" as const },
+  { id: "wallet", name: "Carteira", type: "wallet" as const },
+  { id: "xp", name: "XP Investimentos", type: "investment" as const },
 ];
 
 export const DEMO_CATEGORY_OPTIONS = [

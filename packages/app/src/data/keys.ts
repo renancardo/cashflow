@@ -7,4 +7,5 @@ export const queryKeys = {
   plannedItems: ["plannedItems"] as const,
   installmentPlans: ["installmentPlans"] as const,
   forecast: ["forecast"] as const,
+  creditCardStatements: (cardAccountId: string) => ["creditCardStatements", cardAccountId] as const,
 };

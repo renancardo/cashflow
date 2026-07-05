@@ -42,6 +42,8 @@ export function useTransactionMutations() {
     queryClient.invalidateQueries({ queryKey: ["categories"] });
     queryClient.invalidateQueries({ queryKey: queryKeys.forecast });
     queryClient.invalidateQueries({ queryKey: queryKeys.installmentPlans });
+    queryClient.invalidateQueries({ queryKey: ["creditCardStatements"] });
+    queryClient.invalidateQueries({ queryKey: ["statementDetail"] });
     queryClient.invalidateQueries({ queryKey: ["projection"] });
   };
 

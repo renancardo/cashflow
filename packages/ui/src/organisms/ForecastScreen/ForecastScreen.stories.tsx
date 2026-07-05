@@ -9,6 +9,7 @@ import {
   DEMO_FORECAST_SUMMARY,
   DEMO_INSTALLMENT_ROWS,
   DEMO_PLANNED_ROWS,
+  DEMO_STATEMENT_ROWS,
   DEMO_WORKING_BALANCE_CENTS,
 } from "../../fixtures/forecast.js";
 import { DEMO_ACCOUNT_OPTIONS, DEMO_CATEGORY_OPTIONS } from "../../fixtures/transactions.js";
@@ -30,8 +31,10 @@ export const Populated: Story = {
       <ForecastScreen
         plannedRows={DEMO_PLANNED_ROWS}
         installmentRows={DEMO_INSTALLMENT_ROWS}
+        statementRows={DEMO_STATEMENT_ROWS}
         allPlannedRows={DEMO_PLANNED_ROWS}
         allInstallmentRows={DEMO_INSTALLMENT_ROWS}
+        allStatementRows={DEMO_STATEMENT_ROWS}
         summary={DEMO_FORECAST_SUMMARY}
         filter={filter}
         workingBalanceCents={DEMO_WORKING_BALANCE_CENTS}
@@ -47,8 +50,10 @@ export const Empty: Story = {
   args: {
     plannedRows: [],
     installmentRows: [],
+    statementRows: [],
     allPlannedRows: [],
     allInstallmentRows: [],
+    allStatementRows: [],
     summary: {
       activeItemCount: 0,
       subscriptionCount: 0,
@@ -83,8 +88,10 @@ export const WithPlannedEditor: Story = {
       <ForecastScreen
         plannedRows={DEMO_PLANNED_ROWS}
         installmentRows={DEMO_INSTALLMENT_ROWS}
+        statementRows={DEMO_STATEMENT_ROWS}
         allPlannedRows={DEMO_PLANNED_ROWS}
         allInstallmentRows={DEMO_INSTALLMENT_ROWS}
+        allStatementRows={DEMO_STATEMENT_ROWS}
         summary={DEMO_FORECAST_SUMMARY}
         filter="all"
         workingBalanceCents={DEMO_WORKING_BALANCE_CENTS}

@@ -44,6 +44,7 @@ export function useAccountMutations() {
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: queryKeys.accounts });
     queryClient.invalidateQueries({ queryKey: ["projection"] });
+    queryClient.invalidateQueries({ queryKey: ["creditCardStatements"] });
   };
 
   const create = useMutation({

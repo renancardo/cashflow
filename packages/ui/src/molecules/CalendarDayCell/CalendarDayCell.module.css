@@ -1,7 +1,7 @@
 .cell {
   position: relative;
-  width: 35px;
-  height: 35px;
+  width: var(--day-cell-size);
+  height: var(--day-cell-size);
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   cursor: pointer;

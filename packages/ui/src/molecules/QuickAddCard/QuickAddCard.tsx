@@ -5,6 +5,7 @@ import { Button } from "../../atoms/Button/Button.js";
 import { FormattedDate } from "../../atoms/FormattedDate/FormattedDate.js";
 import { FormField } from "../../molecules/FormField/FormField.js";
 import { SegmentedControl } from "../../molecules/SegmentedControl/SegmentedControl.js";
+import { validateTransferDestination } from "../../lib/transferValidation.js";
 import styles from "./QuickAddCard.module.css";
 
 export type QuickAddValues = {
@@ -212,10 +213,5 @@ export function validateQuickAddTransfer(
   values: QuickAddValues,
   accountOptions: AccountOption[],
 ): string | undefined {
-  if (values.type !== "transfer" || !values.toAccountId) return undefined;
-  const destination = accountOptions.find((account) => account.id === values.toAccountId);
-  if (destination?.type === "credit_card") {
-    return "Transfers to credit cards must use the statement payment flow.";
-  }
-  return undefined;
+  return validateTransferDestination(values, accountOptions);
 }

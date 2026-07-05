@@ -45,6 +45,20 @@
   background: rgba(220, 38, 38, 0.05);
 }
 
+.transferHint {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+}
+
+.validationError {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--color-danger);
+}
+
 @media (max-width: 768px) {
   .row {
     grid-template-columns: 1fr;

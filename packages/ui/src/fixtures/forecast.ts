@@ -1,3 +1,4 @@
+import type { CreditCardStatementRowData } from "../organisms/CreditCardStatementRow/CreditCardStatementRow.js";
 import type { ForecastItemRowData } from "../organisms/ForecastItemRow/ForecastItemRow.js";
 import type { InstallmentPlanRowData } from "../organisms/InstallmentPlanRow/InstallmentPlanRow.js";
 import type { ForecastSummary } from "../organisms/ForecastScreen/ForecastScreen.js";
@@ -112,6 +113,50 @@ export const DEMO_INSTALLMENT_ROWS: InstallmentPlanRowData[] = [
       { id: "i-11", index: 11, dueDate: "2026-06-10", amountCents: 47_500, status: "paid" },
       { id: "i-12", index: 12, dueDate: "2026-07-10", amountCents: 47_500, status: "paid" },
       { id: "i-13", index: 13, dueDate: "2026-08-10", amountCents: 47_500, status: "scheduled" },
+    ],
+  },
+];
+
+export const DEMO_STATEMENT_ROWS: CreditCardStatementRowData[] = [
+  {
+    cardAccountId: "cora-card",
+    cardName: "Cartão Cora",
+    payFromAccountName: "Cora Checking",
+    lastDueDate: "2026-09-01",
+    nextDueDate: "2026-08-01",
+    nextPayAmountCents: 100_000,
+    statements: [
+      {
+        id: "stmt-jun-jul",
+        periodStart: "2026-05-27",
+        closingDate: "2026-06-26",
+        dueDate: "2026-07-01",
+        computedTotalCents: 150_000,
+        payAmountCents: 150_000,
+        status: "paid",
+        hasOverride: false,
+      },
+      {
+        id: "stmt-jul-aug",
+        periodStart: "2026-06-27",
+        closingDate: "2026-07-26",
+        dueDate: "2026-08-01",
+        computedTotalCents: 158_990,
+        plannedPaymentCents: 100_000,
+        payAmountCents: 100_000,
+        status: "open",
+        hasOverride: true,
+      },
+      {
+        id: "stmt-aug-sep",
+        periodStart: "2026-07-27",
+        closingDate: "2026-08-26",
+        dueDate: "2026-09-01",
+        computedTotalCents: 89_000,
+        payAmountCents: 89_000,
+        status: "open",
+        hasOverride: false,
+      },
     ],
   },
 ];

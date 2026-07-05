@@ -1,5 +1,7 @@
 import type { PlannedItemOverride } from "@cashflow/core";
 import { getDatabase } from "../in-memory/database.js";
+import { randomId } from "../randomId.js";
+import { recomputeAllStatementTotals } from "../materialize/statements.js";
 
 export type PlannedItemOverrideInput = Omit<PlannedItemOverride, "id">;
 
@@ -19,12 +21,14 @@ export const plannedItemOverridesRepo = {
     );
 
     if (index === -1) {
-      const row: PlannedItemOverride = { ...input, id: crypto.randomUUID() };
+      const row: PlannedItemOverride = { ...input, id: randomId() };
       db.plannedItemOverrides.push(row);
+      recomputeAllStatementTotals();
       return row;
     }
 
     db.plannedItemOverrides[index] = { ...db.plannedItemOverrides[index], ...input };
+    recomputeAllStatementTotals();
     return db.plannedItemOverrides[index];
   },
 
@@ -46,5 +50,6 @@ export const plannedItemOverridesRepo = {
       throw new Error(`PlannedItemOverride not found: ${id}`);
     }
     db.plannedItemOverrides.splice(index, 1);
+    recomputeAllStatementTotals();
   },
 };

@@ -98,9 +98,11 @@ function TransactionRow({
   onDragOver: (event: DragEvent<HTMLElement>, id: string) => void;
   onDrop: (event: DragEvent<HTMLElement>, id: string) => void;
 }) {
+  const isStatementPayment = row.settlement?.kind === "statement";
+  const displayType: TxType = isStatementPayment ? "expense" : row.type;
   const amountTone =
-    row.type === "income" ? "income" : row.type === "expense" ? "danger" : "default";
-  const amountPrefix = row.type === "income" ? "+" : "−";
+    displayType === "income" ? "income" : displayType === "expense" ? "danger" : "default";
+  const amountPrefix = displayType === "income" ? "+" : "−";
   const isDragging = draggingId === row.id;
   const isDropBefore = dropTarget?.id === row.id && dropTarget.position === "before";
   const isDropAfter = dropTarget?.id === row.id && dropTarget.position === "after";
@@ -115,7 +117,7 @@ function TransactionRow({
       ]
         .filter(Boolean)
         .join(" ")}
-      data-type={row.type}
+      data-type={displayType}
       onDragOver={(event) => onDragOver(event, row.id)}
       onDrop={(event) => onDrop(event, row.id)}
     >
@@ -144,10 +146,12 @@ function TransactionRow({
       </div>
 
       <div>
-        <Chip variant={txTypeChipVariant(row.type)}>{TX_TYPE_LABELS[row.type]}</Chip>
+        <Chip variant={txTypeChipVariant(displayType)}>{TX_TYPE_LABELS[displayType]}</Chip>
       </div>
 
-      <div className={styles.rowDescription}>{row.description}</div>
+      <div className={styles.rowDescription}>
+        {isStatementPayment ? (row.settlement?.label ?? row.description) : row.description}
+      </div>
 
       <div
         className={[styles.rowCategory, !row.categoryName && styles.cellEmpty]
@@ -165,7 +169,7 @@ function TransactionRow({
         {row.toAccountName ?? "—"}
       </div>
 
-      <div className={[styles.rowAmount, styles[`amount${row.type}`]].filter(Boolean).join(" ")}>
+      <div className={[styles.rowAmount, styles[`amount${displayType}`]].filter(Boolean).join(" ")}>
         <span className={styles.amountPrefix} aria-hidden="true">
           {amountPrefix}
         </span>

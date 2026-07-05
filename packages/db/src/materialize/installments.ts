@@ -1,5 +1,6 @@
 import type { Installment, InstallmentPlan } from "@cashflow/core";
 import { getDatabase } from "../in-memory/database.js";
+import { randomId } from "../randomId.js";
 import { addMonths, clampDayOfMonth, parseIso } from "./dates.js";
 
 export type InstallmentPlanInput = Omit<InstallmentPlan, "id" | "payoffDate" | "archivedAt">;
@@ -58,7 +59,7 @@ export function materializeInstallments(planId: string, plan: InstallmentPlanInp
       });
     } else {
       rows.push({
-        id: crypto.randomUUID(),
+        id: randomId(),
         installmentPlanId: planId,
         index,
         dueDate,

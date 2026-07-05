@@ -3,7 +3,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
-import { getDatabase, seedDatabase } from "@cashflow/db";
+import { getDatabase, materializeAllCreditCardStatements, seedDatabase } from "@cashflow/db";
 import { router } from "./router";
 import { queryClient } from "./data/queryClient";
 import { SEED_ACCOUNTS } from "./data/seed/accounts";
@@ -22,6 +22,18 @@ if (getDatabase().accounts.length === 0) {
     installmentPlans: SEED_INSTALLMENT_PLANS,
     installments: SEED_INSTALLMENTS,
   });
+  materializeAllCreditCardStatements("2026-06-28");
+
+  const db = getDatabase();
+  const openingStatement = db.creditCardStatements.find(
+    (row) => row.cardAccountId === "acct-cora-card" && row.dueDate === "2026-07-03",
+  );
+  const cardPayment = db.transactions.find((row) => row.id === "tx-card-payment");
+  if (openingStatement && cardPayment && !cardPayment.paysStatementId) {
+    cardPayment.paysStatementId = openingStatement.id;
+    openingStatement.status = "paid";
+    openingStatement.paymentTransactionId = cardPayment.id;
+  }
 }
 
 createRoot(document.getElementById("root")!).render(

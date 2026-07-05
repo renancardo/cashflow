@@ -1,5 +1,7 @@
 import type { PlannedItem } from "@cashflow/core";
 import { getDatabase } from "../in-memory/database.js";
+import { randomId } from "../randomId.js";
+import { recomputeAllStatementTotals } from "../materialize/statements.js";
 
 export type PlannedItemInput = Omit<PlannedItem, "id" | "archivedAt">;
 
@@ -14,8 +16,9 @@ export const plannedItemsRepo = {
   },
 
   async create(input: PlannedItemInput): Promise<PlannedItem> {
-    const row: PlannedItem = { ...input, id: crypto.randomUUID() };
+    const row: PlannedItem = { ...input, id: randomId() };
     getDatabase().plannedItems.push(row);
+    recomputeAllStatementTotals();
     return row;
   },
 
@@ -26,6 +29,7 @@ export const plannedItemsRepo = {
       throw new Error(`PlannedItem not found: ${id}`);
     }
     db.plannedItems[index] = { ...db.plannedItems[index], ...patch };
+    recomputeAllStatementTotals();
     return db.plannedItems[index];
   },
 
@@ -41,6 +45,7 @@ export const plannedItemsRepo = {
     }
     const today = new Date().toISOString().slice(0, 10);
     db.plannedItems[index] = { ...db.plannedItems[index], archivedAt: today, isActive: false };
+    recomputeAllStatementTotals();
     return db.plannedItems[index];
   },
 
@@ -52,5 +57,6 @@ export const plannedItemsRepo = {
     }
     db.plannedItems.splice(index, 1);
     db.plannedItemOverrides = db.plannedItemOverrides.filter((o) => o.plannedItemId !== id);
+    recomputeAllStatementTotals();
   },
 };

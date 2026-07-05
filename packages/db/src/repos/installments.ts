@@ -1,5 +1,6 @@
 import type { Installment } from "@cashflow/core";
 import { getDatabase } from "../in-memory/database.js";
+import { recomputeAllStatementTotals } from "../materialize/statements.js";
 
 export const installmentsRepo = {
   async getAll(): Promise<Installment[]> {
@@ -28,6 +29,7 @@ export const installmentsRepo = {
       status: "paid",
       settledTransactionId,
     };
+    recomputeAllStatementTotals();
     return db.installments[index];
   },
 
@@ -42,6 +44,7 @@ export const installmentsRepo = {
       status: "scheduled",
       settledTransactionId: undefined,
     };
+    recomputeAllStatementTotals();
     return db.installments[index];
   },
 
@@ -55,6 +58,7 @@ export const installmentsRepo = {
       throw new Error(`Installment not found: ${id}`);
     }
     db.installments[index] = { ...db.installments[index], amountCentsOverride };
+    recomputeAllStatementTotals();
     return db.installments[index];
   },
 };

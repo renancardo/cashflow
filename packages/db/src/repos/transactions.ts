@@ -1,5 +1,9 @@
 import type { Transaction, TxType } from "@cashflow/core";
 import { getDatabase } from "../in-memory/database.js";
+import { randomId } from "../randomId.js";
+import { recomputeAllStatementTotals } from "../materialize/statements.js";
+import { assertValidTransaction } from "../validate/transaction.js";
+import { creditCardStatementsRepo } from "./creditCardStatements.js";
 import { installmentsRepo } from "./installments.js";
 
 export type TransactionQuery = {
@@ -61,9 +65,11 @@ export const transactionsRepo = {
   async create(
     transaction: Omit<Transaction, "id" | "sortOrder"> & { sortOrder?: number },
   ): Promise<Transaction> {
+    await assertValidTransaction(transaction);
     const sortOrder = transaction.sortOrder ?? nextSortOrderForDate(transaction.effectiveDate);
-    const row: Transaction = { ...transaction, sortOrder, id: crypto.randomUUID() };
+    const row: Transaction = { ...transaction, sortOrder, id: randomId() };
     getDatabase().transactions.push(row);
+    recomputeAllStatementTotals();
     return row;
   },
 
@@ -85,7 +91,10 @@ export const transactionsRepo = {
       nextPatch.sortOrder = nextSortOrderForDate(patch.effectiveDate);
     }
 
-    db.transactions[index] = { ...current, ...nextPatch };
+    const next = { ...current, ...nextPatch };
+    await assertValidTransaction(next);
+    db.transactions[index] = next;
+    recomputeAllStatementTotals();
     return db.transactions[index];
   },
 
@@ -145,11 +154,19 @@ export const transactionsRepo = {
     const tx = db.transactions[index];
     const installmentId =
       tx.settlesInstallmentId ?? db.installments.find((row) => row.settledTransactionId === id)?.id;
+    const statementId =
+      tx.paysStatementId ??
+      db.creditCardStatements.find((row) => row.paymentTransactionId === id)?.id;
 
     if (installmentId) {
       await installmentsRepo.markScheduled(installmentId);
     }
 
+    if (statementId) {
+      await creditCardStatementsRepo.markUnpaid(statementId);
+    }
+
     db.transactions.splice(index, 1);
+    recomputeAllStatementTotals();
   },
 };

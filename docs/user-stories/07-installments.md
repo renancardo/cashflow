@@ -15,9 +15,9 @@ Finite debt schedules and payoff visibility.
 
 ### Acceptance criteria
 
-- [ ] `InstallmentPlan` + eager `Installment` rows on save
-- [ ] Shows computed payoff date (last installment)
-- [ ] Managed in Forecast Items → Installments group (no separate screen)
+- [x] `InstallmentPlan` + eager `Installment` rows on save
+- [x] Shows computed payoff date (last installment)
+- [x] Managed in Forecast Items → Installments group (no separate screen)
 
 ---
 
@@ -32,9 +32,9 @@ Finite debt schedules and payoff visibility.
 
 ### Acceptance criteria
 
-- [ ] Set `Installment.status = paid` + optional `settledTransactionId`
-- [ ] Paid installments excluded from projection
-- [ ] Cannot reduce installment count below highest paid index
+- [x] Set `Installment.status = paid` + optional `settledTransactionId`
+- [x] Paid installments excluded from projection
+- [x] Cannot reduce installment count below highest paid index
 
 ---
 
@@ -49,6 +49,6 @@ Finite debt schedules and payoff visibility.
 
 ### Acceptance criteria
 
-- [ ] Plan list shows payoff date
+- [x] Plan list shows payoff date
 - [ ] Optional calendar marker on last installment date
-- [ ] Dormant plans shown but excluded until activated
+- [x] Dormant plans shown but excluded until activated

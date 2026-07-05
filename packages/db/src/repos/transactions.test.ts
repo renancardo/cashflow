@@ -155,4 +155,81 @@ describe("transactionsRepo", () => {
       "Cannot reorder transactions across different dates",
     );
   });
+
+  it("rejects transfer to credit card without paysStatementId", async () => {
+    seedDatabase({
+      accounts: [
+        {
+          id: "checking",
+          name: "Checking",
+          type: "checking",
+          currency: "BRL",
+          isWorking: true,
+          anchorDate: "2026-01-01",
+          anchorBalanceCents: 0,
+        },
+        {
+          id: "card",
+          name: "Card",
+          type: "credit_card",
+          currency: "BRL",
+          isWorking: false,
+          anchorDate: "2026-01-01",
+          anchorBalanceCents: 0,
+          closingDay: 26,
+          dueDay: 1,
+        },
+      ],
+    });
+
+    await expect(
+      transactionsRepo.create({
+        type: "transfer",
+        amountCents: 100_000,
+        accountId: "checking",
+        toAccountId: "card",
+        description: "Manual card payment",
+        effectiveDate: "2026-06-28",
+      }),
+    ).rejects.toThrow("statement payment");
+  });
+
+  it("allows transfer to credit card when paysStatementId is set", async () => {
+    seedDatabase({
+      accounts: [
+        {
+          id: "checking",
+          name: "Checking",
+          type: "checking",
+          currency: "BRL",
+          isWorking: true,
+          anchorDate: "2026-01-01",
+          anchorBalanceCents: 0,
+        },
+        {
+          id: "card",
+          name: "Card",
+          type: "credit_card",
+          currency: "BRL",
+          isWorking: false,
+          anchorDate: "2026-01-01",
+          anchorBalanceCents: 0,
+          closingDay: 26,
+          dueDay: 1,
+        },
+      ],
+    });
+
+    const created = await transactionsRepo.create({
+      type: "transfer",
+      amountCents: 100_000,
+      accountId: "checking",
+      toAccountId: "card",
+      description: "Statement payment",
+      effectiveDate: "2026-06-28",
+      paysStatementId: "stmt-1",
+    });
+
+    expect(created.paysStatementId).toBe("stmt-1");
+  });
 });

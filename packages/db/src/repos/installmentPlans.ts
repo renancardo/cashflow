@@ -1,10 +1,12 @@
 import type { InstallmentPlan } from "@cashflow/core";
 import { getDatabase } from "../in-memory/database.js";
+import { randomId } from "../randomId.js";
 import {
   materializeInstallments,
   payoffDateForPlan,
   type InstallmentPlanInput,
 } from "../materialize/installments.js";
+import { recomputeAllStatementTotals } from "../materialize/statements.js";
 
 export { type InstallmentPlanInput };
 
@@ -20,9 +22,10 @@ export const installmentPlansRepo = {
 
   async create(input: InstallmentPlanInput): Promise<InstallmentPlan> {
     const payoffDate = payoffDateForPlan(input);
-    const row: InstallmentPlan = { ...input, payoffDate, id: crypto.randomUUID() };
+    const row: InstallmentPlan = { ...input, payoffDate, id: randomId() };
     getDatabase().installmentPlans.push(row);
     materializeInstallments(row.id, input);
+    recomputeAllStatementTotals();
     return row;
   },
 
@@ -48,6 +51,7 @@ export const installmentPlansRepo = {
     const payoffDate = payoffDateForPlan(merged);
     db.installmentPlans[index] = { ...current, ...patch, payoffDate };
     materializeInstallments(id, merged);
+    recomputeAllStatementTotals();
     return db.installmentPlans[index];
   },
 
@@ -78,5 +82,6 @@ export const installmentPlansRepo = {
     }
     db.installmentPlans.splice(index, 1);
     db.installments = db.installments.filter((row) => row.installmentPlanId !== id);
+    recomputeAllStatementTotals();
   },
 };

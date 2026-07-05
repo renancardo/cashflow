@@ -33,7 +33,6 @@ export function SideNav({
       >
         <div className={styles.brand}>Cashflow</div>
         <div>
-          <div className={styles.label}>Screens</div>
           <ul className={styles.list}>
             {items.map((item) => {
               const isActive = activePath.startsWith(item.path);

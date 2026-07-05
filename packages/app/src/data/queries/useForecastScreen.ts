@@ -13,6 +13,7 @@ import {
 import {
   accountsRepo,
   categoriesRepo,
+  creditCardStatementsRepo,
   installmentPlansRepo,
   installmentsRepo,
   plannedItemOverridesRepo,
@@ -22,7 +23,7 @@ import {
 import { queryKeys } from "../keys";
 
 export type ForecastFilter =
-  "all" | "subscription" | "income" | "expense" | "transfer" | "installment";
+  "all" | "subscription" | "income" | "expense" | "transfer" | "installment" | "statement";
 
 export type ForecastItemRowData = {
   id: string;
@@ -74,18 +75,42 @@ export type InstallmentPlanRowData = {
   }[];
 };
 
+export type CreditCardStatementRowData = {
+  cardAccountId: string;
+  cardName: string;
+  payFromAccountName: string;
+  lastDueDate?: string;
+  nextDueDate?: string;
+  nextPayAmountCents?: number;
+  statements: {
+    id: string;
+    periodStart: string;
+    closingDate: string;
+    dueDate: string;
+    computedTotalCents: number;
+    plannedPaymentCents?: number;
+    payAmountCents: number;
+    status: "open" | "closed" | "paid";
+    hasOverride: boolean;
+  }[];
+};
+
 export type ForecastScreenData = {
   plannedRows: ForecastItemRowData[];
   installmentRows: InstallmentPlanRowData[];
+  statementRows: CreditCardStatementRowData[];
+  allStatementRows: CreditCardStatementRowData[];
   summary: ReturnType<typeof forecastSummaryMetrics>;
   accountOptions: { id: string; name: string }[];
   categoryOptions: { id: string; name: string; kind: "income" | "expense" }[];
   rawPlannedItems: PlannedItem[];
   rawInstallmentPlans: InstallmentPlan[];
+  rawAccounts: Awaited<ReturnType<typeof accountsRepo.getAll>>;
+  rawStatements: Awaited<ReturnType<typeof creditCardStatementsRepo.getAll>>;
 };
 
 function matchesPlannedFilter(row: ForecastItemRowData, filter: ForecastFilter): boolean {
-  if (filter === "all" || filter === "installment") return true;
+  if (filter === "all" || filter === "installment" || filter === "statement") return true;
   if (filter === "subscription") return row.isSubscription;
   return row.type === filter;
 }
@@ -94,7 +119,7 @@ function filterPlannedRows(
   rows: ForecastItemRowData[],
   filter: ForecastFilter,
 ): ForecastItemRowData[] {
-  if (filter === "installment") return [];
+  if (filter === "installment" || filter === "statement") return [];
   return rows.filter((row) => matchesPlannedFilter(row, filter));
 }
 
@@ -111,6 +136,7 @@ export function useForecastScreen(filter: ForecastFilter = "all") {
         transactions,
         accounts,
         categories,
+        creditCardStatements,
       ] = await Promise.all([
         plannedItemsRepo.getAll(),
         plannedItemOverridesRepo.getAll(),
@@ -119,6 +145,7 @@ export function useForecastScreen(filter: ForecastFilter = "all") {
         transactionsRepo.getAll(),
         accountsRepo.getAll(),
         categoriesRepo.getAll(),
+        creditCardStatementsRepo.getAll(),
       ]);
 
       const accountNames = new Map(accounts.map((a) => [a.id, a.name]));
@@ -200,6 +227,46 @@ export function useForecastScreen(filter: ForecastFilter = "all") {
         };
       });
 
+      const statementRows: CreditCardStatementRowData[] = accounts
+        .filter((account) => account.type === "credit_card" && !account.archivedAt)
+        .map((card) => {
+          const cardStatements = creditCardStatements
+            .filter((row) => row.cardAccountId === card.id)
+            .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+          const nextUnpaid = cardStatements.find(
+            (row) => row.status !== "paid" && !row.paymentTransactionId && row.dueDate >= asOfDate,
+          );
+          const defaultPayFromId =
+            nextUnpaid?.payFromAccountId ??
+            cardStatements.find((row) => row.payFromAccountId)?.payFromAccountId ??
+            card.defaultPayFromAccountId;
+
+          return {
+            cardAccountId: card.id,
+            cardName: card.name,
+            payFromAccountName: defaultPayFromId
+              ? (accountNames.get(defaultPayFromId) ?? "Unknown")
+              : "—",
+            lastDueDate: cardStatements.at(-1)?.dueDate,
+            nextDueDate: nextUnpaid?.dueDate,
+            nextPayAmountCents: nextUnpaid
+              ? (nextUnpaid.plannedPaymentCents ?? nextUnpaid.computedTotalCents)
+              : undefined,
+            statements: cardStatements.map((row) => ({
+              id: row.id,
+              periodStart: row.periodStart,
+              closingDate: row.closingDate,
+              dueDate: row.dueDate,
+              computedTotalCents: row.computedTotalCents,
+              plannedPaymentCents: row.plannedPaymentCents,
+              payAmountCents: row.plannedPaymentCents ?? row.computedTotalCents,
+              status: row.status,
+              hasOverride: row.plannedPaymentCents != null,
+            })),
+          };
+        })
+        .filter((row) => row.statements.length > 0);
+
       const summary = forecastSummaryMetrics({
         plannedItems,
         installmentPlans,
@@ -212,17 +279,22 @@ export function useForecastScreen(filter: ForecastFilter = "all") {
       const filteredPlanned = filterPlannedRows(plannedRows, filter);
       const filteredInstallments =
         filter === "all" || filter === "installment" ? installmentRows : [];
+      const filteredStatements = filter === "all" || filter === "statement" ? statementRows : [];
 
       return {
         plannedRows: filteredPlanned,
         installmentRows: filteredInstallments,
+        statementRows: filteredStatements,
         allPlannedRows: plannedRows,
         allInstallmentRows: installmentRows,
+        allStatementRows: statementRows,
         summary,
         accountOptions: accounts.map((a) => ({ id: a.id, name: a.name })),
         categoryOptions: categories.map((c) => ({ id: c.id, name: c.name, kind: c.kind })),
         rawPlannedItems: plannedItems,
         rawInstallmentPlans: installmentPlans,
+        rawAccounts: accounts,
+        rawStatements: creditCardStatements,
         overrides,
         settledPlanned,
         asOfDate,
@@ -234,6 +306,7 @@ export function useForecastScreen(filter: ForecastFilter = "all") {
       } satisfies ForecastScreenData & {
         allPlannedRows: ForecastItemRowData[];
         allInstallmentRows: InstallmentPlanRowData[];
+        allStatementRows: CreditCardStatementRowData[];
         overrides: typeof overrides;
         settledPlanned: typeof settledPlanned;
         asOfDate: string;
