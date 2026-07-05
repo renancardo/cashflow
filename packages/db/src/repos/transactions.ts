@@ -1,5 +1,6 @@
 import type { Transaction, TxType } from "@cashflow/core";
 import { getDatabase } from "../in-memory/database.js";
+import { randomId } from "../randomId.js";
 import { recomputeAllStatementTotals } from "../materialize/statements.js";
 import { assertValidTransaction } from "../validate/transaction.js";
 import { creditCardStatementsRepo } from "./creditCardStatements.js";
@@ -66,7 +67,7 @@ export const transactionsRepo = {
   ): Promise<Transaction> {
     await assertValidTransaction(transaction);
     const sortOrder = transaction.sortOrder ?? nextSortOrderForDate(transaction.effectiveDate);
-    const row: Transaction = { ...transaction, sortOrder, id: crypto.randomUUID() };
+    const row: Transaction = { ...transaction, sortOrder, id: randomId() };
     getDatabase().transactions.push(row);
     recomputeAllStatementTotals();
     return row;

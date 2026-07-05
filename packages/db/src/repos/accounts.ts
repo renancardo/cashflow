@@ -1,5 +1,6 @@
 import type { Account } from "@cashflow/core";
 import { getDatabase } from "../in-memory/database.js";
+import { randomId } from "../randomId.js";
 import {
   materializeAllCreditCardStatements,
   materializeStatementsForCard,
@@ -33,7 +34,7 @@ export const accountsRepo = {
   },
 
   async create(account: Omit<Account, "id">): Promise<Account> {
-    const row: Account = { ...account, id: crypto.randomUUID() };
+    const row: Account = { ...account, id: randomId() };
     getDatabase().accounts.push(row);
 
     if (isCreditCard(row)) {

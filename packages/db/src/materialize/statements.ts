@@ -7,6 +7,7 @@ import {
   todayIso,
 } from "@cashflow/core";
 import { getDatabase } from "../in-memory/database.js";
+import { randomId } from "../randomId.js";
 import { addMonths, clampDayOfMonth, parseIso, toIso } from "./dates.js";
 
 type StatementCycle = {
@@ -365,7 +366,7 @@ export function materializeStatementsForCard(
 
     const preserved = preservedOverrides.get(cycle.closingDate);
     db.creditCardStatements.push({
-      id: preserved?.id ?? crypto.randomUUID(),
+      id: preserved?.id ?? randomId(),
       cardAccountId,
       periodStart: cycle.periodStart,
       closingDate: cycle.closingDate,

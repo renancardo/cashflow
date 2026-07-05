@@ -1,5 +1,6 @@
 import type { PlannedItemOverride } from "@cashflow/core";
 import { getDatabase } from "../in-memory/database.js";
+import { randomId } from "../randomId.js";
 import { recomputeAllStatementTotals } from "../materialize/statements.js";
 
 export type PlannedItemOverrideInput = Omit<PlannedItemOverride, "id">;
@@ -20,7 +21,7 @@ export const plannedItemOverridesRepo = {
     );
 
     if (index === -1) {
-      const row: PlannedItemOverride = { ...input, id: crypto.randomUUID() };
+      const row: PlannedItemOverride = { ...input, id: randomId() };
       db.plannedItemOverrides.push(row);
       recomputeAllStatementTotals();
       return row;

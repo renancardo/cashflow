@@ -1,5 +1,6 @@
 import type { CategoryBudget } from "@cashflow/core";
 import { getDatabase } from "../in-memory/database.js";
+import { randomId } from "../randomId.js";
 
 export const categoryBudgetsRepo = {
   async getAll(): Promise<CategoryBudget[]> {
@@ -13,7 +14,7 @@ export const categoryBudgetsRepo = {
   },
 
   async create(budget: Omit<CategoryBudget, "id">): Promise<CategoryBudget> {
-    const row: CategoryBudget = { ...budget, id: crypto.randomUUID() };
+    const row: CategoryBudget = { ...budget, id: randomId() };
     getDatabase().categoryBudgets.push(row);
     return row;
   },

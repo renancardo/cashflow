@@ -1,5 +1,6 @@
 import type { InstallmentPlan } from "@cashflow/core";
 import { getDatabase } from "../in-memory/database.js";
+import { randomId } from "../randomId.js";
 import {
   materializeInstallments,
   payoffDateForPlan,
@@ -21,7 +22,7 @@ export const installmentPlansRepo = {
 
   async create(input: InstallmentPlanInput): Promise<InstallmentPlan> {
     const payoffDate = payoffDateForPlan(input);
-    const row: InstallmentPlan = { ...input, payoffDate, id: crypto.randomUUID() };
+    const row: InstallmentPlan = { ...input, payoffDate, id: randomId() };
     getDatabase().installmentPlans.push(row);
     materializeInstallments(row.id, input);
     recomputeAllStatementTotals();

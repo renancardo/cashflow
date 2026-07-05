@@ -1,5 +1,6 @@
 import type { Category } from "@cashflow/core";
 import { getDatabase } from "../in-memory/database.js";
+import { randomId } from "../randomId.js";
 
 export const categoriesRepo = {
   async getAll(): Promise<Category[]> {
@@ -12,7 +13,7 @@ export const categoriesRepo = {
   },
 
   async create(category: Omit<Category, "id">): Promise<Category> {
-    const row: Category = { ...category, id: crypto.randomUUID() };
+    const row: Category = { ...category, id: randomId() };
     getDatabase().categories.push(row);
     return row;
   },

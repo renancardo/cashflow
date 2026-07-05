@@ -1,5 +1,6 @@
 import type { PlannedItem } from "@cashflow/core";
 import { getDatabase } from "../in-memory/database.js";
+import { randomId } from "../randomId.js";
 import { recomputeAllStatementTotals } from "../materialize/statements.js";
 
 export type PlannedItemInput = Omit<PlannedItem, "id" | "archivedAt">;
@@ -15,7 +16,7 @@ export const plannedItemsRepo = {
   },
 
   async create(input: PlannedItemInput): Promise<PlannedItem> {
-    const row: PlannedItem = { ...input, id: crypto.randomUUID() };
+    const row: PlannedItem = { ...input, id: randomId() };
     getDatabase().plannedItems.push(row);
     recomputeAllStatementTotals();
     return row;
