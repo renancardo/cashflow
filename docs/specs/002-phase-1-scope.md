@@ -82,15 +82,13 @@ Answer one question every day:
 | Subscriptions | Indefinite recurring (via `PlannedItem`) or tagged subscription |
 | Dormant debt | Tracked, `isActive = false`, excluded until activated |
 
-### 2.7 Categories, budgets & snapshots
+### 2.7 Categories & budgets
 
 | Feature | Detail |
 |---|---|
 | Category management | Create/edit/archive expense and income categories; one-level parent/child hierarchy |
 | Category budgets | Monthly target per **expense** category (`CategoryBudget`); set amount + `effectiveFromMonth` on **Categories & Budgets** screen |
 | Budget tracking | Current-month actual vs target per category (and parent roll-up); progress bars and over/under on **Categories & Budgets** |
-| Snapshots | Full forecast clone at a point in time |
-| Variance view | Snapshot vs current actuals; over/under by category and month (also surfaced on **Categories & Budgets** when a snapshot is selected) |
 
 ### 2.8 Projection engine
 
@@ -124,7 +122,7 @@ Answer one question every day:
 
 ## 3. Screens in scope
 
-Phase 1 ships **9 screens/panels**. No separate Dashboard, Investments, or Installments screen.
+Phase 1 ships **8 screens/panels**. No separate Dashboard, Investments, Installments, or Snapshots screen.
 
 | # | Screen / panel | Phase 1 scope summary |
 |---|---|---|
@@ -135,8 +133,7 @@ Phase 1 ships **9 screens/panels**. No separate Dashboard, Investments, or Insta
 | 5 | **Accounts** | List, balances, working flag, card cycle config, re-anchor |
 | 6 | **Forecast Items** | Recurring + one-off planned items, **installment plans**, subscriptions (filter), investment outflows |
 | 7 | **Categories & Budgets** | Category CRUD; set monthly budget per category; track current-month actual vs target (child + parent roll-up) |
-| 8 | **Snapshots** | Create baseline, compare variance by category/month |
-| 9 | **Settings** | Language, buffer, large-outflow threshold, horizon, alert lead time, export/backup, card defaults |
+| 8 | **Settings** | Language, buffer, large-outflow threshold, horizon, alert lead time, export/backup, card defaults |
 
 ### Screen decisions (locked)
 
@@ -159,7 +156,6 @@ flowchart TB
   Acct["Accounts"]
   Forecast["Forecast Items"]
   Budgets["Categories & Budgets"]
-  Snap["Snapshots"]
   Settings["Settings"]
 
   YearCal --> DayPanel
@@ -169,7 +165,6 @@ flowchart TB
   YearCal --> Acct
   YearCal --> Forecast
   YearCal --> Budgets
-  YearCal --> Snap
   YearCal --> Settings
 ```
 
@@ -192,7 +187,7 @@ All entities in [001-data-model.md](./001-data-model.md) are in Phase 1 — noth
 | `CreditCardStatement` | Full |
 | `InstallmentPlan` | Full |
 | `Installment` | Full (eager) |
-| `Snapshot` + `SnapshotPayload` | Full |
+| `Snapshot` + `SnapshotPayload` | Schema only — UI deferred to Phase 2 |
 | `Settings` | Full |
 
 ---
@@ -203,6 +198,7 @@ Explicitly **not** built in Phase 1. Screen specs get one-line deferred stubs on
 
 | Feature | Phase 2 notes |
 |---|---|
+| **Snapshots & variance** | Full forecast clone at a point in time; baseline vs actual compare by category/month (prototype in `docs/prototype/004/snapshots.html`) |
 | **What-if simulation** | "Can I afford R$ X on date Y?" — read-only engine overlay |
 | **AI insights** | Summaries, suggestions, NL queries; **Insights** screen |
 | **Full Google Sheets import** | Maps existing 6-tab spreadsheet structure |
@@ -241,7 +237,6 @@ Copied from [000-initial-ideas.md §9](../ideas/000-initial-ideas.md) and [001-d
 | Transfers | Single row + `toAccountId` |
 | Statements | Pre-create full horizon per card |
 | Categories | One parent level max |
-| Snapshots | Full forecast clone |
 
 ---
 
@@ -251,7 +246,6 @@ Copied from [000-initial-ideas.md §9](../ideas/000-initial-ideas.md) and [001-d
 |---|---|---|
 | Month view layout | Month grid (same weekday columns as year, single month) | [003 §4](./003-screen-specs.md#4-screen-2--month-calendar) |
 | Forecast Items grouping | Active/dormant → Recurring / One-off / Installments; subscriptions via filter chip | [003 §8](./003-screen-specs.md#8-screen-6--forecast-items) |
-| Snapshot compare UI | Side-by-side month table + category breakdown | [003 §10](./003-screen-specs.md#10-screen-8--snapshots) |
 | CSV import format | Minimal 4-column template (date, description, amount, account) | [003 §12](./003-screen-specs.md#12-csv-import-onboarding) |
 | Bulk-entry mode | Multi-row inline form on Transactions screen | [003 §6](./003-screen-specs.md#6-screen-4--transactions) |
 
@@ -268,7 +262,6 @@ Copied from [000-initial-ideas.md §9](../ideas/000-initial-ideas.md) and [001-d
 - [ ] Month view shows same data with denser detail
 - [ ] Day panel shows balance breakdown and supports quick-add
 - [ ] Calendar header shows working balance, next negative date, and in-app lead-time alert badge
-- [ ] User can create a snapshot and view variance vs actuals by category/month
 - [ ] User can set monthly category budgets on **Categories & Budgets** and see current-month actual vs target (with parent roll-up)
 - [ ] CSV import loads initial data
 - [ ] UI works in pt-BR and en
@@ -280,6 +273,6 @@ Copied from [000-initial-ideas.md §9](../ideas/000-initial-ideas.md) and [001-d
 
 | Order | Document | Status | Uses this scope for |
 |---|---|---|---|
-| 1 | [003-screen-specs.md](./003-screen-specs.md) | draft | Per-screen fields, actions, states (9 screens above) |
+| 1 | [003-screen-specs.md](./003-screen-specs.md) | draft | Per-screen fields, actions, states (8 screens above) |
 | 2 | [004-style-guide.md](./004-style-guide.md) | **locked** | Calendar components, tokens, semantic colors — canonical ref: `docs/prototype/004/` |
 | 3 | [005-prd.md](./005-prd.md) | pending | User stories + acceptance criteria synthesized from specs |

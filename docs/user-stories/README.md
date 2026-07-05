@@ -17,7 +17,7 @@ User stories and acceptance criteria for the Cashflow app. The [PRD](../specs/00
 | 6 — Credit cards | [06-credit-cards.md](./06-credit-cards.md) | US-6.1 – US-6.6 | Engine + accounts |
 | 7 — Installments | [07-installments.md](./07-installments.md) | US-7.1 – US-7.3 | Engine + forecast |
 | 8 — Categories & budgets | [08-categories-budgets.md](./08-categories-budgets.md) | US-8.1 – US-8.3 | After transactions |
-| 9 — Snapshots | [09-snapshots.md](./09-snapshots.md) | US-9.1 – US-9.2 | After engine + forecast |
+| 9 — Snapshots | [09-snapshots.md](./09-snapshots.md) | US-9.1 – US-9.2 | **Phase 2** (deferred from v1) |
 | 10 — Settings & data | [10-settings-data.md](./10-settings-data.md) | US-10.1 – US-10.3 | Throughout |
 | 11 — Design system | [11-design-system.md](./11-design-system.md) | US-11.1 – US-11.5 | Parallel with UI epics |
 | 12 — Developer tools | [12-developer-tools.md](./12-developer-tools.md) | US-12.1 – US-12.5 | Parallel with app epics |
@@ -61,7 +61,7 @@ flowchart LR
 2. **Engine + fixtures** — pure JS projection with tests (no UI persistence yet)  
 3. **Calendar** — wire Year/Month views to real `ProjectionResult`  
 4. **Accounts + Transactions + Forecast** — CRUD + storage  
-5. **Remaining epics** — credit cards UI, installments, budgets, snapshots, settings  
+5. **Remaining epics** — credit cards UI, installments, budgets, settings
 
 ---
 

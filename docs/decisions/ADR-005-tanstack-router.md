@@ -9,9 +9,9 @@
 
 ## Context
 
-Phase 1 has **9 screens** plus a day-detail overlay ([003-screen-specs.md](../specs/003-screen-specs.md)):
+Phase 1 has **8 screens** plus a day-detail overlay ([003-screen-specs.md](../specs/003-screen-specs.md)):
 
-`/`, `/month/:yyyy-mm`, `/transactions`, `/accounts`, `/forecast`, `/categories`, `/snapshots`, `/settings`, and `?day=YYYY-MM-DD` overlay.
+`/`, `/month/:yyyy-mm`, `/transactions`, `/accounts`, `/forecast`, `/categories`, `/settings`, and `?day=YYYY-MM-DD` overlay. (`/snapshots` deferred to Phase 2.)
 
 We already adopt **TanStack Query** for async client data. Routing should support typed params, search params (day panel), and loader patterns that pair with Query.
 
@@ -47,7 +47,8 @@ const transactionsRoute = createRoute({
   component: TransactionsPage,
 });
 
-// … accounts, forecast, categories, snapshots, settings
+// … accounts, forecast, categories, settings
+// snapshots route deferred to Phase 2
 ```
 
 ### Day panel via search param
@@ -100,7 +101,7 @@ Start simple (hooks in pages); add loaders when navigation perf matters.
 |---|---|
 | **TanStack Router** | **Accepted** — pairs with Query; typed `$yearMonth` params |
 | React Router v7 | Viable; less unified TanStack story |
-| Defer routing | Rejected — 9 screens need nav from day one |
+| Defer routing | Rejected — 8 screens need nav from day one |
 
 ---
 

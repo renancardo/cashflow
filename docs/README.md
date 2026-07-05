@@ -58,7 +58,7 @@ Decisions that implementation must follow. Numbered files encode dependency orde
 | Spec | Prototype reference |
 |---|---|
 | [004-style-guide.md](specs/004-style-guide.md) | [`prototype/004/`](prototype/004/) — Paper (canonical) |
-| [003-screen-specs.md](specs/003-screen-specs.md) | All three prototypes implement the same 9 screens with different themes |
+| [003-screen-specs.md](specs/003-screen-specs.md) | All three prototypes implement the same screen set (8 Phase 1 + Snapshots prototype for Phase 2) |
 
 Prototypes `005` (Ink) and `006` (Analytical) are exploratory alternates. Phase 1 implementation must follow **004-style-guide** and **prototype/004**.
 

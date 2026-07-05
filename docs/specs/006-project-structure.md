@@ -171,7 +171,7 @@ packages/app/
 │   │   ├── YearCalendarPage/
 │   │   ├── MonthCalendarPage/
 │   │   ├── TransactionsPage/
-│   │   └── …               # 9 screens per 003-screen-specs
+│   │   └── …               # 8 Phase 1 screens per 003-screen-specs
 │   ├── data/
 │   │   ├── queryClient.ts
 │   │   ├── keys.ts
@@ -343,7 +343,8 @@ Centralized in `packages/app/src/data/keys.ts`:
 | `['transactions', filters]` | Ledger |
 | `['projection', asOfDate]` | Year + Month calendar, header |
 | `['categories']`, `['budgets']` | Categories & Budgets |
-| `['snapshots']` | Snapshots |
+
+(`['snapshots']` reserved for Phase 2.)
 
 **Rule:** any mutation that changes entities feeding the engine must invalidate `['projection']` (and relevant entity keys).
 

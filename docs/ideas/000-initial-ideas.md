@@ -344,11 +344,11 @@ This replaces your manual sync between **Estudo de Gastos** and **Lançamentos**
 - **Month view** (detailed month editing/review)
 - Proactive "next negative date" + lead-time alert
 - Installment plans + subscriptions + payoff dates
-- Baseline snapshots (full clone) + variance view (incl. budget vs actual by category)
 - Lightweight bulk-entry + CSV import for onboarding
 - pt-BR + en UI
 
 ### Phase 2 — Advanced & platform
+- **Baseline snapshots** (full forecast clone) + variance view (incl. budget vs actual by category)
 - **What-if simulation** ("Can I afford R$ X on date Y?")
 - AI insights
 - Full spreadsheet import from your Google Sheets structure

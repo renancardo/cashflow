@@ -305,8 +305,8 @@ Each Phase 1 screen adds a scoped CSS file. All link `paper.css` first.
 | 5 Accounts | `accounts.css` | Account cards, re-anchor dialog |
 | 6 Forecast Items | `forecast.css` | Filter chips, grouped lists, recurrence dialog |
 | 7 Categories & Budgets | `categories.css` | Budget bars, variance table, category editor |
-| 8 Snapshots | `snapshots.css` | Snapshot list, compare table |
-| 9 Settings | `settings.css` | Grouped sections, export block |
+| 8 Settings | `settings.css` | Grouped sections, export block |
+| Snapshots *(Phase 2)* | `snapshots.css` | Prototype reference only |
 
 Shared JS for mobile nav: `js/nav.js`.
 

@@ -1,6 +1,6 @@
 ---
 name: Screen Specs (Phase 1)
-overview: Per-screen specification for the 9 Phase 1 screens — purpose, layout regions, fields/columns, actions, states, and the data-model entities each reads and writes. Bridges the locked scope and data model into concrete UI behavior for the PRD and implementation.
+overview: Per-screen specification for the 8 Phase 1 screens — purpose, layout regions, fields/columns, actions, states, and the data-model entities each reads and writes. Bridges the locked scope and data model into concrete UI behavior for the PRD and implementation.
 status: draft
 isProject: false
 ---
@@ -9,7 +9,7 @@ isProject: false
 
 > **Sources:** [001-data-model.md](./001-data-model.md), [002-phase-1-scope.md §3](./002-phase-1-scope.md). Visual tokens, components, and semantic colors come from [004-style-guide.md](./004-style-guide.md) (locked — canonical reference: `docs/prototype/004/`).
 >
-> **Scope guard:** This doc specifies only the 9 locked Phase 1 screens plus a deferred **Insights** stub. No new entities are introduced — every field maps to [001-data-model.md](./001-data-model.md).
+> **Scope guard:** This doc specifies only the 8 locked Phase 1 screens plus deferred **Snapshots** and **Insights** stubs. No new entities are introduced — every field maps to [001-data-model.md](./001-data-model.md).
 
 ---
 
@@ -25,7 +25,7 @@ isProject: false
 | **i18n** | All labels are translation keys (pt-BR + en); no hardcoded strings |
 
 **Global chrome (all screens):**
-- Persistent left/top **nav** to the 9 screens (see §1 navigation map).
+- Persistent left/top **nav** to the 8 Phase 1 screens (see §1 navigation map).
 - **Calendar header strip** (working balance, next negative date, alert badge) is visible on calendar screens; other screens show a condensed version in the top bar.
 - Locale + language switch lives in **Settings**, but the active language applies everywhere immediately.
 
@@ -42,8 +42,8 @@ isProject: false
 | 5 | Accounts | `/accounts` | `Account` |
 | 6 | Forecast Items | `/forecast` | `PlannedItem` (+ `PlannedItemOverride`), `InstallmentPlan` (+ `Installment`) |
 | 7 | Categories & Budgets | `/categories` | `Category` (+ `CategoryBudget`) |
-| 8 | Snapshots | `/snapshots` | `Snapshot` (+ `SnapshotPayload`) |
-| 9 | Settings | `/settings` | `Settings` |
+| 8 | Settings | `/settings` | `Settings` |
+| — | Snapshots (Phase 2 stub) | `/snapshots` | deferred |
 | — | Insights (Phase 2 stub) | `/insights` | deferred |
 
 > **Route alias:** `/installments` redirects to `/forecast` (Installments group). Former Screen 7 merged into Screen 6; data model unchanged.
@@ -57,15 +57,14 @@ flowchart TB
   Acct["5 Accounts"]
   Forecast["6 Forecast Items"]
   Budgets["7 Categories & Budgets"]
-  Snap["8 Snapshots"]
-  Settings["9 Settings"]
+  Settings["8 Settings"]
 
   YearCal --- MonthCal
   YearCal --> DayPanel
   MonthCal --> DayPanel
   DayPanel -->|quick-add| Txn
   DayPanel -->|quick-add planned| Forecast
-  YearCal --> Txn & Acct & Forecast & Budgets & Snap & Settings
+  YearCal --> Txn & Acct & Forecast & Budgets & Settings
 ```
 
 Primary entry is **Year Calendar**. The Day Detail Panel is an overlay reachable from either calendar.
@@ -410,31 +409,27 @@ Subscriptions are **not** a separate group — they are recurring `PlannedItem`s
 | Concern | Spec |
 |---|---|
 | **Reads / Writes** | `Category` (CRUD/archive), `CategoryBudget` (set/update with effective month) |
-| **Derived** | Per-category month actuals; variance; parent roll-up; snapshot variance (when a snapshot is selected) |
-| **Actions** | Add/edit/archive category; set/change budget; pick month; select snapshot to compare |
+| **Derived** | Per-category month actuals; parent roll-up |
+| **Actions** | Add/edit/archive category; set/change budget; pick month |
 | **Validation** | Child's parent must be a root (`parentId = null`); transfers never categorized; budget only on expense categories |
-| **States** | Empty (→ create first category); loading; error; populated (with/without snapshot overlay) |
+| **States** | Empty (→ create first category); loading; error; populated |
 
 ---
 
-## 10. Screen 8 — Snapshots
+## 10. Snapshots (Phase 2 — deferred)
 
-**Purpose:** Create baselines (full forecast clone) and compare baseline-vs-actual variance by category and month.
+Baseline forecast capture and variance compare are **not in Phase 1**. See [002-phase-1-scope.md §5](./002-phase-1-scope.md) and [09-snapshots.md](../user-stories/09-snapshots.md). Visual reference only: `docs/prototype/004/snapshots.html`.
 
-**List contents** (`Snapshot`): `name`, `asOfDate`, `horizonMonths`, `createdAt`.
+When implemented in Phase 2:
 
-**Compare view** (default side-by-side per scope §8): month table + category breakdown, over/under highlighting. Data read from `SnapshotPayload.summaryJson` (fast) and `payloadJson` (detail).
-
-| Concern | Spec |
-|---|---|
-| **Reads / Writes** | `Snapshot` + `SnapshotPayload` (create, view, delete). Snapshots are **immutable** once created |
-| **Derived** | Variance = snapshot baseline vs current actuals, by month and category |
-| **Actions** | Create snapshot (name + asOfDate, captures current forecast); open compare; delete; feed selected snapshot into Categories & Budgets overlay |
-| **States** | Empty (→ "create your first snapshot"); loading; error; populated (list + compare) |
+- **Purpose:** Create baselines (full forecast clone) and compare baseline-vs-actual variance by category and month.
+- **Entities:** `Snapshot` + `SnapshotPayload` (create, view, delete; immutable once created).
+- **Compare view:** Side-by-side month table + category breakdown, over/under highlighting.
+- **Integration:** Optional snapshot overlay on Categories & Budgets when a snapshot is selected.
 
 ---
 
-## 11. Screen 9 — Settings
+## 11. Screen 8 — Settings
 
 **Purpose:** Global configuration; export/backup. Single `Settings` row (`id = "singleton"`).
 
@@ -506,8 +501,8 @@ A single placeholder screen with a "coming in Phase 2" state. No data wiring. Pr
 | Accounts | §2.2, §3.5 | `Account`, `CreditCardStatement` (side effect) |
 | Forecast Items | §2.4, §2.6, §3.6 | `PlannedItem`, `PlannedItemOverride`, `InstallmentPlan`, `Installment` |
 | Categories & Budgets | §2.7, §3.7 | `Category`, `CategoryBudget` |
-| Snapshots | §2.7, §3.8 | `Snapshot`, `SnapshotPayload` |
-| Settings | §2.1, §3.9 | `Settings` |
+| Settings | §2.1, §3.8 | `Settings` |
+| Snapshots (deferred) | §5 | `Snapshot`, `SnapshotPayload` (Phase 2) |
 | Insights (stub) | §5 | — (Phase 2) |
 
 ---

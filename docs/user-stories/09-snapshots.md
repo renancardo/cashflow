@@ -2,6 +2,8 @@
 
 Baseline forecast capture and comparison to actuals.
 
+**Status:** Deferred to **Phase 2** (removed from v1 scope). Prototype reference: `docs/prototype/004/snapshots.html`.
+
 ---
 
 ## US-9.1 — Create baseline snapshot
@@ -10,7 +12,7 @@ Baseline forecast capture and comparison to actuals.
 
 **Story:** As a user, I want to **save a named snapshot** of my forecast so I can compare what I planned vs what happened.
 
-**Priority:** P0  
+**Priority:** Phase 2  
 **Depends on:** US-1.6, US-5.1
 
 ### Acceptance criteria
@@ -27,7 +29,7 @@ Baseline forecast capture and comparison to actuals.
 
 **Story:** As a user, I want **variance by month and category** against a snapshot so I can see where I diverged.
 
-**Priority:** P0  
+**Priority:** Phase 2  
 **Depends on:** US-9.1, US-8.3
 
 ### Acceptance criteria
