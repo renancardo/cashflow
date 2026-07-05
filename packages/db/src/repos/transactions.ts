@@ -1,6 +1,7 @@
 import type { Transaction, TxType } from "@cashflow/core";
 import { getDatabase } from "../in-memory/database.js";
 import { recomputeAllStatementTotals } from "../materialize/statements.js";
+import { assertValidTransaction } from "../validate/transaction.js";
 import { creditCardStatementsRepo } from "./creditCardStatements.js";
 import { installmentsRepo } from "./installments.js";
 
@@ -63,6 +64,7 @@ export const transactionsRepo = {
   async create(
     transaction: Omit<Transaction, "id" | "sortOrder"> & { sortOrder?: number },
   ): Promise<Transaction> {
+    await assertValidTransaction(transaction);
     const sortOrder = transaction.sortOrder ?? nextSortOrderForDate(transaction.effectiveDate);
     const row: Transaction = { ...transaction, sortOrder, id: crypto.randomUUID() };
     getDatabase().transactions.push(row);
@@ -88,7 +90,9 @@ export const transactionsRepo = {
       nextPatch.sortOrder = nextSortOrderForDate(patch.effectiveDate);
     }
 
-    db.transactions[index] = { ...current, ...nextPatch };
+    const next = { ...current, ...nextPatch };
+    await assertValidTransaction(next);
+    db.transactions[index] = next;
     recomputeAllStatementTotals();
     return db.transactions[index];
   },

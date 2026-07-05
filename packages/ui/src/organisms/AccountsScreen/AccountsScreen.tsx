@@ -18,6 +18,7 @@ type Props = {
   onAddAccount?: () => void;
   onWorkingChange?: (id: string, isWorking: boolean) => void;
   onEdit?: (id: string) => void;
+  onStatements?: (id: string) => void;
 };
 
 export function AccountsScreen({
@@ -29,6 +30,7 @@ export function AccountsScreen({
   onAddAccount,
   onWorkingChange,
   onEdit,
+  onStatements,
 }: Props) {
   const workingCount = accounts.filter((account) => account.isWorking).length;
 
@@ -92,6 +94,7 @@ export function AccountsScreen({
               account={account}
               onWorkingChange={onWorkingChange}
               onEdit={onEdit}
+              onStatements={onStatements}
             />
           ))}
         </AccountList>

@@ -20,5 +20,6 @@ export const Checking: Story = {
 export const CreditCard: Story = {
   args: {
     account: DEMO_ACCOUNTS[2],
+    onStatements: (id) => alert(`Open statements for ${id}`),
   },
 };

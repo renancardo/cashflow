@@ -19,10 +19,14 @@ export { installmentsRepo } from "./repos/installments.js";
 export { settleInstallment, type SettleInstallmentResult } from "./settlements/installment.js";
 export { settlePlannedItem } from "./settlements/planned.js";
 export { settleStatement, type SettleStatementResult } from "./settlements/statement.js";
+export { assertValidTransaction, TRANSFER_TO_CREDIT_CARD_ERROR } from "./validate/transaction.js";
 export {
   computeDueDate,
   generateStatementCycles,
+  listStatementCharges,
   materializeStatementsForCard,
+  type StatementCharge,
+  type StatementChargeSource,
 } from "./materialize/statements.js";
 export {
   createEmptyState,

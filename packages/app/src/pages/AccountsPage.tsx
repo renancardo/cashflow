@@ -1,13 +1,22 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import type { Account } from "@cashflow/core";
 import { defaultIsWorking } from "@cashflow/core";
-import { AccountEditorPanel, AccountsScreen, type AccountEditorValues } from "@cashflow/ui";
+import {
+  AccountEditorPanel,
+  AccountsScreen,
+  StatementDetailPanel,
+  StatementListPanel,
+  type AccountEditorValues,
+} from "@cashflow/ui";
 import {
   createEmptyAccountInput,
   useAccountMutations,
   type AccountInput,
 } from "../data/mutations/useAccountMutations";
 import { useAccounts } from "../data/queries/useAccounts";
+import { useStatements } from "../data/queries/useStatements";
+import { useStatementDetail } from "../data/queries/useStatementDetail";
 
 function toEditorValues(account: Account): AccountEditorValues {
   return {
@@ -44,12 +53,17 @@ function toAccountInput(values: AccountEditorValues): AccountInput {
 }
 
 export function AccountsPage() {
+  const navigate = useNavigate();
   const { data, isPending, isError, error } = useAccounts();
   const { create, update, setWorking, archive } = useAccountMutations();
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorMode, setEditorMode] = useState<"create" | "edit">("create");
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [statementsCardId, setStatementsCardId] = useState<string | null>(null);
+  const [detailStatementId, setDetailStatementId] = useState<string | null>(null);
   const [editorValues, setEditorValues] = useState<AccountEditorValues>(createEmptyAccountInput());
+  const { data: statements = [] } = useStatements(statementsCardId);
+  const { data: statementDetail, isPending: isDetailPending } = useStatementDetail(detailStatementId);
 
   const payFromOptions = useMemo(
     () =>
@@ -63,6 +77,11 @@ export function AccountsPage() {
     if (!editingId) return 0;
     return data?.accounts.find((account) => account.id === editingId)?.balanceCents ?? 0;
   }, [data?.accounts, editingId]);
+
+  const statementsCardName = useMemo(() => {
+    if (!statementsCardId) return "";
+    return data?.rawAccounts.find((account) => account.id === statementsCardId)?.name ?? "";
+  }, [data?.rawAccounts, statementsCardId]);
 
   const openCreate = () => {
     setEditorMode("create");
@@ -117,19 +136,46 @@ export function AccountsPage() {
       errorMessage={error instanceof Error ? error.message : undefined}
       onAddAccount={openCreate}
       onEdit={openEdit}
+      onStatements={setStatementsCardId}
       onWorkingChange={(id, isWorking) => setWorking.mutate({ id, isWorking })}
       editor={
-        <AccountEditorPanel
-          open={editorOpen}
-          mode={editorMode}
-          values={editorValues}
-          balanceCents={editingBalanceCents}
-          payFromOptions={payFromOptions}
-          onChange={handleTypeChange}
-          onClose={() => setEditorOpen(false)}
-          onSave={handleSave}
-          onArchive={editorMode === "edit" ? handleArchive : undefined}
-        />
+        <>
+          <AccountEditorPanel
+            open={editorOpen}
+            mode={editorMode}
+            values={editorValues}
+            balanceCents={editingBalanceCents}
+            payFromOptions={payFromOptions}
+            onChange={handleTypeChange}
+            onClose={() => setEditorOpen(false)}
+            onSave={handleSave}
+            onArchive={editorMode === "edit" ? handleArchive : undefined}
+          />
+          <StatementListPanel
+            open={Boolean(statementsCardId)}
+            cardName={statementsCardName}
+            statements={statements}
+            onClose={() => setStatementsCardId(null)}
+            onViewItems={(statementId) => setDetailStatementId(statementId)}
+            onNavigateToTransaction={() => {
+              setStatementsCardId(null);
+              navigate({ to: "/transactions" });
+            }}
+          />
+          <StatementDetailPanel
+            open={Boolean(detailStatementId)}
+            cardName={statementDetail?.cardName ?? statementsCardName}
+            periodStart={statementDetail?.statement.periodStart ?? ""}
+            closingDate={statementDetail?.statement.closingDate ?? ""}
+            dueDate={statementDetail?.statement.dueDate ?? ""}
+            computedTotalCents={statementDetail?.statement.computedTotalCents ?? 0}
+            plannedPaymentCents={statementDetail?.statement.plannedPaymentCents}
+            status={statementDetail?.statement.status ?? "open"}
+            charges={statementDetail?.charges ?? []}
+            loading={isDetailPending}
+            onClose={() => setDetailStatementId(null)}
+          />
+        </>
       }
     />
   );

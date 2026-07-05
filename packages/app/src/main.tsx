@@ -23,6 +23,17 @@ if (getDatabase().accounts.length === 0) {
     installments: SEED_INSTALLMENTS,
   });
   materializeAllCreditCardStatements("2026-06-28");
+
+  const db = getDatabase();
+  const openingStatement = db.creditCardStatements.find(
+    (row) => row.cardAccountId === "acct-cora-card" && row.dueDate === "2026-07-03",
+  );
+  const cardPayment = db.transactions.find((row) => row.id === "tx-card-payment");
+  if (openingStatement && cardPayment && !cardPayment.paysStatementId) {
+    cardPayment.paysStatementId = openingStatement.id;
+    openingStatement.status = "paid";
+    openingStatement.paymentTransactionId = cardPayment.id;
+  }
 }
 
 createRoot(document.getElementById("root")!).render(

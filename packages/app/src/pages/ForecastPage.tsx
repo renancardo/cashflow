@@ -1,14 +1,17 @@
 import { useMemo, useState } from "react";
 import type { PlannedItem } from "@cashflow/core";
-import { isRecurring } from "@cashflow/core";
+import { compareIso, isRecurring } from "@cashflow/core";
 import {
   ForecastScreen,
   InstallmentPlanEditorPanel,
   PlannedItemEditorPanel,
   RecurrenceScopeDialog,
+  StatementEditorPanel,
+  StatementDetailPanel,
   type ForecastFilter,
   type PlannedItemEditorValues,
   type RecurrenceScope,
+  type StatementEditorValues,
 } from "@cashflow/ui";
 import {
   createEmptyInstallmentPlanInput,
@@ -20,10 +23,12 @@ import {
   usePlannedItemMutations,
   type PlannedItemEditorInput,
 } from "../data/mutations/usePlannedItemMutations";
+import { useStatementMutations } from "../data/mutations/useStatementMutations";
 import { useForecastScreen } from "../data/queries/useForecastScreen";
+import { useStatementDetail } from "../data/queries/useStatementDetail";
 import { useAccounts } from "../data/queries/useAccounts";
 
-type EditorKind = "planned" | "installment";
+type EditorKind = "planned" | "installment" | "statement";
 
 function toPlannedEditorValues(item: PlannedItem): PlannedItemEditorValues {
   return {
@@ -47,17 +52,22 @@ function toPlannedEditorValues(item: PlannedItem): PlannedItemEditorValues {
 
 export function ForecastPage() {
   const [filter, setFilter] = useState<ForecastFilter>("all");
+  const [detailStatementId, setDetailStatementId] = useState<string | null>(null);
   const { data, isPending, isError, error } = useForecastScreen(filter);
   const { data: accountsData } = useAccounts();
+  const { data: statementDetail, isPending: isDetailPending } = useStatementDetail(detailStatementId);
 
   const plannedMutations = usePlannedItemMutations();
   const installmentMutations = useInstallmentMutations();
+  const statementMutations = useStatementMutations();
 
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorKind, setEditorKind] = useState<EditorKind>("planned");
   const [editorMode, setEditorMode] = useState<"create" | "edit">("create");
   const [editingPlannedId, setEditingPlannedId] = useState<string | null>(null);
   const [editingInstallmentId, setEditingInstallmentId] = useState<string | null>(null);
+  const [editingStatementId, setEditingStatementId] = useState<string | null>(null);
+  const [statementValues, setStatementValues] = useState<StatementEditorValues>({});
   const [plannedValues, setPlannedValues] = useState<PlannedItemEditorValues>(() =>
     createEmptyPlannedItemInput(),
   );
@@ -69,6 +79,40 @@ export function ForecastPage() {
   const [scopeOccurrenceDate, setScopeOccurrenceDate] = useState<string>("");
 
   const defaultAccountId = data?.accountOptions[0]?.id;
+
+  const payFromOptions = useMemo(
+    () =>
+      (accountsData?.rawAccounts ?? [])
+        .filter((account) => account.isWorking && account.type !== "credit_card")
+        .map((account) => ({ id: account.id, name: account.name })),
+    [accountsData?.rawAccounts],
+  );
+
+  const editingStatement = useMemo(() => {
+    if (!editingStatementId || !data) return null;
+    return data.rawStatements.find((row) => row.id === editingStatementId) ?? null;
+  }, [data, editingStatementId]);
+
+  const editingStatementCard = useMemo(() => {
+    if (!editingStatement || !data) return null;
+    return data.rawAccounts.find((row) => row.id === editingStatement.cardAccountId) ?? null;
+  }, [data, editingStatement]);
+
+  const includesOpeningDebt = useMemo(() => {
+    if (!editingStatement || !editingStatementCard) return false;
+    if (editingStatementCard.anchorBalanceCents <= 0) return false;
+
+    const cardStatements = data?.rawStatements
+      .filter((row) => row.cardAccountId === editingStatementCard.id)
+      .filter(
+        (row) =>
+          compareIso(row.dueDate, editingStatementCard.anchorDate) >= 0 &&
+          compareIso(row.closingDate, editingStatementCard.anchorDate) >= 0,
+      )
+      .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+
+    return cardStatements?.[0]?.id === editingStatement.id;
+  }, [data?.rawStatements, editingStatement, editingStatementCard]);
 
   const openCreatePlanned = () => {
     setEditorKind("planned");
@@ -106,7 +150,23 @@ export function ForecastPage() {
     setEditorMode("edit");
     setEditingInstallmentId(id);
     setEditingPlannedId(null);
+    setEditingStatementId(null);
     setInstallmentValues(toInstallmentEditorValues(plan));
+    setEditorOpen(true);
+  };
+
+  const openEditStatement = (id: string) => {
+    const statement = data?.rawStatements.find((row) => row.id === id);
+    if (!statement) return;
+    setEditorKind("statement");
+    setEditorMode("edit");
+    setEditingStatementId(id);
+    setEditingPlannedId(null);
+    setEditingInstallmentId(null);
+    setStatementValues({
+      plannedPaymentCents: statement.plannedPaymentCents,
+      payFromAccountId: statement.payFromAccountId,
+    });
     setEditorOpen(true);
   };
 
@@ -171,6 +231,21 @@ export function ForecastPage() {
     setEditorOpen(false);
   };
 
+  const handleStatementReset = async () => {
+    if (!editingStatementId) return;
+    await statementMutations.resetOverride.mutateAsync(editingStatementId);
+    setStatementValues((current) => ({ ...current, plannedPaymentCents: undefined }));
+  };
+
+  const handleStatementRecordPayment = async () => {
+    if (!editingStatementId) return;
+    await statementMutations.recordPayment.mutateAsync({
+      id: editingStatementId,
+      input: statementValues,
+    });
+    setEditorOpen(false);
+  };
+
   const occurrencePreview = useMemo(() => {
     if (!editingPlannedId || !data) return [];
     return data.previewOccurrences(editingPlannedId);
@@ -187,8 +262,10 @@ export function ForecastPage() {
       <ForecastScreen
         plannedRows={data?.plannedRows ?? []}
         installmentRows={data?.installmentRows ?? []}
+        statementRows={data?.statementRows ?? []}
         allPlannedRows={data?.allPlannedRows ?? []}
         allInstallmentRows={data?.allInstallmentRows ?? []}
+        allStatementRows={data?.allStatementRows ?? []}
         summary={
           data?.summary ?? {
             activeItemCount: 0,
@@ -218,6 +295,9 @@ export function ForecastPage() {
         onMarkPlannedPaid={(plannedItemId, occurrenceDate) =>
           plannedMutations.markPaid.mutate({ plannedItemId, occurrenceDate })
         }
+        onEditStatement={openEditStatement}
+        onMarkStatementPaid={(statementId) => statementMutations.markPaid.mutate({ id: statementId })}
+        onViewStatementItems={setDetailStatementId}
         editor={
           editorKind === "planned" ? (
             <PlannedItemEditorPanel
@@ -248,7 +328,7 @@ export function ForecastPage() {
                   : undefined
               }
             />
-          ) : (
+          ) : editorKind === "installment" ? (
             <InstallmentPlanEditorPanel
               open={editorOpen}
               mode={editorMode}
@@ -271,8 +351,49 @@ export function ForecastPage() {
                   : undefined
               }
             />
+          ) : (
+            <StatementEditorPanel
+              open={editorOpen}
+              cardName={editingStatementCard?.name ?? "Credit card"}
+              periodStart={editingStatement?.periodStart ?? ""}
+              closingDate={editingStatement?.closingDate ?? ""}
+              dueDate={editingStatement?.dueDate ?? ""}
+              computedTotalCents={editingStatement?.computedTotalCents ?? 0}
+              includesOpeningDebt={includesOpeningDebt}
+              values={statementValues}
+              status={editingStatement?.status ?? "open"}
+              payFromOptions={payFromOptions}
+              saving={
+                statementMutations.update.isPending ||
+                statementMutations.markPaid.isPending ||
+                statementMutations.recordPayment.isPending
+              }
+              onChange={(patch) => setStatementValues((current) => ({ ...current, ...patch }))}
+              onClose={() => setEditorOpen(false)}
+              onResetToFull={handleStatementReset}
+              onRecordPayment={handleStatementRecordPayment}
+            />
           )
         }
+      />
+
+      <StatementDetailPanel
+        open={Boolean(detailStatementId)}
+        cardName={statementDetail?.cardName ?? ""}
+        periodStart={statementDetail?.statement.periodStart ?? ""}
+        closingDate={statementDetail?.statement.closingDate ?? ""}
+        dueDate={statementDetail?.statement.dueDate ?? ""}
+        computedTotalCents={statementDetail?.statement.computedTotalCents ?? 0}
+        plannedPaymentCents={statementDetail?.statement.plannedPaymentCents}
+        status={statementDetail?.statement.status ?? "open"}
+        charges={statementDetail?.charges ?? []}
+        loading={isDetailPending}
+        onClose={() => setDetailStatementId(null)}
+        onEdit={() => {
+          if (!detailStatementId) return;
+          setDetailStatementId(null);
+          openEditStatement(detailStatementId);
+        }}
       />
 
       <RecurrenceScopeDialog

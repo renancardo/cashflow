@@ -35,6 +35,7 @@ export function computeDueDate(closingDate: string, closingDay: number, dueDay: 
   return clampDayOfMonth(next.getFullYear(), next.getMonth() + 1, dueDay);
 }
 
+/** Generates billing cycles with due dates in `[rangeStart, rangeEnd]` (inclusive). */
 export function generateStatementCycles(
   closingDay: number,
   dueDay: number,
@@ -59,7 +60,7 @@ export function generateStatementCycles(
     const dueDate = computeDueDate(closingDate, closingDay, dueDay);
 
     if (compareIso(dueDate, rangeEnd) > 0) continue;
-    if (compareIso(closingDate, addMonths(rangeStart, -12)) < 0) continue;
+    if (compareIso(dueDate, rangeStart) < 0) continue;
 
     cycles.push({
       periodStart,
@@ -90,13 +91,6 @@ function resolveStatementStatus(
   return "open";
 }
 
-function chargeFromTransaction(tx: Transaction, cardAccountId: string): number | null {
-  if (tx.accountId === cardAccountId && tx.type === "expense") {
-    return tx.amountCents;
-  }
-  return null;
-}
-
 function isInPeriod(date: string, periodStart: string, closingDate: string): boolean {
   return compareIso(date, periodStart) >= 0 && compareIso(date, closingDate) <= 0;
 }
@@ -114,15 +108,36 @@ function findOpeningDebtStatement(
     .sort((a, b) => compareIso(a.dueDate, b.dueDate))[0];
 }
 
-function sumChargesInPeriod(
+function chargeFromTransaction(tx: Transaction, cardAccountId: string): number | null {
+  if (tx.accountId === cardAccountId && tx.type === "expense") {
+    return tx.amountCents;
+  }
+  return null;
+}
+
+export type StatementChargeSource = "transaction" | "planned" | "installment" | "opening_debt";
+
+export type StatementCharge = {
+  id: string;
+  source: StatementChargeSource;
+  refId: string;
+  description: string;
+  effectiveDate: string;
+  amountCents: number;
+  categoryId?: string;
+  isProjected: boolean;
+};
+
+function collectChargesInPeriod(
   card: Account,
   periodStart: string,
   closingDate: string,
   horizonEnd: string,
+  asOfDate: string,
   afterDate?: string,
-): number {
+): StatementCharge[] {
   const db = getDatabase();
-  let total = 0;
+  const charges: StatementCharge[] = [];
 
   const includeDate = (date: string): boolean => {
     if (!isInPeriod(date, periodStart, closingDate)) return false;
@@ -131,9 +146,18 @@ function sumChargesInPeriod(
   };
 
   for (const tx of db.transactions) {
-    const charge = chargeFromTransaction(tx, card.id);
-    if (charge !== null && includeDate(tx.effectiveDate)) {
-      total += charge;
+    const amountCents = chargeFromTransaction(tx, card.id);
+    if (amountCents !== null && includeDate(tx.effectiveDate)) {
+      charges.push({
+        id: `tx-${tx.id}`,
+        source: "transaction",
+        refId: tx.id,
+        description: tx.description,
+        effectiveDate: tx.effectiveDate,
+        amountCents,
+        categoryId: tx.categoryId,
+        isProjected: false,
+      });
     }
   }
 
@@ -150,9 +174,17 @@ function sumChargesInPeriod(
     );
 
     for (const occurrence of occurrences) {
-      if (includeDate(occurrence.effectiveDate)) {
-        total += occurrence.amountCents;
-      }
+      if (!includeDate(occurrence.effectiveDate)) continue;
+      charges.push({
+        id: `planned-${item.id}-${occurrence.effectiveDate}`,
+        source: "planned",
+        refId: item.id,
+        description: item.description,
+        effectiveDate: occurrence.effectiveDate,
+        amountCents: occurrence.amountCents,
+        categoryId: item.categoryId,
+        isProjected: compareIso(occurrence.effectiveDate, asOfDate) > 0,
+      });
     }
   }
 
@@ -163,10 +195,85 @@ function sumChargesInPeriod(
     if (!plan || plan.archivedAt || !plan.isActive || plan.accountId !== card.id) continue;
     if (!includeDate(installment.dueDate)) continue;
 
-    total += installment.amountCentsOverride ?? plan.installmentAmountCents;
+    charges.push({
+      id: `installment-${installment.id}`,
+      source: "installment",
+      refId: installment.id,
+      description: plan.description,
+      effectiveDate: installment.dueDate,
+      amountCents: installment.amountCentsOverride ?? plan.installmentAmountCents,
+      categoryId: plan.categoryId,
+      isProjected: compareIso(installment.dueDate, asOfDate) > 0,
+    });
   }
 
-  return total;
+  return charges;
+}
+
+export function listStatementCharges(
+  statementId: string,
+  asOfDate: string = todayIso(),
+): StatementCharge[] {
+  const db = getDatabase();
+  const statement = db.creditCardStatements.find((row) => row.id === statementId);
+  if (!statement) {
+    throw new Error(`CreditCardStatement not found: ${statementId}`);
+  }
+
+  const card = db.accounts.find((row) => row.id === statement.cardAccountId && !row.archivedAt);
+  if (!card || card.type !== "credit_card") {
+    throw new Error(`Credit card account not found: ${statement.cardAccountId}`);
+  }
+
+  const horizonEnd = horizonEndDate(asOfDate, db.settings.horizonMonths);
+  const statements = db.creditCardStatements.filter((row) => row.cardAccountId === card.id);
+  const openingDebtStatement = findOpeningDebtStatement(statements, card.anchorDate);
+  const isOpeningDebt =
+    statement.id === openingDebtStatement?.id && card.anchorBalanceCents > 0;
+
+  const charges = collectChargesInPeriod(
+    card,
+    statement.periodStart,
+    statement.closingDate,
+    horizonEnd,
+    asOfDate,
+    isOpeningDebt ? card.anchorDate : undefined,
+  );
+
+  if (isOpeningDebt) {
+    charges.unshift({
+      id: `opening-debt-${statement.id}`,
+      source: "opening_debt",
+      refId: card.id,
+      description: "Opening balance",
+      effectiveDate: card.anchorDate,
+      amountCents: card.anchorBalanceCents,
+      isProjected: false,
+    });
+  }
+
+  return charges.sort((a, b) => {
+    const dateCmp = compareIso(a.effectiveDate, b.effectiveDate);
+    if (dateCmp !== 0) return dateCmp;
+    return a.description.localeCompare(b.description);
+  });
+}
+
+function sumChargesInPeriod(
+  card: Account,
+  periodStart: string,
+  closingDate: string,
+  horizonEnd: string,
+  afterDate?: string,
+): number {
+  return collectChargesInPeriod(
+    card,
+    periodStart,
+    closingDate,
+    horizonEnd,
+    todayIso(),
+    afterDate,
+  ).reduce((sum, charge) => sum + charge.amountCents, 0);
 }
 
 function computeStatementTotal(
@@ -238,8 +345,8 @@ export function materializeStatementsForCard(
     return [];
   }
 
-  const horizonEnd = horizonEndDate(asOfDate, db.settings.horizonMonths);
-  const rangeStart = addMonths(card.anchorDate, -12);
+  const rangeStart = card.anchorDate;
+  const rangeEnd = addMonths(card.anchorDate, db.settings.horizonMonths);
   const existing = db.creditCardStatements.filter((row) => row.cardAccountId === cardAccountId);
   const paidStatements = existing.filter(isPaidStatement);
   const preservedOverrides = new Map(
@@ -252,7 +359,7 @@ export function materializeStatementsForCard(
     (row) => row.cardAccountId !== cardAccountId || isPaidStatement(row),
   );
 
-  const cycles = generateStatementCycles(card.closingDay, card.dueDay, rangeStart, horizonEnd);
+  const cycles = generateStatementCycles(card.closingDay, card.dueDay, rangeStart, rangeEnd);
   const paidClosingDates = new Set(paidStatements.map((row) => row.closingDate));
 
   for (const cycle of cycles) {

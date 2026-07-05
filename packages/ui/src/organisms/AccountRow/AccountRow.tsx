@@ -19,10 +19,17 @@ type Props = {
   account: AccountRowData;
   onWorkingChange?: (id: string, isWorking: boolean) => void;
   onEdit?: (id: string) => void;
+  onStatements?: (id: string) => void;
   workingDisabled?: boolean;
 };
 
-export function AccountRow({ account, onWorkingChange, onEdit, workingDisabled }: Props) {
+export function AccountRow({
+  account,
+  onWorkingChange,
+  onEdit,
+  onStatements,
+  workingDisabled,
+}: Props) {
   const isCreditCard = account.type === "credit_card";
 
   return (
@@ -48,6 +55,15 @@ export function AccountRow({ account, onWorkingChange, onEdit, workingDisabled }
         <MoneyAmount cents={account.balanceCents} tone={isCreditCard ? "danger" : "default"} />
       </div>
       <div className={styles.actions}>
+        {isCreditCard && onStatements && (
+          <IconButton
+            title="Statements"
+            aria-label={`View statements for ${account.name}`}
+            onClick={() => onStatements(account.id)}
+          >
+            📄
+          </IconButton>
+        )}
         <IconButton
           title="Edit"
           aria-label={`Edit ${account.name}`}

@@ -1,0 +1,288 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  visibility: hidden;
+  pointer-events: none;
+  transition: visibility 0s linear 0.3s;
+}
+
+.open {
+  visibility: visible;
+  pointer-events: auto;
+  transition: visibility 0s;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.35);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  border: none;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.open .backdrop {
+  opacity: 1;
+}
+
+.panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(720px, 100vw);
+  background: var(--color-paper);
+  border-left: 1px solid var(--color-border);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.1);
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.open .panel {
+  transform: translateX(0);
+}
+
+.header {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  flex-shrink: 0;
+}
+
+.headerTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.close:hover {
+  border-color: var(--color-text-muted);
+  color: var(--color-text);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-primary);
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: var(--space-1) 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.body {
+  flex: 1;
+  overflow: auto;
+  padding: var(--space-4) var(--space-5) var(--space-5);
+}
+
+.empty {
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+}
+
+.table {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+}
+
+.tableHeader,
+.tableRow {
+  display: grid;
+  grid-template-columns:
+    minmax(7.25rem, 1.2fr)
+    minmax(3.25rem, auto)
+    minmax(3.25rem, auto)
+    minmax(5.5rem, auto)
+    minmax(6rem, auto)
+    minmax(4.75rem, auto)
+    minmax(3rem, auto);
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  align-items: center;
+  font-size: 0.8125rem;
+  min-width: 36rem;
+}
+
+.tableHeader {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tableRow {
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-paper);
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+.tableRow:hover {
+  background: var(--color-surface);
+}
+
+.period {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.colPeriod,
+.colClose,
+.colDue,
+.colTotal,
+.colPay,
+.colStatus,
+.colActions {
+  min-width: 0;
+}
+
+.periodSep {
+  color: var(--color-text-muted);
+}
+
+.payCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+
+.statusCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+
+.paidLink {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: var(--color-secondary);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.paidLink:hover {
+  color: var(--color-primary);
+}
+
+.editButton {
+  font-size: 0.75rem;
+  padding: var(--space-1) var(--space-2);
+}
+
+@media (max-width: 768px) {
+  .panel {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: none;
+    border-left: none;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .open .panel {
+    transform: translateY(0);
+  }
+
+  .close {
+    width: var(--touch-min);
+    height: var(--touch-min);
+  }
+
+  .tableHeader {
+    display: none;
+  }
+
+  .tableRow {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "period status"
+      "due due"
+      "total pay"
+      "actions actions";
+    gap: var(--space-1) var(--space-3);
+    padding: var(--space-3);
+  }
+
+  .colPeriod {
+    grid-area: period;
+  }
+
+  .colClose {
+    display: none;
+  }
+
+  .colDue {
+    grid-area: due;
+    color: var(--color-text-muted);
+  }
+
+  .colTotal {
+    grid-area: total;
+  }
+
+  .colPay {
+    grid-area: pay;
+    justify-self: end;
+  }
+
+  .colStatus {
+    grid-area: status;
+    justify-self: end;
+  }
+
+  .colActions {
+    grid-area: actions;
+    justify-self: end;
+  }
+}

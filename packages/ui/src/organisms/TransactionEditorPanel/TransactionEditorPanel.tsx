@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import type { TxType } from "@cashflow/core";
+import type { AccountType, TxType } from "@cashflow/core";
 import { TX_TYPES, TX_TYPE_LABELS, formatCents, parseMoney } from "@cashflow/core";
 import { Button } from "../../atoms/Button/Button.js";
 import { FormField } from "../../molecules/FormField/FormField.js";
 import { EditorPanel, EditorPanelFooterActions } from "../EditorPanel/EditorPanel.js";
+import { validateTransferDestination } from "../../lib/transferValidation.js";
 import styles from "./TransactionEditorPanel.module.css";
 
 export type TransactionEditorValues = {
@@ -16,7 +17,7 @@ export type TransactionEditorValues = {
   effectiveDate: string;
 };
 
-type AccountOption = { id: string; name: string };
+type AccountOption = { id: string; name: string; type: AccountType };
 type CategoryOption = { id: string; name: string; kind: "income" | "expense" };
 
 type Props = {
@@ -26,6 +27,7 @@ type Props = {
   currency?: string;
   accountOptions: AccountOption[];
   categoryOptions: CategoryOption[];
+  allowCreditCardDestination?: boolean;
   onChange: (patch: Partial<TransactionEditorValues>) => void;
   onClose: () => void;
   onSave: () => void;
@@ -75,6 +77,7 @@ export function TransactionEditorPanel({
   currency = "BRL",
   accountOptions,
   categoryOptions,
+  allowCreditCardDestination = false,
   onChange,
   onClose,
   onSave,
@@ -85,13 +88,23 @@ export function TransactionEditorPanel({
     values.type === "income" ? c.kind === "income" : c.kind === "expense",
   );
 
-  const toAccountOptions = accountOptions.filter((a) => a.id !== values.accountId);
+  const toAccountOptions = accountOptions.filter((account) => {
+    if (account.id === values.accountId) return false;
+    if (account.type === "credit_card" && !allowCreditCardDestination) return false;
+    return true;
+  });
+
+  const transferError =
+    allowCreditCardDestination || !isTransfer
+      ? undefined
+      : validateTransferDestination(values, accountOptions);
 
   const canSave =
     values.description.trim().length > 0 &&
     values.amountCents > 0 &&
     values.accountId.length > 0 &&
     values.effectiveDate.length > 0 &&
+    !transferError &&
     (isTransfer
       ? Boolean(values.toAccountId && values.toAccountId !== values.accountId)
       : Boolean(values.categoryId));
@@ -242,6 +255,15 @@ export function TransactionEditorPanel({
           </FormField>
         )}
       </div>
+
+      {isTransfer && !allowCreditCardDestination && (
+        <p className={styles.transferHint}>
+          To pay a credit card, open Forecast Items, expand the card statement, set the payment
+          amount, then use Record payment.
+        </p>
+      )}
+
+      {transferError && <p className={styles.validationError}>{transferError}</p>}
     </EditorPanel>
   );
 }

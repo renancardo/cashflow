@@ -12,10 +12,14 @@ import {
   InstallmentPlanRow,
   type InstallmentPlanRowData,
 } from "../InstallmentPlanRow/InstallmentPlanRow.js";
+import {
+  CreditCardStatementRow,
+  type CreditCardStatementRowData,
+} from "../CreditCardStatementRow/CreditCardStatementRow.js";
 import styles from "./ForecastScreen.module.css";
 
 export type ForecastFilter =
-  "all" | "subscription" | "income" | "expense" | "transfer" | "installment";
+  "all" | "subscription" | "income" | "expense" | "transfer" | "installment" | "statement";
 
 export type ForecastSummary = {
   activeItemCount: number;
@@ -31,13 +35,16 @@ const FILTER_OPTIONS: { value: ForecastFilter; label: string }[] = [
   { value: "expense", label: "Expense" },
   { value: "transfer", label: "Transfer" },
   { value: "installment", label: "Installments" },
+  { value: "statement", label: "Statements" },
 ];
 
 type Props = {
   plannedRows: ForecastItemRowData[];
   installmentRows: InstallmentPlanRowData[];
+  statementRows: CreditCardStatementRowData[];
   allPlannedRows: ForecastItemRowData[];
   allInstallmentRows: InstallmentPlanRowData[];
+  allStatementRows: CreditCardStatementRowData[];
   summary: ForecastSummary;
   filter: ForecastFilter;
   workingBalanceCents: number;
@@ -53,15 +60,20 @@ type Props = {
   onEditInstallment?: (id: string) => void;
   onMarkInstallmentPaid?: (installmentId: string) => void;
   onMarkPlannedPaid?: (plannedItemId: string, occurrenceDate: string) => void;
+  onEditStatement?: (statementId: string) => void;
+  onMarkStatementPaid?: (statementId: string) => void;
+  onViewStatementItems?: (statementId: string) => void;
 };
 
 function ForecastGroup({
   title,
   plannedHeader,
   installmentHeader,
+  statementHeader,
   recurring,
   oneOff,
   installments,
+  statements,
   dormant,
   onPlannedActiveChange,
   onInstallmentActiveChange,
@@ -69,13 +81,18 @@ function ForecastGroup({
   onEditInstallment,
   onMarkInstallmentPaid,
   onMarkPlannedPaid,
+  onEditStatement,
+  onMarkStatementPaid,
+  onViewStatementItems,
 }: {
   title: string;
   plannedHeader: boolean;
   installmentHeader: boolean;
+  statementHeader: boolean;
   recurring: ForecastItemRowData[];
   oneOff: ForecastItemRowData[];
   installments: InstallmentPlanRowData[];
+  statements: CreditCardStatementRowData[];
   dormant: boolean;
   onPlannedActiveChange?: (id: string, isActive: boolean) => void;
   onInstallmentActiveChange?: (id: string, isActive: boolean) => void;
@@ -83,8 +100,12 @@ function ForecastGroup({
   onEditInstallment?: (id: string) => void;
   onMarkInstallmentPaid?: (installmentId: string) => void;
   onMarkPlannedPaid?: (plannedItemId: string, occurrenceDate: string) => void;
+  onEditStatement?: (statementId: string) => void;
+  onMarkStatementPaid?: (statementId: string) => void;
+  onViewStatementItems?: (statementId: string) => void;
 }) {
-  const hasContent = recurring.length > 0 || oneOff.length > 0 || installments.length > 0;
+  const hasContent =
+    recurring.length > 0 || oneOff.length > 0 || installments.length > 0 || statements.length > 0;
   if (!hasContent) return null;
 
   return (
@@ -182,6 +203,32 @@ function ForecastGroup({
           </div>
         </div>
       )}
+
+      {statements.length > 0 && (
+        <div className={styles.group}>
+          <h3 className={styles.groupLabel}>Credit card statements</h3>
+          <div className={styles.list}>
+            {statementHeader && (
+              <div className={styles.listHeaderStatements}>
+                <span>Card</span>
+                <span>Pay from</span>
+                <span>Horizon</span>
+                <span>Next due</span>
+                <span />
+              </div>
+            )}
+            {statements.map((row) => (
+              <CreditCardStatementRow
+                key={row.cardAccountId}
+                row={row}
+                onEdit={onEditStatement}
+                onMarkPaid={onMarkStatementPaid}
+                onViewItems={onViewStatementItems}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
@@ -189,8 +236,10 @@ function ForecastGroup({
 export function ForecastScreen({
   plannedRows,
   installmentRows,
+  statementRows,
   allPlannedRows,
   allInstallmentRows,
+  allStatementRows,
   summary,
   filter,
   workingBalanceCents,
@@ -206,6 +255,9 @@ export function ForecastScreen({
   onEditInstallment,
   onMarkInstallmentPaid,
   onMarkPlannedPaid,
+  onEditStatement,
+  onMarkStatementPaid,
+  onViewStatementItems,
 }: Props) {
   if (status === "loading") {
     return (
@@ -225,7 +277,10 @@ export function ForecastScreen({
     );
   }
 
-  const isEmpty = allPlannedRows.length === 0 && allInstallmentRows.length === 0;
+  const isEmpty =
+    allPlannedRows.length === 0 &&
+    allInstallmentRows.length === 0 &&
+    allStatementRows.length === 0;
 
   const activePlanned = plannedRows.filter((row) => row.isActive);
   const dormantPlanned = plannedRows.filter((row) => !row.isActive);
@@ -264,7 +319,7 @@ export function ForecastScreen({
       <div className={styles.page}>
         <PageHeader
           title="Forecast Items"
-          subtitle="Recurring obligations, one-off plans, installment debt, and subscriptions"
+          subtitle="Recurring obligations, one-off plans, installment debt, card statements, and subscriptions"
         />
 
         {isEmpty ? (
@@ -332,9 +387,11 @@ export function ForecastScreen({
               title="Active"
               plannedHeader
               installmentHeader
+              statementHeader
               recurring={activePlannedGroups.recurring}
               oneOff={activePlannedGroups.oneOff}
               installments={activeInstallments}
+              statements={statementRows}
               dormant={false}
               onPlannedActiveChange={onPlannedActiveChange}
               onInstallmentActiveChange={onInstallmentActiveChange}
@@ -342,15 +399,20 @@ export function ForecastScreen({
               onEditInstallment={onEditInstallment}
               onMarkInstallmentPaid={onMarkInstallmentPaid}
               onMarkPlannedPaid={onMarkPlannedPaid}
+              onEditStatement={onEditStatement}
+              onMarkStatementPaid={onMarkStatementPaid}
+              onViewStatementItems={onViewStatementItems}
             />
 
             <ForecastGroup
               title="Dormant"
               plannedHeader
               installmentHeader
+              statementHeader
               recurring={dormantPlannedGroups.recurring}
               oneOff={dormantPlannedGroups.oneOff}
               installments={dormantInstallments}
+              statements={[]}
               dormant
               onPlannedActiveChange={onPlannedActiveChange}
               onInstallmentActiveChange={onInstallmentActiveChange}

@@ -1,6 +1,6 @@
 .row {
   display: grid;
-  grid-template-columns: 1fr 5rem 9rem 2rem;
+  grid-template-columns: 1fr 5rem 9rem 4.5rem;
   gap: var(--space-4);
   align-items: center;
   padding: var(--space-4);
@@ -67,6 +67,7 @@
   display: flex;
   justify-content: center;
   justify-self: center;
+  gap: var(--space-1);
 }
 
 @media (max-width: 768px) {

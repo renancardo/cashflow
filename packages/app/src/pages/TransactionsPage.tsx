@@ -84,6 +84,8 @@ export function TransactionsPage() {
     setEditorOpen(true);
   };
 
+  const editingTx = editingId ? data?.rawTransactions.find((row) => row.id === editingId) : undefined;
+
   const handleSave = async () => {
     const input = toTransactionInput(editorValues);
     if (!input.description.trim() || input.amountCents <= 0) return;
@@ -134,6 +136,7 @@ export function TransactionsPage() {
           values={editorValues}
           accountOptions={data?.accounts ?? []}
           categoryOptions={data?.categories ?? []}
+          allowCreditCardDestination={Boolean(editingTx?.paysStatementId)}
           onChange={(patch) => setEditorValues((current) => ({ ...current, ...patch }))}
           onClose={() => setEditorOpen(false)}
           onSave={handleSave}

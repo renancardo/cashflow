@@ -117,6 +117,39 @@ describe("statement materialization", () => {
     );
   });
 
+  it("materializes from anchor through anchor + horizonMonths only", async () => {
+    resetDatabase(createEmptyState());
+
+    const checking = await accountsRepo.create({
+      name: "Checking",
+      type: "checking",
+      currency: "BRL",
+      isWorking: true,
+      anchorBalanceCents: 500_000,
+      anchorDate: "2026-06-01",
+    });
+
+    const card = await accountsRepo.create({
+      name: "Cartão Cora",
+      type: "credit_card",
+      currency: "BRL",
+      isWorking: false,
+      anchorBalanceCents: 185_000,
+      anchorDate: "2026-06-01",
+      closingDay: 25,
+      dueDay: 3,
+      defaultPayFromAccountId: checking.id,
+    });
+
+    materializeStatementsForCard(card.id, "2026-06-28");
+
+    const statements = statementsForCard(card.id);
+    expect(statements.length).toBeGreaterThan(0);
+    expect(statements.every((row) => row.dueDate >= "2026-06-01")).toBe(true);
+    expect(statements.every((row) => row.dueDate <= "2028-06-01")).toBe(true);
+    expect(statements.some((row) => row.dueDate < "2026-07-01")).toBe(false);
+  });
+
   it("preserves paid statements when rematerializing", async () => {
     resetDatabase(createEmptyState());
 

@@ -51,15 +51,22 @@ function resolveSettlement(
       : undefined;
     return { kind: "installment", label: plan?.description ?? "Installment" };
   }
-  if (tx.paysStatementId) {
-    const statement = getDatabase().creditCardStatements.find(
-      (row) => row.id === tx.paysStatementId,
-    );
+
+  const statement =
+    (tx.paysStatementId
+      ? getDatabase().creditCardStatements.find((row) => row.id === tx.paysStatementId)
+      : undefined) ??
+    getDatabase().creditCardStatements.find((row) => row.paymentTransactionId === tx.id);
+
+  if (statement) {
+    const [, startMonth, startDay] = statement.periodStart.split("-");
+    const [endYear, endMonth, endDay] = statement.closingDate.split("-");
     return {
       kind: "statement",
-      label: statement ? `Statement ${statement.periodStart}` : "Statement",
+      label: `${startDay}/${startMonth}–${endDay}/${endMonth}/${endYear.slice(-2)}`,
     };
   }
+
   return undefined;
 }
 
@@ -99,7 +106,7 @@ export function useTransactions(filters: TransactionFilters = {}) {
         rows,
         totalCount: rows.length,
         rawTransactions: transactions,
-        accounts: accounts.map((a) => ({ id: a.id, name: a.name })),
+        accounts: accounts.map((a) => ({ id: a.id, name: a.name, type: a.type })),
         categories: categories.map((c) => ({ id: c.id, name: c.name, kind: c.kind })),
       };
     },
