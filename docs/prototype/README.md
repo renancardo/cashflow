@@ -22,7 +22,7 @@ Each theme folder is self-contained: its own `css/`, `js/`, and `DESIGN.md` with
 
 ## Screens (all themes)
 
-Every theme implements the same nine Phase 1 screens:
+Every theme implements the same screen set. **Phase 1 ships 8 screens**; Snapshots remains in prototypes as a Phase 2 reference.
 
 | Screen | File | Spec ref |
 |---|---|---|
@@ -34,8 +34,8 @@ Every theme implements the same nine Phase 1 screens:
 | Accounts | `accounts.html` | Screen 5 |
 | Forecast Items | `forecast.html` | Screen 6 |
 | Categories & Budgets | `categories.html` | Screen 7 |
-| Snapshots | `snapshots.html` | Screen 8 |
-| Settings | `settings.html` | Screen 9 |
+| Settings | `settings.html` | Screen 8 |
+| Snapshots *(Phase 2)* | `snapshots.html` | deferred — see [09-snapshots.md](../user-stories/09-snapshots.md) |
 
 See [`../specs/003-screen-specs.md`](../specs/003-screen-specs.md) for per-screen behavior.
 

@@ -12,7 +12,7 @@
 Phase 1 is a **local-first** personal cash flow app with:
 
 - A **pure projection engine** (highest-risk logic)
-- A **calendar-heavy React UI** (9 screens, Paper theme)
+- A **calendar-heavy React UI** (8 screens, Paper theme)
 - **No cloud backend** in Phase 1
 
 The stack must support engine-first development, component isolation (Storybook), and a clear package boundary so projection math never depends on React.

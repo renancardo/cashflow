@@ -53,4 +53,4 @@ Category management and monthly expense budgets.
 
 - [x] Progress bars and over/under amounts per category — per-row `ProgressBar`, variance column, summary-strip budget progress
 - [x] Parent category rolls up child spend — `useCategories` `buildRows()` sums child actuals/budgets into parent row
-- [ ] When snapshot selected, variance also surfaced here (link to Epic 9) — snapshots route disabled; no overlay on Categories screen yet
+- [ ] When snapshot selected, variance also surfaced here (Epic 9 — **Phase 2**; not in v1)

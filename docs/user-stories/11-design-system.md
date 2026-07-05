@@ -41,7 +41,7 @@ Cross-cutting UI consistency: shared **Card** primitives, mobile list patterns, 
 **Screens without mobile card treatment yet (candidates for follow-up):**
 
 - **Categories** — horizontal scroll table at narrow widths (`CategoriesScreen`); may need card rows or simplified tree
-- **Snapshots** — not implemented in app
+- **Snapshots** — Phase 2 (deferred from v1)
 - **Settings** — form sections could use `SurfaceCard`
 - **Accounts** desktop table header — already card-like on mobile only
 

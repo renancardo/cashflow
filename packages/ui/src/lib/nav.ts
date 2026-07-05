@@ -12,6 +12,5 @@ export const SIDE_NAV_ITEMS: NavItem[] = [
   { label: "Accounts", path: "/accounts" },
   { label: "Forecast Items", path: "/forecast" },
   { label: "Categories", path: "/categories" },
-  { label: "Snapshots", path: "/snapshots", disabled: true },
   { label: "Settings", path: "/settings", disabled: true },
 ];
