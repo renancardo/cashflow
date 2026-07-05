@@ -14,6 +14,7 @@ import {
   useAccountMutations,
   type AccountInput,
 } from "../data/mutations/useAccountMutations";
+import { useSettings } from "../data/queries/useSettings";
 import { useAccounts } from "../data/queries/useAccounts";
 import { useStatements } from "../data/queries/useStatements";
 import { useStatementDetail } from "../data/queries/useStatementDetail";
@@ -55,13 +56,16 @@ function toAccountInput(values: AccountEditorValues): AccountInput {
 export function AccountsPage() {
   const navigate = useNavigate();
   const { data, isPending, isError, error } = useAccounts();
+  const { data: settingsData } = useSettings();
   const { create, update, setWorking, archive } = useAccountMutations();
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorMode, setEditorMode] = useState<"create" | "edit">("create");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [statementsCardId, setStatementsCardId] = useState<string | null>(null);
   const [detailStatementId, setDetailStatementId] = useState<string | null>(null);
-  const [editorValues, setEditorValues] = useState<AccountEditorValues>(createEmptyAccountInput());
+  const [editorValues, setEditorValues] = useState<AccountEditorValues>(() =>
+    createEmptyAccountInput(),
+  );
   const { data: statements = [] } = useStatements(statementsCardId);
   const { data: statementDetail, isPending: isDetailPending } =
     useStatementDetail(detailStatementId);
@@ -87,7 +91,7 @@ export function AccountsPage() {
   const openCreate = () => {
     setEditorMode("create");
     setEditingId(null);
-    setEditorValues(createEmptyAccountInput());
+    setEditorValues(createEmptyAccountInput("BRL", settingsData));
     setEditorOpen(true);
   };
 
@@ -123,7 +127,7 @@ export function AccountsPage() {
     setEditorValues((current) => {
       const next = { ...current, ...patch };
       if (patch.type && patch.type !== current.type) {
-        next.isWorking = defaultIsWorking(patch.type);
+        next.isWorking = defaultIsWorking(patch.type, settingsData);
       }
       return next;
     });

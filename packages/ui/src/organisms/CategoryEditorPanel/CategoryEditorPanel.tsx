@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { formatCents, parseMoney, type CategoryKind } from "@cashflow/core";
+import { fmt, formatCents, parseMoney, type CategoryKind } from "@cashflow/core";
 import { Button } from "../../atoms/Button/Button.js";
 import { Tooltip } from "../../atoms/Tooltip/Tooltip.js";
 import { FormField } from "../../molecules/FormField/FormField.js";
+import { useMessages } from "../../i18n/LanguageContext.js";
 import { EditorPanel, EditorPanelFooterActions } from "../EditorPanel/EditorPanel.js";
 import styles from "./CategoryEditorPanel.module.css";
 
@@ -35,12 +36,13 @@ type Props = {
 type MoneyFieldProps = {
   id: string;
   label: string;
+  placeholder: string;
   cents: number | undefined;
   hint?: string;
   onCentsChange: (cents: number | undefined) => void;
 };
 
-function MoneyField({ id, label, cents, hint, onCentsChange }: MoneyFieldProps) {
+function MoneyField({ id, label, placeholder, cents, hint, onCentsChange }: MoneyFieldProps) {
   const [draft, setDraft] = useState(() => formatCents(cents));
 
   useEffect(() => {
@@ -53,7 +55,7 @@ function MoneyField({ id, label, cents, hint, onCentsChange }: MoneyFieldProps) 
       label={label}
       type="text"
       inputMode="decimal"
-      placeholder="0.00"
+      placeholder={placeholder}
       value={draft}
       hint={hint}
       onChange={(event) => {
@@ -66,11 +68,6 @@ function MoneyField({ id, label, cents, hint, onCentsChange }: MoneyFieldProps) 
   );
 }
 
-const KIND_LABELS: Record<CategoryKind, string> = {
-  expense: "Expense",
-  income: "Income",
-};
-
 export function CategoryEditorPanel({
   open,
   mode,
@@ -81,20 +78,28 @@ export function CategoryEditorPanel({
   onSave,
   onArchive,
 }: Props) {
+  const m = useMessages();
+  const ed = m.categories.editor;
+
   const canSave = values.name.trim().length > 0;
   const isExpense = values.kind === "expense";
   const isChild = !!values.parentId;
+  const kindLabel = m.common.kind[values.kind];
 
   const subtitle =
     mode === "edit"
-      ? `${values.name} · ${KIND_LABELS[values.kind]}${isChild ? " · subcategory" : " · parent"}`
-      : `New ${KIND_LABELS[values.kind].toLowerCase()} category`;
+      ? fmt(ed.editCategorySubtitle, {
+          name: values.name,
+          kind: kindLabel,
+          suffix: isChild ? ed.subcategorySuffix : ed.parentSuffix,
+        })
+      : fmt(ed.newCategorySubtitle, { kind: kindLabel.toLowerCase() });
 
   return (
     <EditorPanel
       open={open}
       labelId="category-editor-title"
-      title={mode === "create" ? "Add category" : "Edit category"}
+      title={mode === "create" ? ed.addTitle : ed.editTitle}
       subtitle={subtitle}
       onClose={onClose}
       onSubmit={() => {
@@ -103,18 +108,15 @@ export function CategoryEditorPanel({
       footer={
         <>
           {mode === "edit" && onArchive && (
-            <Tooltip
-              align="start"
-              content="Archiving preserves historical transactions using this category."
-            >
+            <Tooltip align="start" content={ed.archiveTooltip}>
               <Button variant="ghost" className={styles.archiveButton} onClick={onArchive}>
-                Archive
+                {m.common.archive}
               </Button>
             </Tooltip>
           )}
           <EditorPanelFooterActions>
             <Button variant="ghost" onClick={onClose}>
-              Cancel
+              {m.common.cancel}
             </Button>
             <Button
               variant="primary"
@@ -122,7 +124,7 @@ export function CategoryEditorPanel({
               disabled={!canSave}
               className={styles.saveButton}
             >
-              {mode === "create" ? "Add category" : "Save changes"}
+              {mode === "create" ? ed.addSubmit : m.common.saveChanges}
             </Button>
           </EditorPanelFooterActions>
         </>
@@ -130,9 +132,9 @@ export function CategoryEditorPanel({
     >
       <FormField
         id="cat-name"
-        label="Name"
+        label={m.common.form.name}
         value={values.name}
-        placeholder="e.g. Groceries"
+        placeholder={m.common.form.placeholderCategoryName}
         onChange={(event) => onChange({ name: event.target.value })}
         required
       />
@@ -140,20 +142,20 @@ export function CategoryEditorPanel({
       <div className={styles.row}>
         <FormField
           id="cat-kind"
-          label="Kind"
+          label={m.common.form.type}
           inputType="select"
           value={values.kind}
           onChange={(event) =>
             onChange({ kind: event.target.value as CategoryKind, parentId: undefined })
           }
         >
-          <option value="expense">Expense</option>
-          <option value="income">Income</option>
+          <option value="expense">{m.common.kind.expense}</option>
+          <option value="income">{m.common.kind.income}</option>
         </FormField>
 
         <div className={styles.colorField}>
           <label className={styles.colorLabel} htmlFor="cat-color">
-            Color
+            {m.common.form.color}
           </label>
           <div className={styles.colorRow}>
             <input
@@ -170,17 +172,13 @@ export function CategoryEditorPanel({
 
       <FormField
         id="cat-parent"
-        label="Parent category"
+        label={m.common.form.parentCategory}
         inputType="select"
         value={values.parentId ?? ""}
-        hint={
-          parentOptions.length === 0
-            ? "No root categories available for this kind"
-            : "One level max — only root categories can be parents"
-        }
+        hint={parentOptions.length === 0 ? ed.parentHintEmpty : ed.parentHint}
         onChange={(event) => onChange({ parentId: event.target.value || undefined })}
       >
-        <option value="">None (root category)</option>
+        <option value="">{m.common.form.noneRootCategory}</option>
         {parentOptions.map((opt) => (
           <option key={opt.id} value={opt.id}>
             {opt.name}
@@ -190,22 +188,20 @@ export function CategoryEditorPanel({
 
       {isExpense && (
         <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Monthly budget</h3>
-          <p className={styles.sectionHint}>
-            Budgets apply to expense categories only. Changes take effect from the chosen month
-            onward.
-          </p>
+          <h3 className={styles.sectionTitle}>{ed.monthlyBudgetTitle}</h3>
+          <p className={styles.sectionHint}>{ed.monthlyBudgetHint}</p>
           <div className={styles.row}>
             <MoneyField
               id="cat-budget-amount"
-              label="Amount"
+              label={m.common.form.amount}
+              placeholder={m.common.form.placeholderAmount}
               cents={values.budgetCents}
-              hint="Leave empty for no budget"
+              hint={m.common.form.placeholderLeaveEmptyNoBudget}
               onCentsChange={(cents) => onChange({ budgetCents: cents })}
             />
             <FormField
               id="cat-budget-month"
-              label="Effective from"
+              label={ed.effectiveFrom}
               type="month"
               value={values.budgetEffectiveFromMonth}
               onChange={(event) => onChange({ budgetEffectiveFromMonth: event.target.value })}

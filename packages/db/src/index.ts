@@ -39,3 +39,12 @@ export {
   seedDatabase,
   type DatabaseState,
 } from "./in-memory/database.js";
+export {
+  BACKUP_VERSION,
+  createEmptyBackup,
+  exportDatabase,
+  parseBackupJson,
+  restoreDatabase,
+  validateBackup,
+  type DatabaseBackup,
+} from "./backup.js";

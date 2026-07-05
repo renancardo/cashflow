@@ -1,9 +1,10 @@
 import type { AccountType } from "@cashflow/core";
+import { accountTypeLabel, accountTypeChipVariant, fmt } from "@cashflow/core";
 import { Chip } from "../../atoms/Chip/Chip.js";
 import { MoneyAmount } from "../../atoms/MoneyAmount/MoneyAmount.js";
 import { Toggle } from "../../atoms/Toggle/Toggle.js";
 import { IconButton } from "../../molecules/IconButton/IconButton.js";
-import { ACCOUNT_TYPE_LABELS, accountTypeChipVariant } from "@cashflow/core";
+import { useMessages } from "../../i18n/LanguageContext.js";
 import styles from "./AccountRow.module.css";
 
 export type AccountRowData = {
@@ -30,6 +31,7 @@ export function AccountRow({
   onStatements,
   workingDisabled,
 }: Props) {
+  const m = useMessages();
   const isCreditCard = account.type === "credit_card";
 
   return (
@@ -38,7 +40,7 @@ export function AccountRow({
         <div className={styles.name}>{account.name}</div>
         <div className={styles.meta}>
           <Chip variant={accountTypeChipVariant(account.type)}>
-            {ACCOUNT_TYPE_LABELS[account.type]}
+            {accountTypeLabel(m, account.type)}
           </Chip>
         </div>
       </div>
@@ -46,27 +48,27 @@ export function AccountRow({
         <Toggle
           checked={account.isWorking}
           disabled={workingDisabled ?? isCreditCard}
-          aria-label={account.isWorking ? "Working account" : "Not working"}
+          aria-label={account.isWorking ? m.accounts.working.on : m.accounts.working.off}
           onChange={(checked) => onWorkingChange?.(account.id, checked)}
         />
       </div>
       <div className={[styles.balance, isCreditCard && styles.debt].filter(Boolean).join(" ")}>
-        {isCreditCard && <span className={styles.balanceLabel}>Owed</span>}
+        {isCreditCard && <span className={styles.balanceLabel}>{m.common.owed}</span>}
         <MoneyAmount cents={account.balanceCents} tone={isCreditCard ? "danger" : "default"} />
       </div>
       <div className={styles.actions}>
         {isCreditCard && onStatements && (
           <IconButton
-            title="Statements"
-            aria-label={`View statements for ${account.name}`}
+            title={m.common.statements}
+            aria-label={fmt(m.common.aria.viewStatementsFor, { name: account.name })}
             onClick={() => onStatements(account.id)}
           >
             📄
           </IconButton>
         )}
         <IconButton
-          title="Edit"
-          aria-label={`Edit ${account.name}`}
+          title={m.common.edit}
+          aria-label={fmt(m.common.aria.editName, { name: account.name })}
           onClick={() => onEdit?.(account.id)}
         >
           ✎

@@ -1,6 +1,6 @@
 import { useState, type DragEvent, type ReactNode } from "react";
 import type { TxType } from "@cashflow/core";
-import { TX_TYPE_LABELS, txTypeChipVariant } from "@cashflow/core";
+import { fmt, txTypeChipVariant, txTypeLabel } from "@cashflow/core";
 import { Button } from "../../atoms/Button/Button.js";
 import { Chip } from "../../atoms/Chip/Chip.js";
 import { FormattedDate } from "../../atoms/FormattedDate/FormattedDate.js";
@@ -8,6 +8,7 @@ import { MoneyAmount } from "../../atoms/MoneyAmount/MoneyAmount.js";
 import { Metric } from "../../molecules/Metric/Metric.js";
 import { IconButton } from "../../molecules/IconButton/IconButton.js";
 import { SegmentedControl } from "../../molecules/SegmentedControl/SegmentedControl.js";
+import { useMessages } from "../../i18n/LanguageContext.js";
 import { HeaderStrip } from "../HeaderStrip/HeaderStrip.js";
 import { PageHeader } from "../PageHeader/PageHeader.js";
 import styles from "./TransactionsScreen.module.css";
@@ -98,6 +99,7 @@ function TransactionRow({
   onDragOver: (event: DragEvent<HTMLElement>, id: string) => void;
   onDrop: (event: DragEvent<HTMLElement>, id: string) => void;
 }) {
+  const m = useMessages();
   const isStatementPayment = row.settlement?.kind === "statement";
   const displayType: TxType = isStatementPayment ? "expense" : row.type;
   const amountTone =
@@ -126,8 +128,8 @@ function TransactionRow({
           type="button"
           className={styles.dragHandle}
           draggable
-          aria-label={`Reorder ${row.description}`}
-          title="Drag to reorder within the same day"
+          aria-label={fmt(m.common.aria.reorderDescription, { description: row.description })}
+          title={m.common.aria.dragToReorder}
           onDragStart={(event) => {
             event.dataTransfer.effectAllowed = "move";
             event.dataTransfer.setData("text/plain", row.id);
@@ -146,7 +148,7 @@ function TransactionRow({
       </div>
 
       <div>
-        <Chip variant={txTypeChipVariant(displayType)}>{TX_TYPE_LABELS[displayType]}</Chip>
+        <Chip variant={txTypeChipVariant(displayType)}>{txTypeLabel(m, displayType)}</Chip>
       </div>
 
       <div className={styles.rowDescription}>
@@ -158,7 +160,7 @@ function TransactionRow({
           .filter(Boolean)
           .join(" ")}
       >
-        {row.categoryName ?? "—"}
+        {row.categoryName ?? m.common.dash}
       </div>
 
       <div className={styles.rowAccount}>{row.accountName}</div>
@@ -166,7 +168,7 @@ function TransactionRow({
       <div
         className={[styles.rowTo, !row.toAccountName && styles.cellEmpty].filter(Boolean).join(" ")}
       >
-        {row.toAccountName ?? "—"}
+        {row.toAccountName ?? m.common.dash}
       </div>
 
       <div className={[styles.rowAmount, styles[`amount${displayType}`]].filter(Boolean).join(" ")}>
@@ -188,18 +190,18 @@ function TransactionRow({
             }
           >
             {row.settlement.kind === "planned"
-              ? "Planned"
+              ? m.common.chips.planned
               : row.settlement.kind === "installment"
-                ? "Installment"
-                : "Statement"}
+                ? m.common.chips.installment
+                : m.common.chips.statement}
           </Chip>
         )}
       </div>
 
       <div className={styles.rowActions}>
         <IconButton
-          title="Edit transaction"
-          aria-label={`Edit ${row.description}`}
+          title={m.transactions.editTransaction}
+          aria-label={fmt(m.common.aria.editDescription, { description: row.description })}
           onClick={() => onEdit?.(row.id)}
         >
           ✎
@@ -226,6 +228,7 @@ export function TransactionsScreen({
   onEdit,
   onReorder,
 }: Props) {
+  const m = useMessages();
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dropTarget, setDropTarget] = useState<DropTarget | null>(null);
   const [filtersExpanded, setFiltersExpanded] = useState(false);
@@ -278,8 +281,8 @@ export function TransactionsScreen({
   if (status === "loading") {
     return (
       <div className={styles.statusPage}>
-        <h2 className={styles.statusTitle}>Loading transactions…</h2>
-        <p>Fetching ledger entries.</p>
+        <h2 className={styles.statusTitle}>{m.transactions.loading.title}</h2>
+        <p>{m.transactions.loading.description}</p>
       </div>
     );
   }
@@ -287,8 +290,8 @@ export function TransactionsScreen({
   if (status === "error") {
     return (
       <div className={styles.statusPage}>
-        <h2 className={styles.statusTitle}>Could not load transactions</h2>
-        <p>{errorMessage ?? "Something went wrong. Try again."}</p>
+        <h2 className={styles.statusTitle}>{m.transactions.error.title}</h2>
+        <p>{errorMessage ?? m.common.errorFallback}</p>
       </div>
     );
   }
@@ -297,34 +300,29 @@ export function TransactionsScreen({
     <>
       <HeaderStrip
         metric={
-          <Metric label="Working balance">
+          <Metric label={m.common.workingBalance}>
             <MoneyAmount cents={workingBalanceCents} />
           </Metric>
         }
         action={
           <Button variant="primary" onClick={onAddTransaction}>
-            + Add transaction
+            {m.transactions.addTransaction}
           </Button>
         }
       />
 
       <div className={styles.page}>
-        <PageHeader
-          title="Transactions"
-          subtitle="Chronological ledger with filters — newest first"
-        />
+        <PageHeader title={m.transactions.title} subtitle={m.transactions.subtitle} />
 
         {!hasLedger ? (
           <div className={styles.empty}>
             <div className={styles.emptyIcon} aria-hidden="true">
               📒
             </div>
-            <h2 className={styles.emptyTitle}>No transactions yet</h2>
-            <p className={styles.emptyDesc}>
-              Add your first transaction to start tracking income, expenses, and transfers.
-            </p>
+            <h2 className={styles.emptyTitle}>{m.transactions.empty.title}</h2>
+            <p className={styles.emptyDesc}>{m.transactions.empty.description}</p>
             <Button variant="primary" onClick={onAddTransaction}>
-              + Add transaction
+              {m.transactions.addTransaction}
             </Button>
           </div>
         ) : (
@@ -333,14 +331,14 @@ export function TransactionsScreen({
               <div className={styles.filtersHeader}>
                 <div className={styles.typeFilters}>
                   <SegmentedControl
-                    aria-label="Filter by type"
+                    aria-label={m.common.aria.filterByType}
                     value={typeFilter}
                     onChange={(type) => patchFilters({ type: type === "all" ? undefined : type })}
                     options={[
-                      { value: "all", label: "All types" },
-                      { value: "income", label: TX_TYPE_LABELS.income },
-                      { value: "expense", label: TX_TYPE_LABELS.expense },
-                      { value: "transfer", label: TX_TYPE_LABELS.transfer },
+                      { value: "all", label: m.transactions.allTypes },
+                      { value: "income", label: txTypeLabel(m, "income") },
+                      { value: "expense", label: txTypeLabel(m, "expense") },
+                      { value: "transfer", label: txTypeLabel(m, "transfer") },
                     ]}
                   />
                 </div>
@@ -349,8 +347,14 @@ export function TransactionsScreen({
                   {!filtersExpanded && (
                     <span className={styles.filtersSummary}>
                       {activeFilterCount === 0
-                        ? "All transactions"
-                        : `${activeFilterCount} ${activeFilterCount === 1 ? "filter" : "filters"} active`}
+                        ? m.transactions.allTransactions
+                        : fmt(m.transactions.filterActive, {
+                            count: activeFilterCount,
+                            suffix:
+                              activeFilterCount === 1
+                                ? m.transactions.filter
+                                : m.transactions.filterPlural,
+                          })}
                     </span>
                   )}
                   <button
@@ -358,10 +362,14 @@ export function TransactionsScreen({
                     className={styles.filtersToggle}
                     aria-expanded={filtersExpanded}
                     aria-controls="transaction-filters-detail"
-                    aria-label={filtersExpanded ? "Collapse filters" : "Expand filters"}
+                    aria-label={
+                      filtersExpanded
+                        ? m.transactions.collapseFilters
+                        : m.transactions.expandFilters
+                    }
                     onClick={() => setFiltersExpanded((expanded) => !expanded)}
                   >
-                    {filtersExpanded ? "Hide filters" : "More filters"}
+                    {filtersExpanded ? m.transactions.hideFilters : m.transactions.moreFilters}
                     <span className={styles.filtersToggleIcon} aria-hidden="true">
                       {filtersExpanded ? "▴" : "▾"}
                     </span>
@@ -373,12 +381,12 @@ export function TransactionsScreen({
                 <div
                   id="transaction-filters-detail"
                   className={styles.filtersDetail}
-                  aria-label="Transaction filters"
+                  aria-label={m.transactions.transactionFilters}
                 >
                   <div className={styles.filterGrid}>
                     <div className={styles.filterField}>
                       <label className={styles.filterLabel} htmlFor="filter-account">
-                        Account
+                        {m.transactions.account}
                       </label>
                       <select
                         id="filter-account"
@@ -386,7 +394,7 @@ export function TransactionsScreen({
                         value={filters.accountId ?? ""}
                         onChange={(e) => patchFilters({ accountId: e.target.value || undefined })}
                       >
-                        <option value="">All accounts</option>
+                        <option value="">{m.transactions.allAccounts}</option>
                         {accountOptions.map((option) => (
                           <option key={option.id} value={option.id}>
                             {option.name}
@@ -397,7 +405,7 @@ export function TransactionsScreen({
 
                     <div className={styles.filterField}>
                       <label className={styles.filterLabel} htmlFor="filter-category">
-                        Category
+                        {m.transactions.category}
                       </label>
                       <select
                         id="filter-category"
@@ -405,7 +413,7 @@ export function TransactionsScreen({
                         value={filters.categoryId ?? ""}
                         onChange={(e) => patchFilters({ categoryId: e.target.value || undefined })}
                       >
-                        <option value="">All categories</option>
+                        <option value="">{m.transactions.allCategories}</option>
                         {categoryOptions.map((option) => (
                           <option key={option.id} value={option.id}>
                             {option.name}
@@ -416,7 +424,7 @@ export function TransactionsScreen({
 
                     <div className={styles.filterField}>
                       <label className={styles.filterLabel} htmlFor="filter-from">
-                        From
+                        {m.transactions.from}
                       </label>
                       <input
                         id="filter-from"
@@ -429,7 +437,7 @@ export function TransactionsScreen({
 
                     <div className={styles.filterField}>
                       <label className={styles.filterLabel} htmlFor="filter-to">
-                        To
+                        {m.transactions.to}
                       </label>
                       <input
                         id="filter-to"
@@ -442,8 +450,8 @@ export function TransactionsScreen({
                   </div>
 
                   {activeFilterCount > 0 && (
-                    <div className={styles.activeFilters} aria-label="Active filters">
-                      <span className={styles.activeFiltersLabel}>Active</span>
+                    <div className={styles.activeFilters} aria-label={m.common.aria.activeFilters}>
+                      <span className={styles.activeFiltersLabel}>{m.common.active}</span>
                       <div className={styles.activePills}>
                         {filters.type && (
                           <button
@@ -451,7 +459,7 @@ export function TransactionsScreen({
                             className={styles.activePill}
                             onClick={() => patchFilters({ type: undefined })}
                           >
-                            {TX_TYPE_LABELS[filters.type]}
+                            {txTypeLabel(m, filters.type)}
                             <span aria-hidden="true">×</span>
                           </button>
                         )}
@@ -462,7 +470,7 @@ export function TransactionsScreen({
                             onClick={() => patchFilters({ accountId: undefined })}
                           >
                             {accountOptions.find((a) => a.id === filters.accountId)?.name ??
-                              "Account"}
+                              m.transactions.account}
                             <span aria-hidden="true">×</span>
                           </button>
                         )}
@@ -473,7 +481,7 @@ export function TransactionsScreen({
                             onClick={() => patchFilters({ categoryId: undefined })}
                           >
                             {categoryOptions.find((c) => c.id === filters.categoryId)?.name ??
-                              "Category"}
+                              m.transactions.category}
                             <span aria-hidden="true">×</span>
                           </button>
                         )}
@@ -483,7 +491,7 @@ export function TransactionsScreen({
                             className={styles.activePill}
                             onClick={() => patchFilters({ dateFrom: undefined })}
                           >
-                            From {filters.dateFrom}
+                            {m.transactions.from} {filters.dateFrom}
                             <span aria-hidden="true">×</span>
                           </button>
                         )}
@@ -493,13 +501,13 @@ export function TransactionsScreen({
                             className={styles.activePill}
                             onClick={() => patchFilters({ dateTo: undefined })}
                           >
-                            To {filters.dateTo}
+                            {m.transactions.to} {filters.dateTo}
                             <span aria-hidden="true">×</span>
                           </button>
                         )}
                       </div>
                       <button type="button" className={styles.clearAll} onClick={clearFilters}>
-                        Clear all
+                        {m.common.clearAll}
                       </button>
                     </div>
                   )}
@@ -509,40 +517,41 @@ export function TransactionsScreen({
 
             <div className={styles.toolbar}>
               <p className={styles.toolbarCount}>
-                Showing <strong>{transactions.length}</strong>
-                {totalCount !== transactions.length ? (
-                  <>
-                    {" "}
-                    of <strong>{totalCount}</strong>
-                  </>
-                ) : null}{" "}
-                {totalCount === 1 ? "transaction" : "transactions"} · sorted by date (newest first)
+                {fmt(m.transactions.showingSummary, {
+                  shown: transactions.length,
+                  ofTotal:
+                    totalCount !== transactions.length
+                      ? fmt(m.transactions.showingSummaryOf, { total: totalCount })
+                      : "",
+                  suffix:
+                    totalCount === 1
+                      ? m.transactions.showingSummarySuffixOne
+                      : m.transactions.showingSummarySuffixMany,
+                })}
               </p>
             </div>
 
             {isFilteredEmpty ? (
               <div className={styles.noResults}>
-                <h2 className={styles.noResultsTitle}>No matching transactions</h2>
-                <p className={styles.noResultsDesc}>
-                  Try adjusting your filters or clear them to see the full ledger.
-                </p>
+                <h2 className={styles.noResultsTitle}>{m.transactions.noMatching.title}</h2>
+                <p className={styles.noResultsDesc}>{m.transactions.noMatching.description}</p>
                 <Button variant="ghost" onClick={clearFilters}>
-                  Clear filters
+                  {m.transactions.clearFilters}
                 </Button>
               </div>
             ) : (
               <>
-                <section className={styles.list} aria-label="Transaction list">
+                <section className={styles.list} aria-label={m.common.aria.transactionList}>
                   <div className={styles.listHeader}>
                     <span aria-hidden="true" />
-                    <span>Date</span>
-                    <span>Type</span>
-                    <span>Description</span>
-                    <span>Category</span>
-                    <span>Account</span>
-                    <span>To</span>
-                    <span>Amount</span>
-                    <span>Settles</span>
+                    <span>{m.transactions.headers.date}</span>
+                    <span>{m.transactions.headers.type}</span>
+                    <span>{m.transactions.headers.description}</span>
+                    <span>{m.transactions.headers.category}</span>
+                    <span>{m.transactions.headers.account}</span>
+                    <span>{m.transactions.headers.to}</span>
+                    <span>{m.transactions.headers.amount}</span>
+                    <span>{m.transactions.headers.settles}</span>
                     <span />
                   </div>
 
@@ -564,7 +573,7 @@ export function TransactionsScreen({
                 {hasMore && (
                   <div className={styles.loadMore}>
                     <Button variant="ghost" onClick={onLoadMore}>
-                      Load more
+                      {m.transactions.loadMore}
                     </Button>
                   </div>
                 )}

@@ -1,4 +1,5 @@
 import type { AccountType } from "@cashflow/core";
+import type { Messages } from "@cashflow/core";
 import { compareIso } from "@cashflow/core";
 import { plannedItemsRepo, transactionsRepo } from "@cashflow/db";
 import type { QuickAddValues } from "@cashflow/ui";
@@ -7,26 +8,34 @@ import { type PlannedItemEditorInput, toPlannedItemPayload } from "./usePlannedI
 
 type AccountOption = { id: string; name: string; type: AccountType };
 
+export type QuickAddValidationError = keyof Messages["common"]["errors"];
+
+export function quickAddValidationMessage(m: Messages, error: QuickAddValidationError): string {
+  return m.common.errors[error];
+}
+
 export function validateCalendarQuickAdd(
   values: QuickAddValues,
   accountOptions: AccountOption[],
-): string | undefined {
-  const transferError = validateQuickAddTransfer(values, accountOptions);
-  if (transferError) return transferError;
-  if (values.amountCents <= 0) return "Amount must be greater than zero.";
-  if (!values.accountId) return "Select an account.";
-  if (!values.effectiveDate) return "Select a date.";
-  if (values.type !== "transfer" && !values.categoryId) return "Select a category.";
+): QuickAddValidationError | undefined {
+  if (validateQuickAddTransfer(values, accountOptions)) return "transferToCreditCard";
+  if (values.amountCents <= 0) return "amountMustBePositive";
+  if (!values.accountId) return "selectAccount";
+  if (!values.effectiveDate) return "selectDate";
+  if (values.type !== "transfer" && !values.categoryId) return "selectCategory";
   if (
     values.type === "transfer" &&
     (!values.toAccountId || values.toAccountId === values.accountId)
   ) {
-    return "Select a valid destination account.";
+    return "selectValidDestination";
   }
   return undefined;
 }
 
-export function quickAddToPlannedItemInput(values: QuickAddValues): PlannedItemEditorInput {
+export function quickAddToPlannedItemInput(
+  values: QuickAddValues,
+  defaultDescription = "Quick add",
+): PlannedItemEditorInput {
   const isTransfer = values.type === "transfer";
 
   return {
@@ -35,7 +44,7 @@ export function quickAddToPlannedItemInput(values: QuickAddValues): PlannedItemE
     accountId: values.accountId,
     toAccountId: isTransfer ? values.toAccountId : undefined,
     categoryId: isTransfer ? undefined : values.categoryId,
-    description: values.description.trim() || "Quick add",
+    description: values.description.trim() || defaultDescription,
     recurrence: "once",
     interval: 1,
     startDate: values.effectiveDate,
@@ -56,8 +65,9 @@ export function shouldRecordQuickAddAsTransaction(
 export async function submitCalendarQuickAdd(
   values: QuickAddValues,
   asOfDate: string,
+  defaultDescription = "Quick add",
 ): Promise<void> {
-  const description = values.description.trim() || "Quick add";
+  const description = values.description.trim() || defaultDescription;
 
   if (shouldRecordQuickAddAsTransaction(values.effectiveDate, asOfDate)) {
     const isTransfer = values.type === "transfer";
@@ -74,6 +84,8 @@ export async function submitCalendarQuickAdd(
   }
 
   await plannedItemsRepo.create(
-    toPlannedItemPayload(quickAddToPlannedItemInput({ ...values, description })),
+    toPlannedItemPayload(
+      quickAddToPlannedItemInput({ ...values, description }, defaultDescription),
+    ),
   );
 }

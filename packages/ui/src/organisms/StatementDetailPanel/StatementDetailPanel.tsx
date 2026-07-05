@@ -1,8 +1,10 @@
 import type { StatementStatus } from "@cashflow/core";
+import { fmt } from "@cashflow/core";
 import { Button } from "../../atoms/Button/Button.js";
 import { Chip, type ChipVariant } from "../../atoms/Chip/Chip.js";
 import { FormattedDate } from "../../atoms/FormattedDate/FormattedDate.js";
 import { MoneyAmount } from "../../atoms/MoneyAmount/MoneyAmount.js";
+import { useMessages } from "../../i18n/LanguageContext.js";
 import { formatStatementPeriod } from "../../lib/statementDates.js";
 import styles from "./StatementDetailPanel.module.css";
 
@@ -31,16 +33,19 @@ type Props = {
   onEdit?: () => void;
 };
 
-function sourceLabel(source: StatementChargeRow["source"]): string {
+function sourceLabel(
+  m: ReturnType<typeof useMessages>,
+  source: StatementChargeRow["source"],
+): string {
   switch (source) {
     case "opening_debt":
-      return "Opening debt";
+      return m.common.chips.openingDebt;
     case "transaction":
-      return "Transaction";
+      return m.common.chips.transaction;
     case "planned":
-      return "Planned";
+      return m.common.chips.planned;
     case "installment":
-      return "Installment";
+      return m.common.chips.installment;
   }
 }
 
@@ -71,6 +76,8 @@ export function StatementDetailPanel({
   onClose,
   onEdit,
 }: Props) {
+  const m = useMessages();
+
   if (!open) return null;
 
   const periodLabel =
@@ -83,7 +90,7 @@ export function StatementDetailPanel({
       <button
         type="button"
         className={styles.backdrop}
-        aria-label="Close statement items"
+        aria-label={m.common.aria.closeStatementItems}
         onClick={onClose}
       />
       <aside
@@ -96,16 +103,16 @@ export function StatementDetailPanel({
           <div className={styles.headerTop}>
             <div>
               <h2 className={styles.title} id="statement-detail-title">
-                Statement items
+                {m.statements.detail.title}
               </h2>
               <p className={styles.subtitle}>
-                {cardName} · {periodLabel}
+                {fmt(m.statements.detail.subtitle, { cardName, period: periodLabel })}
               </p>
             </div>
             <button
               type="button"
               className={styles.close}
-              aria-label="Close statement items"
+              aria-label={m.common.aria.closeStatementItems}
               onClick={onClose}
             >
               ×
@@ -114,15 +121,15 @@ export function StatementDetailPanel({
 
           <div className={styles.summary}>
             <div className={styles.summaryItem}>
-              <span className={styles.summaryLabel}>Due</span>
-              {dueDate ? <FormattedDate isoDate={dueDate} /> : "—"}
+              <span className={styles.summaryLabel}>{m.statements.due}</span>
+              {dueDate ? <FormattedDate isoDate={dueDate} /> : m.common.dash}
             </div>
             <div className={styles.summaryItem}>
-              <span className={styles.summaryLabel}>Computed total</span>
+              <span className={styles.summaryLabel}>{m.statements.computedTotal}</span>
               <MoneyAmount cents={computedTotalCents} />
             </div>
             <div className={styles.summaryItem}>
-              <span className={styles.summaryLabel}>Planned pay</span>
+              <span className={styles.summaryLabel}>{m.statements.plannedPay}</span>
               <MoneyAmount cents={payAmountCents} />
             </div>
           </div>
@@ -130,15 +137,15 @@ export function StatementDetailPanel({
 
         <div className={styles.body}>
           {loading ? (
-            <p className={styles.empty}>Loading items…</p>
+            <p className={styles.empty}>{m.statements.loadingItems}</p>
           ) : charges.length === 0 ? (
-            <p className={styles.empty}>No charges in this statement period yet.</p>
+            <p className={styles.empty}>{m.statements.emptyItems}</p>
           ) : (
             <div className={styles.list}>
               <div className={styles.listHeader}>
-                <span>Date</span>
-                <span>Description</span>
-                <span>Amount</span>
+                <span>{m.statements.chargeHeaders.date}</span>
+                <span>{m.statements.chargeHeaders.description}</span>
+                <span>{m.statements.chargeHeaders.amount}</span>
               </div>
               {charges.map((charge) => (
                 <div
@@ -154,10 +161,12 @@ export function StatementDetailPanel({
                     <div className={styles.description}>{charge.description}</div>
                     <div className={styles.meta}>
                       <Chip variant={sourceChipVariant(charge.source)}>
-                        {sourceLabel(charge.source)}
+                        {sourceLabel(m, charge.source)}
                       </Chip>
                       {charge.categoryName && <span>{charge.categoryName}</span>}
-                      {charge.isProjected && <Chip variant="planned">Projected</Chip>}
+                      {charge.isProjected && (
+                        <Chip variant="planned">{m.common.chips.projected}</Chip>
+                      )}
                     </div>
                   </div>
                   <span className={styles.amount}>
@@ -171,12 +180,12 @@ export function StatementDetailPanel({
 
         <footer className={styles.footer}>
           <div className={styles.footerTotal}>
-            <span className={styles.summaryLabel}>Items total</span>
+            <span className={styles.summaryLabel}>{m.statements.itemsTotal}</span>
             <MoneyAmount cents={computedTotalCents} />
           </div>
           {!isPaid && onEdit && (
             <Button variant="ghost" onClick={onEdit}>
-              Edit payment
+              {m.statements.editPayment}
             </Button>
           )}
         </footer>

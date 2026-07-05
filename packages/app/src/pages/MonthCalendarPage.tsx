@@ -5,6 +5,7 @@ import { DayDetailPanel, MonthCalendarScreen, type QuickAddValues } from "@cashf
 import { validateCalendarQuickAdd } from "../data/mutations/calendarQuickAdd";
 import { useCalendarQuickAdd } from "../data/mutations/useCalendarQuickAdd";
 import { createEmptyTransactionInput } from "../data/mutations/useTransactionMutations";
+import { useAccounts } from "../data/queries/useAccounts";
 import { useCalendarScreen } from "../data/queries/useCalendarScreen";
 
 type Props = {
@@ -22,6 +23,7 @@ export function MonthCalendarPage({
 }: Props) {
   const navigate = useNavigate();
   const { data, isPending, isError, error } = useCalendarScreen();
+  const { data: accountsData } = useAccounts();
   const quickAdd = useCalendarQuickAdd(data?.today);
   const [quickAddValues, setQuickAddValues] = useState<QuickAddValues>(() => ({
     ...createEmptyTransactionInput(),
@@ -88,9 +90,8 @@ export function MonthCalendarPage({
     <MonthCalendarScreen
       month={month}
       days={data?.projection.days ?? []}
-      workingBalanceCents={data?.projection.workingBalanceTodayCents ?? 0}
+      workingBalanceCents={accountsData?.workingBalanceCents ?? 0}
       nextNegativeDate={data?.projection.nextNegativeDate ?? null}
-      alertLeadTimeDays={data?.settings.alertLeadTimeDays ?? 14}
       today={data?.today ?? todayIso()}
       selectedDate={selectedDay}
       status={isPending ? "loading" : isError ? "error" : "ready"}

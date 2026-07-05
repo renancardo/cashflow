@@ -1,4 +1,5 @@
 import type { FormEvent, ReactNode } from "react";
+import { useMessages } from "../../i18n/LanguageContext.js";
 import styles from "./EditorPanel.module.css";
 
 type Props = {
@@ -31,6 +32,8 @@ export function EditorPanel({
   footer,
   children,
 }: Props) {
+  const m = useMessages();
+
   return (
     <div
       className={[styles.overlay, open && styles.open].filter(Boolean).join(" ")}
@@ -39,7 +42,7 @@ export function EditorPanel({
       <button
         type="button"
         className={styles.backdrop}
-        aria-label="Close editor"
+        aria-label={m.common.aria.closeEditor}
         onClick={onClose}
       />
       <aside className={styles.panel} role="dialog" aria-modal="true" aria-labelledby={labelId}>
@@ -54,7 +57,7 @@ export function EditorPanel({
             <button
               type="button"
               className={styles.close}
-              aria-label="Close editor"
+              aria-label={m.common.aria.closeEditor}
               onClick={onClose}
             >
               ×

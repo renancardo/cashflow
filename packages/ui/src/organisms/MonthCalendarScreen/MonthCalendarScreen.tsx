@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import type { ProjectionDay } from "@cashflow/core";
-import { formatMoney } from "@cashflow/core";
+import { fmt, formatDate, formatMoney } from "@cashflow/core";
 import { Button } from "../../atoms/Button/Button.js";
 import { Indicator } from "../../atoms/Indicator/Indicator.js";
 import { CalendarHeaderMetrics } from "../../molecules/CalendarHeaderMetrics/CalendarHeaderMetrics.js";
@@ -13,18 +13,17 @@ import {
   getDayIndicators,
   indexProjectionDays,
   shiftMonth,
+  weekdayLongLabels,
 } from "../../lib/calendar.js";
+import { useLanguage, useMessages } from "../../i18n/LanguageContext.js";
 import { HeaderStrip } from "../HeaderStrip/HeaderStrip.js";
 import styles from "./MonthCalendarScreen.module.css";
-
-const WEEKDAY_HEADERS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 type Props = {
   month: string;
   days: ProjectionDay[];
   workingBalanceCents: number;
   nextNegativeDate: string | null;
-  alertLeadTimeDays: number;
   today: string;
   selectedDate?: string | null;
   status?: "ready" | "loading" | "error";
@@ -40,7 +39,6 @@ export function MonthCalendarScreen({
   days,
   workingBalanceCents,
   nextNegativeDate,
-  alertLeadTimeDays,
   today,
   selectedDate,
   status = "ready",
@@ -53,6 +51,13 @@ export function MonthCalendarScreen({
   const [year, monthNum] = month.split("-").map(Number);
   const daysByDate = useMemo(() => indexProjectionDays(days), [days]);
   const cells = useMemo(() => buildMonthGrid(year, monthNum), [year, monthNum]);
+  const language = useLanguage();
+  const m = useMessages();
+  const weekdayHeaders = useMemo(
+    () => weekdayLongLabels(m.calendar.weekdays.long),
+    [m.calendar.weekdays.long],
+  );
+  const monthLocale = language === "pt-BR" ? "pt-BR" : "en-US";
 
   const monthDays = useMemo(
     () => days.filter((day) => day.date.startsWith(`${month}-`)),
@@ -73,8 +78,8 @@ export function MonthCalendarScreen({
   if (status === "loading") {
     return (
       <div className={styles.status}>
-        <h2 className={styles.statusTitle}>Loading calendar…</h2>
-        <p>Fetching projection data.</p>
+        <h2 className={styles.statusTitle}>{m.calendar.loading.title}</h2>
+        <p>{m.calendar.loading.description}</p>
       </div>
     );
   }
@@ -82,8 +87,8 @@ export function MonthCalendarScreen({
   if (status === "error") {
     return (
       <div className={styles.status}>
-        <h2 className={styles.statusTitle}>Could not load calendar</h2>
-        <p>{errorMessage ?? "Something went wrong. Try again."}</p>
+        <h2 className={styles.statusTitle}>{m.calendar.error.title}</h2>
+        <p>{errorMessage ?? m.calendar.error.fallback}</p>
       </div>
     );
   }
@@ -99,7 +104,6 @@ export function MonthCalendarScreen({
           <CalendarHeaderMetrics
             workingBalanceCents={workingBalanceCents}
             nextNegativeDate={nextNegativeDate}
-            alertLeadTimeDays={alertLeadTimeDays}
             today={today}
           />
         }
@@ -109,43 +113,45 @@ export function MonthCalendarScreen({
         <div className={styles.toolbar}>
           <div className={styles.toolbarActions}>
             <Button variant="ghost" onClick={onYearView}>
-              Year view
+              {m.calendar.yearView}
             </Button>
-            <div className={styles.monthNav} role="group" aria-label="Month">
+            <div className={styles.monthNav} role="group" aria-label={m.calendar.aria.monthNav}>
               <Button
                 variant="ghost"
                 className={styles.iconButton}
-                aria-label="Previous month"
+                aria-label={m.calendar.aria.previousMonth}
                 onClick={() => onMonthChange?.(shiftMonth(month, -1))}
               >
                 ←
               </Button>
-              <span className={styles.monthLabel}>{formatMonthYear(`${month}-01`)}</span>
+              <span className={styles.monthLabel}>
+                {formatMonthYear(`${month}-01`, monthLocale)}
+              </span>
               <Button
                 variant="ghost"
                 className={styles.iconButton}
-                aria-label="Next month"
+                aria-label={m.calendar.aria.nextMonth}
                 onClick={() => onMonthChange?.(shiftMonth(month, 1))}
               >
                 →
               </Button>
             </div>
             <Button variant="ghost" onClick={jumpToToday}>
-              Jump to today
+              {m.calendar.jumpToToday}
             </Button>
           </div>
           <CalendarLegend variant="month" />
         </div>
 
         <SummaryStrip className={styles.summary}>
-          <SummaryStripItem label="Projected inflows" tone="success">
+          <SummaryStripItem label={m.calendar.summary.projectedInflows} tone="success">
             {formatMoney(totals.inflows)}
           </SummaryStripItem>
-          <SummaryStripItem label="Projected outflows" tone="warning">
+          <SummaryStripItem label={m.calendar.summary.projectedOutflows} tone="warning">
             {formatMoney(totals.outflows)}
           </SummaryStripItem>
           <SummaryStripItem
-            label="Below buffer days"
+            label={m.calendar.summary.belowBufferDays}
             tone={totals.belowBufferDays > 0 ? "warning" : "default"}
           >
             {totals.belowBufferDays}
@@ -153,8 +159,8 @@ export function MonthCalendarScreen({
         </SummaryStrip>
 
         <div className={styles.calendar}>
-          <div className={styles.weekdayHeader}>
-            {WEEKDAY_HEADERS.map((label) => (
+          <div className={styles.weekdayHeader} aria-label={m.calendar.aria.weekdayHeader}>
+            {weekdayHeaders.map((label) => (
               <div key={label} className={styles.weekdayCell}>
                 {label}
               </div>
@@ -182,6 +188,9 @@ export function MonthCalendarScreen({
                   ]
                     .filter(Boolean)
                     .join(" ")}
+                  aria-label={fmt(m.calendar.aria.selectDay, {
+                    date: formatDate(cell.date, language),
+                  })}
                   onClick={() => onDaySelect?.(cell.date!)}
                 >
                   <span className={styles.dayNumberContainer}>

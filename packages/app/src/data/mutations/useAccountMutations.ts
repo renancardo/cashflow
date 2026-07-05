@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { Account, AccountType } from "@cashflow/core";
+import type { Account, AccountType, Settings } from "@cashflow/core";
 import { defaultIsWorking } from "@cashflow/core";
 import { accountsRepo } from "@cashflow/db";
 import { queryKeys } from "../keys";
@@ -72,12 +72,15 @@ export function useAccountMutations() {
   return { create, update, setWorking, archive };
 }
 
-export function createEmptyAccountInput(currency = "BRL"): AccountInput {
+export function createEmptyAccountInput(
+  currency = "BRL",
+  settings?: Pick<Settings, "defaultWorkingForType">,
+): AccountInput {
   return {
     name: "",
     type: "checking",
     currency,
-    isWorking: defaultIsWorking("checking"),
+    isWorking: defaultIsWorking("checking", settings),
     anchorBalanceCents: 0,
     anchorDate: new Date().toISOString().slice(0, 10),
   };

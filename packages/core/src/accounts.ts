@@ -1,4 +1,4 @@
-import type { AccountType } from "./entities.js";
+import type { AccountType, Settings } from "./entities.js";
 
 export const ACCOUNT_TYPES = [
   "checking",
@@ -22,6 +22,12 @@ export function accountTypeChipVariant(type: AccountType): AccountTypeChipVarian
   return type === "credit_card" ? "card" : "default";
 }
 
-export function defaultIsWorking(type: AccountType): boolean {
-  return type !== "credit_card" && type !== "investment";
+export function defaultIsWorking(
+  type: AccountType,
+  settings?: Pick<Settings, "defaultWorkingForType">,
+): boolean {
+  if (type === "credit_card") return false;
+  const configured = settings?.defaultWorkingForType?.[type];
+  if (configured !== undefined) return configured;
+  return type !== "investment";
 }

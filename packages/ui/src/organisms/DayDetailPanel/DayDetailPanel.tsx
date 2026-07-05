@@ -9,6 +9,7 @@ import {
   type QuickAddValues,
   validateQuickAddTransfer,
 } from "../../molecules/QuickAddCard/QuickAddCard.js";
+import { useLanguage, useMessages } from "../../i18n/LanguageContext.js";
 import styles from "./DayDetailPanel.module.css";
 
 export type DayDetailItem = ProjectionItem & {
@@ -33,13 +34,6 @@ type Props = {
   onClose: () => void;
 };
 
-const GROUPS: { title: string; sources: ProjectionItem["source"][] }[] = [
-  { title: "Transactions", sources: ["transaction"] },
-  { title: "Planned & subscriptions", sources: ["planned"] },
-  { title: "Installments", sources: ["installment"] },
-  { title: "Statement payments", sources: ["statement_payment"] },
-];
-
 function chipVariant(item: ProjectionItem): ChipVariant {
   if (!item.isProjected) return "actual";
   if (item.source === "statement_payment") return "statement";
@@ -48,11 +42,14 @@ function chipVariant(item: ProjectionItem): ChipVariant {
   return "planned";
 }
 
-function chipLabel(item: ProjectionItem): string {
-  if (!item.isProjected) return "Actual";
-  if (item.source === "statement_payment") return "Statement";
-  if (item.source === "installment") return "Installment";
-  return "Planned";
+function chipLabel(
+  item: ProjectionItem,
+  chips: ReturnType<typeof useMessages>["common"]["chips"],
+): string {
+  if (!item.isProjected) return chips.actual;
+  if (item.source === "statement_payment") return chips.statement;
+  if (item.source === "installment") return chips.installment;
+  return chips.planned;
 }
 
 function itemMeta(item: DayDetailItem): string {
@@ -81,7 +78,17 @@ export function DayDetailPanel({
   onQuickAddSubmit,
   onClose,
 }: Props) {
+  const m = useMessages();
+  const language = useLanguage();
+  const locale = language === "pt-BR" ? "pt-BR" : "en-US";
   const transferError = validateQuickAddTransfer(quickAddValues, accountOptions);
+
+  const groups: { title: string; sources: ProjectionItem["source"][] }[] = [
+    { title: m.dayDetail.groups.transactions, sources: ["transaction"] },
+    { title: m.dayDetail.groups.planned, sources: ["planned"] },
+    { title: m.dayDetail.groups.installments, sources: ["installment"] },
+    { title: m.dayDetail.groups.statementPayments, sources: ["statement_payment"] },
+  ];
 
   return (
     <div
@@ -91,7 +98,7 @@ export function DayDetailPanel({
       <button
         type="button"
         className={styles.backdrop}
-        aria-label="Close day detail"
+        aria-label={m.common.aria.closeDayDetail}
         onClick={onClose}
       />
       <aside
@@ -108,12 +115,12 @@ export function DayDetailPanel({
                   <h2 className={styles.title} id="day-detail-title">
                     <FormattedDate isoDate={day.date} />
                   </h2>
-                  <p className={styles.subtitle}>{formatWeekdayLong(day.date)}</p>
+                  <p className={styles.subtitle}>{formatWeekdayLong(day.date, locale)}</p>
                 </div>
                 <button
                   type="button"
                   className={styles.close}
-                  aria-label="Close day detail"
+                  aria-label={m.common.aria.closeDayDetail}
                   onClick={onClose}
                 >
                   ×
@@ -122,11 +129,11 @@ export function DayDetailPanel({
 
               <div className={styles.balances}>
                 <div className={styles.balance}>
-                  <span className={styles.balanceLabel}>Opening</span>
+                  <span className={styles.balanceLabel}>{m.dayDetail.opening}</span>
                   <MoneyAmount cents={day.openingBalanceCents} className={styles.balanceValue} />
                 </div>
                 <div className={styles.balance}>
-                  <span className={styles.balanceLabel}>Closing</span>
+                  <span className={styles.balanceLabel}>{m.dayDetail.closing}</span>
                   <MoneyAmount
                     cents={day.closingBalanceCents}
                     tone={day.belowBuffer ? "danger" : "default"}
@@ -138,13 +145,13 @@ export function DayDetailPanel({
               {day.belowBuffer && (
                 <div className={styles.flag} role="status">
                   <span className={styles.flagDot} aria-hidden />
-                  Below buffer
+                  {m.dayDetail.belowBuffer}
                 </div>
               )}
             </header>
 
             <div className={styles.body}>
-              {GROUPS.map((group) => {
+              {groups.map((group) => {
                 const items = day.items.filter((item) =>
                   group.sources.includes(item.source),
                 ) as DayDetailItem[];
@@ -164,7 +171,9 @@ export function DayDetailPanel({
                             <div className={styles.itemMain}>
                               <div className={styles.itemDesc}>{item.description}</div>
                               <div className={styles.itemMeta}>
-                                <Chip variant={chipVariant(item)}>{chipLabel(item)}</Chip>
+                                <Chip variant={chipVariant(item)}>
+                                  {chipLabel(item, m.common.chips)}
+                                </Chip>
                                 <span>{itemMeta(item)}</span>
                               </div>
                             </div>
@@ -185,9 +194,7 @@ export function DayDetailPanel({
                 );
               })}
 
-              {day.items.length === 0 && (
-                <p className={styles.empty}>No items affecting this day.</p>
-              )}
+              {day.items.length === 0 && <p className={styles.empty}>{m.dayDetail.empty}</p>}
             </div>
 
             <footer className={styles.footer}>

@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Recurrence, TxType } from "@cashflow/core";
-import { TX_TYPES, TX_TYPE_LABELS, formatCents, parseMoney } from "@cashflow/core";
+import { TX_TYPES, fmt, formatCents, parseMoney, txTypeLabel } from "@cashflow/core";
 import { Button } from "../../atoms/Button/Button.js";
 import { Toggle } from "../../atoms/Toggle/Toggle.js";
 import { FormattedDate } from "../../atoms/FormattedDate/FormattedDate.js";
 import { MoneyAmount } from "../../atoms/MoneyAmount/MoneyAmount.js";
 import { FormField } from "../../molecules/FormField/FormField.js";
 import { SegmentedControl } from "../../molecules/SegmentedControl/SegmentedControl.js";
+import { weekdayLongLabels, monthShortLabels } from "../../lib/calendar.js";
+import { useMessages } from "../../i18n/LanguageContext.js";
 import { EditorPanel, EditorPanelFooterActions } from "../EditorPanel/EditorPanel.js";
 import styles from "./PlannedItemEditorPanel.module.css";
 
@@ -52,31 +54,10 @@ type Props = {
   onDelete?: () => void;
 };
 
-const RECURRENCE_OPTIONS: { value: Recurrence; label: string }[] = [
-  { value: "once", label: "Once" },
-  { value: "weekly", label: "Weekly" },
-  { value: "monthly", label: "Monthly" },
-  { value: "yearly", label: "Yearly" },
-];
-
-const WEEKDAY_OPTIONS = [
-  { value: 0, label: "Sunday" },
-  { value: 1, label: "Monday" },
-  { value: 2, label: "Tuesday" },
-  { value: 3, label: "Wednesday" },
-  { value: 4, label: "Thursday" },
-  { value: 5, label: "Friday" },
-  { value: 6, label: "Saturday" },
-];
-
-const MONTH_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
-  value: i + 1,
-  label: new Date(2000, i, 1).toLocaleString("en-US", { month: "long" }),
-}));
-
 function MoneyField({
   id,
   label,
+  placeholder,
   currency,
   cents,
   required,
@@ -84,6 +65,7 @@ function MoneyField({
 }: {
   id: string;
   label: string;
+  placeholder: string;
   currency: string;
   cents: number;
   required?: boolean;
@@ -102,7 +84,7 @@ function MoneyField({
       type="text"
       inputMode="decimal"
       prefix={currency}
-      placeholder="0.00"
+      placeholder={placeholder}
       value={draft}
       required={required}
       onChange={(event) => {
@@ -129,6 +111,33 @@ export function PlannedItemEditorPanel({
   onSave,
   onDelete,
 }: Props) {
+  const m = useMessages();
+  const e = m.forecast.editor;
+
+  const recurrenceOptions = useMemo(
+    () => [
+      { value: "once" as const, label: e.recurrenceOnce },
+      { value: "weekly" as const, label: e.recurrenceWeekly },
+      { value: "monthly" as const, label: e.recurrenceMonthly },
+      { value: "yearly" as const, label: e.recurrenceYearly },
+    ],
+    [e],
+  );
+
+  const weekdayOptions = useMemo(() => {
+    const labels = weekdayLongLabels(m.calendar.weekdays.long);
+    return labels.map((label, value) => ({ value, label }));
+  }, [m.calendar.weekdays.long]);
+
+  const monthOptions = useMemo(
+    () =>
+      monthShortLabels(m.calendar.months.short).map((label, index) => ({
+        value: index + 1,
+        label,
+      })),
+    [m.calendar.months.short],
+  );
+
   const isTransfer = values.type === "transfer";
   const filteredCategories = categoryOptions.filter((c) =>
     values.type === "income" ? c.kind === "income" : c.kind === "expense",
@@ -144,21 +153,26 @@ export function PlannedItemEditorPanel({
       ? Boolean(values.toAccountId && values.toAccountId !== values.accountId)
       : Boolean(values.categoryId));
 
-  const intervalSuffix =
+  const intervalLabel =
     values.recurrence === "weekly"
-      ? "week(s)"
+      ? e.intervalEveryWeeks
       : values.recurrence === "monthly"
-        ? "month(s)"
+        ? e.intervalEveryMonths
         : values.recurrence === "yearly"
-          ? "year(s)"
+          ? e.intervalEveryYears
           : "";
 
   const subtitle =
     mode === "edit"
-      ? `${values.description || "Forecast item"} · ${values.recurrence}`
-      : `New ${TX_TYPE_LABELS[values.type].toLowerCase()} forecast item`;
+      ? fmt(e.editForecastItemSubtitle, {
+          description: values.description || m.common.unknown,
+          recurrence: values.recurrence,
+        })
+      : fmt(e.newForecastItemSubtitle, {
+          type: txTypeLabel(m, values.type).toLowerCase(),
+        });
 
-  const markPaidLabel = values.type === "income" ? "Mark as received" : "Mark paid";
+  const markPaidLabel = values.type === "income" ? m.common.markAsReceived : m.common.markPaid;
   const previewAmountTone =
     values.type === "income" ? "income" : values.type === "expense" ? "danger" : "default";
 
@@ -166,7 +180,7 @@ export function PlannedItemEditorPanel({
     <EditorPanel
       open={open}
       labelId="planned-item-editor-title"
-      title={mode === "create" ? "Add forecast item" : "Edit forecast item"}
+      title={mode === "create" ? e.addForecastItem : e.editForecastItem}
       subtitle={subtitle}
       onClose={onClose}
       onSubmit={() => {
@@ -176,30 +190,30 @@ export function PlannedItemEditorPanel({
         <>
           {mode === "edit" && onDelete && (
             <Button variant="ghost" className={styles.deleteButton} onClick={onDelete}>
-              Delete
+              {m.common.delete}
             </Button>
           )}
           <EditorPanelFooterActions>
             <Button variant="ghost" onClick={onClose}>
-              Cancel
+              {m.common.cancel}
             </Button>
             <Button variant="primary" type="submit" disabled={!canSave}>
-              {mode === "create" ? "Add item" : "Save changes"}
+              {mode === "create" ? e.addItem : m.common.saveChanges}
             </Button>
           </EditorPanelFooterActions>
         </>
       }
     >
       <SegmentedControl
-        aria-label="Item type"
+        aria-label={m.common.form.itemType}
         value={values.type}
         onChange={(type) => onChange({ type })}
-        options={TX_TYPES.map((type) => ({ value: type, label: TX_TYPE_LABELS[type] }))}
+        options={TX_TYPES.map((type) => ({ value: type, label: txTypeLabel(m, type) }))}
       />
 
       <FormField
         id="fc-description"
-        label="Description"
+        label={m.common.form.description}
         value={values.description}
         required
         onChange={(e) => onChange({ description: e.target.value })}
@@ -208,7 +222,8 @@ export function PlannedItemEditorPanel({
       <div className={styles.row}>
         <MoneyField
           id="fc-amount"
-          label="Amount"
+          label={m.common.form.amount}
+          placeholder={m.common.form.placeholderAmount}
           currency={currency}
           cents={values.amountCents}
           required
@@ -217,13 +232,13 @@ export function PlannedItemEditorPanel({
         {!isTransfer && (
           <FormField
             id="fc-category"
-            label="Category"
+            label={m.common.form.category}
             inputType="select"
             value={values.categoryId ?? ""}
             required
             onChange={(e) => onChange({ categoryId: e.target.value || undefined })}
           >
-            <option value="">Select category</option>
+            <option value="">{m.common.form.selectCategory}</option>
             {filteredCategories.map((cat) => (
               <option key={cat.id} value={cat.id}>
                 {cat.name}
@@ -236,13 +251,13 @@ export function PlannedItemEditorPanel({
       <div className={styles.row}>
         <FormField
           id="fc-account"
-          label="Account"
+          label={m.common.form.account}
           inputType="select"
           value={values.accountId}
           required
           onChange={(e) => onChange({ accountId: e.target.value })}
         >
-          <option value="">Select account</option>
+          <option value="">{m.common.form.selectAccount}</option>
           {accountOptions.map((account) => (
             <option key={account.id} value={account.id}>
               {account.name}
@@ -252,13 +267,13 @@ export function PlannedItemEditorPanel({
         {isTransfer && (
           <FormField
             id="fc-to"
-            label="To account"
+            label={m.common.form.toAccount}
             inputType="select"
             value={values.toAccountId ?? ""}
             required
             onChange={(e) => onChange({ toAccountId: e.target.value || undefined })}
           >
-            <option value="">Select account</option>
+            <option value="">{m.common.form.selectAccount}</option>
             {toAccountOptions.map((account) => (
               <option key={account.id} value={account.id}>
                 {account.name}
@@ -269,16 +284,16 @@ export function PlannedItemEditorPanel({
       </div>
 
       <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Recurrence</h3>
+        <h3 className={styles.sectionTitle}>{m.common.form.recurrence}</h3>
         <div className={styles.row}>
           <FormField
             id="fc-recurrence"
-            label="Pattern"
+            label={e.recurrencePattern}
             inputType="select"
             value={values.recurrence}
             onChange={(e) => onChange({ recurrence: e.target.value as Recurrence })}
           >
-            {RECURRENCE_OPTIONS.map((opt) => (
+            {recurrenceOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>
@@ -287,7 +302,7 @@ export function PlannedItemEditorPanel({
           {values.recurrence !== "once" && (
             <FormField
               id="fc-interval"
-              label={`Every (${intervalSuffix})`}
+              label={intervalLabel}
               type="number"
               min="1"
               value={String(values.interval)}
@@ -300,7 +315,7 @@ export function PlannedItemEditorPanel({
           {(values.recurrence === "monthly" || values.recurrence === "yearly") && (
             <FormField
               id="fc-day-of-month"
-              label="Day of month"
+              label={m.common.form.dayOfMonth}
               type="number"
               min={1}
               max={31}
@@ -311,12 +326,12 @@ export function PlannedItemEditorPanel({
           {values.recurrence === "weekly" && (
             <FormField
               id="fc-weekday"
-              label="Weekday"
+              label={e.weekday}
               inputType="select"
               value={String(values.weekday ?? 0)}
               onChange={(e) => onChange({ weekday: Number(e.target.value) })}
             >
-              {WEEKDAY_OPTIONS.map((opt) => (
+              {weekdayOptions.map((opt) => (
                 <option key={opt.value} value={opt.value}>
                   {opt.label}
                 </option>
@@ -326,12 +341,12 @@ export function PlannedItemEditorPanel({
           {values.recurrence === "yearly" && (
             <FormField
               id="fc-month-of-year"
-              label="Month"
+              label={m.common.form.month}
               inputType="select"
               value={String(values.monthOfYear ?? 1)}
               onChange={(e) => onChange({ monthOfYear: Number(e.target.value) })}
             >
-              {MONTH_OPTIONS.map((opt) => (
+              {monthOptions.map((opt) => (
                 <option key={opt.value} value={opt.value}>
                   {opt.label}
                 </option>
@@ -343,7 +358,7 @@ export function PlannedItemEditorPanel({
         <div className={styles.row}>
           <FormField
             id="fc-start-date"
-            label={values.recurrence === "once" ? "Date" : "Start date"}
+            label={values.recurrence === "once" ? m.common.form.date : e.startDate}
             type="date"
             value={values.startDate}
             required
@@ -352,10 +367,10 @@ export function PlannedItemEditorPanel({
           {values.recurrence !== "once" && (
             <FormField
               id="fc-end-date"
-              label="End date"
+              label={e.endDate}
               type="date"
               value={values.endDate ?? ""}
-              hint="Leave empty for indefinite"
+              hint={e.endDateHint}
               onChange={(e) => onChange({ endDate: e.target.value || undefined })}
             />
           )}
@@ -365,12 +380,12 @@ export function PlannedItemEditorPanel({
       {values.recurrence !== "once" && (
         <div className={styles.toggleRow}>
           <div>
-            <div className={styles.toggleLabel}>Subscription</div>
-            <div className={styles.toggleHint}>Recurring charge on a card or account</div>
+            <div className={styles.toggleLabel}>{e.subscriptionLabel}</div>
+            <div className={styles.toggleHint}>{e.subscriptionHint}</div>
           </div>
           <Toggle
             checked={values.isSubscription}
-            aria-label="Is subscription"
+            aria-label={m.common.form.isSubscription}
             onChange={(checked) => onChange({ isSubscription: checked })}
           />
         </div>
@@ -378,21 +393,19 @@ export function PlannedItemEditorPanel({
 
       <div className={styles.toggleRow}>
         <div>
-          <div className={styles.toggleLabel}>Active</div>
-          <div className={styles.toggleHint}>
-            Paused items stay visible but are excluded from projection
-          </div>
+          <div className={styles.toggleLabel}>{m.common.active}</div>
+          <div className={styles.toggleHint}>{e.activeHint}</div>
         </div>
         <Toggle
           checked={values.isActive}
-          aria-label="Active"
+          aria-label={m.common.active}
           onChange={(checked) => onChange({ isActive: checked })}
         />
       </div>
 
       {occurrencePreview.length > 0 && (
         <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Upcoming occurrences</h3>
+          <h3 className={styles.sectionTitle}>{m.common.form.upcomingOccurrences}</h3>
           <ul className={styles.previewList}>
             {occurrencePreview.map((occ) => (
               <li key={occ.occurrenceDate} className={styles.previewItem}>

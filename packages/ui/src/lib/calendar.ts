@@ -19,10 +19,38 @@ export type DayEntryLine = {
   tone: EntryLineTone;
 };
 
-const WEEKDAY_LABELS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"] as const;
+export const WEEKDAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
+export const MONTH_KEYS = [
+  "jan",
+  "feb",
+  "mar",
+  "apr",
+  "may",
+  "jun",
+  "jul",
+  "aug",
+  "sep",
+  "oct",
+  "nov",
+  "dec",
+] as const;
 
-export function weekdayLabels(columns = YEAR_GRID_COLUMNS): string[] {
-  return Array.from({ length: columns }, (_, index) => WEEKDAY_LABELS[index % 7]);
+export type WeekdayKey = (typeof WEEKDAY_KEYS)[number];
+export type MonthKey = (typeof MONTH_KEYS)[number];
+
+export function repeatWeekdayLabels(
+  labels: Record<WeekdayKey, string>,
+  columns = YEAR_GRID_COLUMNS,
+): string[] {
+  return Array.from({ length: columns }, (_, index) => labels[WEEKDAY_KEYS[index % 7]]);
+}
+
+export function weekdayLongLabels(labels: Record<WeekdayKey, string>): string[] {
+  return WEEKDAY_KEYS.map((key) => labels[key]);
+}
+
+export function monthShortLabels(labels: Record<MonthKey, string>): string[] {
+  return MONTH_KEYS.map((key) => labels[key]);
 }
 
 export function buildYearMonthRow(year: number, month: number): CalendarCell[] {
@@ -128,13 +156,8 @@ export function daysUntil(fromIso: string, toIso: string): number {
   return Math.round((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-export function isAlertActive(
-  nextNegativeDate: string | null,
-  alertLeadTimeDays: number,
-  today: string,
-): boolean {
-  if (!nextNegativeDate) return false;
-  return daysUntil(today, nextNegativeDate) <= alertLeadTimeDays;
+export function isAlertActive(nextNegativeDate: string | null): boolean {
+  return nextNegativeDate !== null;
 }
 
 export function isWeekend(isoDate: string): boolean {

@@ -7,3 +7,4 @@ export * from "./accounts.js";
 export * from "./transactions.js";
 export * from "./plannedItems.js";
 export * from "./installments.js";
+export * from "./i18n/index.js";

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import type { StatementStatus } from "@cashflow/core";
-import { formatCents, parseMoney } from "@cashflow/core";
+import { fmt, formatCents, parseMoney } from "@cashflow/core";
 import { Button } from "../../atoms/Button/Button.js";
 import { Chip } from "../../atoms/Chip/Chip.js";
 import { FormattedDate } from "../../atoms/FormattedDate/FormattedDate.js";
 import { MoneyAmount } from "../../atoms/MoneyAmount/MoneyAmount.js";
 import { FormField } from "../../molecules/FormField/FormField.js";
+import { useMessages } from "../../i18n/LanguageContext.js";
 import { formatStatementPeriod } from "../../lib/statementDates.js";
 import { EditorPanel, EditorPanelFooterActions } from "../EditorPanel/EditorPanel.js";
 import styles from "./StatementEditorPanel.module.css";
@@ -39,12 +40,14 @@ type Props = {
 function MoneyField({
   id,
   label,
+  placeholder,
   currency,
   cents,
   onCentsChange,
 }: {
   id: string;
   label: string;
+  placeholder: string;
   currency: string;
   cents: number;
   onCentsChange: (cents: number) => void;
@@ -62,7 +65,7 @@ function MoneyField({
       type="text"
       inputMode="decimal"
       prefix={currency}
-      placeholder="0.00"
+      placeholder={placeholder}
       value={draft}
       required
       onChange={(event) => {
@@ -93,6 +96,7 @@ export function StatementEditorPanel({
   onResetToFull,
   onRecordPayment,
 }: Props) {
+  const m = useMessages();
   const isPaid = status === "paid";
   const plannedCents = values.plannedPaymentCents ?? computedTotalCents;
   const hasOverride = values.plannedPaymentCents != null;
@@ -103,13 +107,13 @@ export function StatementEditorPanel({
     <EditorPanel
       open={open}
       labelId="statement-editor-title"
-      title="Edit statement payment"
-      subtitle={`${cardName} · ${periodLabel}`}
+      title={m.statements.editor.title}
+      subtitle={fmt(m.statements.editor.subtitle, { cardName, period: periodLabel })}
       onClose={onClose}
       footer={
         <EditorPanelFooterActions>
           <Button variant="ghost" type="button" onClick={onClose}>
-            Cancel
+            {m.common.cancel}
           </Button>
           {onRecordPayment && (
             <Button
@@ -119,7 +123,7 @@ export function StatementEditorPanel({
               className={styles.recordButton}
               onClick={onRecordPayment}
             >
-              Record payment
+              {m.common.recordPayment}
             </Button>
           )}
         </EditorPanelFooterActions>
@@ -127,17 +131,17 @@ export function StatementEditorPanel({
     >
       <div className={styles.section}>
         <div className={styles.readOnlyRow}>
-          <span className={styles.readOnlyLabel}>Computed total</span>
+          <span className={styles.readOnlyLabel}>{m.statements.computedTotal}</span>
           <MoneyAmount cents={computedTotalCents} />
           {includesOpeningDebt && (
-            <p className={styles.readOnlyHint}>Includes opening debt from card anchor</p>
+            <p className={styles.readOnlyHint}>{m.statements.computedHint}</p>
           )}
         </div>
 
         <div className={styles.readOnlyRow}>
-          <span className={styles.readOnlyLabel}>Due date</span>
+          <span className={styles.readOnlyLabel}>{m.common.form.dueDate}</span>
           <FormattedDate isoDate={dueDate} />
-          {isPaid && <Chip variant="actual">paid ✓</Chip>}
+          {isPaid && <Chip variant="actual">{m.common.paidCheck}</Chip>}
         </div>
 
         {!isPaid && (
@@ -145,7 +149,8 @@ export function StatementEditorPanel({
             <div className={styles.fieldRow}>
               <MoneyField
                 id="statement-planned-payment"
-                label="Planned payment"
+                label={m.common.form.plannedPayment}
+                placeholder={m.common.form.placeholderAmount}
                 currency={currency}
                 cents={plannedCents}
                 onCentsChange={(cents) => onChange({ plannedPaymentCents: cents })}
@@ -157,19 +162,19 @@ export function StatementEditorPanel({
                   className={styles.resetButton}
                   onClick={onResetToFull}
                 >
-                  Reset to full
+                  {m.common.resetToFull}
                 </Button>
               )}
             </div>
 
             <FormField
               id="statement-pay-from"
-              label="Pay from"
+              label={m.common.form.payFrom}
               inputType="select"
               value={values.payFromAccountId ?? ""}
               onChange={(event) => onChange({ payFromAccountId: event.target.value || undefined })}
             >
-              <option value="">Default account</option>
+              <option value="">{m.common.defaultAccount}</option>
               {payFromOptions.map((option) => (
                 <option key={option.id} value={option.id}>
                   {option.name}

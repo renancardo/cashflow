@@ -5,6 +5,7 @@ import { Chip } from "../../atoms/Chip/Chip.js";
 import { FormattedDate } from "../../atoms/FormattedDate/FormattedDate.js";
 import { MoneyAmount } from "../../atoms/MoneyAmount/MoneyAmount.js";
 import { IconButton } from "../../molecules/IconButton/IconButton.js";
+import { useMessages } from "../../i18n/LanguageContext.js";
 import { formatStatementPeriod } from "../../lib/statementDates.js";
 import styles from "./CreditCardStatementRow.module.css";
 
@@ -38,19 +39,22 @@ type Props = {
 };
 
 function statusLabel(
+  m: ReturnType<typeof useMessages>,
   status: StatementStatus,
   hasOverride: boolean,
   payAmountCents: number,
   computedTotalCents: number,
 ): string {
-  if (status === "paid") return "Paid";
-  if (hasOverride && payAmountCents < computedTotalCents) return "Partial";
-  if (status === "closed") return "Closed";
-  return "Open";
+  if (status === "paid") return m.common.paid;
+  if (hasOverride && payAmountCents < computedTotalCents) return m.common.partial;
+  if (status === "closed") return m.common.closed;
+  return m.common.open;
 }
 
 export function CreditCardStatementRow({ row, onEdit, onMarkPaid, onViewItems }: Props) {
+  const m = useMessages();
   const [expanded, setExpanded] = useState(false);
+  const h = m.forecast.headers.schedule;
 
   return (
     <article className={[styles.plan, expanded && styles.expanded].filter(Boolean).join(" ")}>
@@ -58,27 +62,27 @@ export function CreditCardStatementRow({ row, onEdit, onMarkPaid, onViewItems }:
         <div className={styles.info}>
           <div className={styles.name}>{row.cardName}</div>
           <div className={styles.meta}>
-            <Chip variant="statement">Statement</Chip>
+            <Chip variant="statement">{m.common.chips.statement}</Chip>
           </div>
         </div>
 
         <div className={styles.payFrom}>
           <span className={styles.cellLabel} aria-hidden="true">
-            Pay from
+            {m.common.form.payFrom}
           </span>
           {row.payFromAccountName}
         </div>
 
         <div className={styles.horizon}>
           <span className={styles.cellLabel} aria-hidden="true">
-            Horizon
+            {m.common.form.horizon}
           </span>
-          {row.lastDueDate ? <FormattedDate isoDate={row.lastDueDate} /> : "—"}
+          {row.lastDueDate ? <FormattedDate isoDate={row.lastDueDate} /> : m.common.dash}
         </div>
 
         <div className={[styles.next, !row.nextDueDate && styles.muted].filter(Boolean).join(" ")}>
           <span className={styles.cellLabel} aria-hidden="true">
-            Next due
+            {m.common.form.nextDue}
           </span>
           {row.nextDueDate ? (
             <>
@@ -92,13 +96,15 @@ export function CreditCardStatementRow({ row, onEdit, onMarkPaid, onViewItems }:
               )}
             </>
           ) : (
-            "—"
+            m.common.dash
           )}
         </div>
 
         <div className={styles.actions}>
           <IconButton
-            title={expanded ? "Collapse statements" : "Expand statements"}
+            title={
+              expanded ? m.forecast.editor.collapseStatements : m.forecast.editor.expandStatements
+            }
             aria-expanded={expanded}
             onClick={() => setExpanded((value) => !value)}
           >
@@ -110,11 +116,11 @@ export function CreditCardStatementRow({ row, onEdit, onMarkPaid, onViewItems }:
       {expanded && (
         <div className={styles.schedule}>
           <div className={styles.scheduleHeader}>
-            <span>Period</span>
-            <span>Due</span>
-            <span>Total</span>
-            <span>Pay</span>
-            <span>Status</span>
+            <span>{h.period}</span>
+            <span>{h.due}</span>
+            <span>{h.total}</span>
+            <span>{h.pay}</span>
+            <span>{h.status}</span>
             <span />
           </div>
           {row.statements.map((stmt) => {
@@ -137,13 +143,16 @@ export function CreditCardStatementRow({ row, onEdit, onMarkPaid, onViewItems }:
                 </span>
                 <span className={styles.schedulePay}>
                   <MoneyAmount cents={stmt.payAmountCents} />
-                  {stmt.hasOverride && !paid && <Chip variant="statement">Override</Chip>}
+                  {stmt.hasOverride && !paid && (
+                    <Chip variant="statement">{m.common.override}</Chip>
+                  )}
                 </span>
                 <span className={styles.scheduleStatus}>
                   <Chip
                     variant={paid ? "actual" : stmt.status === "open" ? "statement" : "default"}
                   >
                     {statusLabel(
+                      m,
                       stmt.status,
                       stmt.hasOverride,
                       stmt.payAmountCents,
@@ -158,7 +167,7 @@ export function CreditCardStatementRow({ row, onEdit, onMarkPaid, onViewItems }:
                       className={styles.actionButton}
                       onClick={() => onViewItems(stmt.id)}
                     >
-                      Items
+                      {m.statements.items}
                     </Button>
                   )}
                   {!paid && onEdit && (
@@ -167,7 +176,7 @@ export function CreditCardStatementRow({ row, onEdit, onMarkPaid, onViewItems }:
                       className={styles.actionButton}
                       onClick={() => onEdit(stmt.id)}
                     >
-                      Edit
+                      {m.statements.edit}
                     </Button>
                   )}
                   {!paid && onMarkPaid && (
@@ -176,7 +185,7 @@ export function CreditCardStatementRow({ row, onEdit, onMarkPaid, onViewItems }:
                       className={styles.actionButton}
                       onClick={() => onMarkPaid(stmt.id)}
                     >
-                      Mark paid
+                      {m.common.markPaid}
                     </Button>
                   )}
                 </span>

@@ -15,6 +15,7 @@ import { AccountsPage } from "./pages/AccountsPage";
 import { CategoriesPage } from "./pages/CategoriesPage";
 import { TransactionsPage } from "./pages/TransactionsPage";
 import { ForecastPage } from "./pages/ForecastPage";
+import { SettingsPage } from "./pages/SettingsPage";
 
 type DaySearch = {
   day?: string;
@@ -120,6 +121,12 @@ const forecastRoute = createRoute({
   component: ForecastPage,
 });
 
+const settingsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/settings",
+  component: SettingsPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRedirectRoute,
   yearCalendarRoute,
@@ -129,6 +136,7 @@ const routeTree = rootRoute.addChildren([
   categoriesRoute,
   transactionsRoute,
   forecastRoute,
+  settingsRoute,
 ]);
 
 export const router = createRouter({

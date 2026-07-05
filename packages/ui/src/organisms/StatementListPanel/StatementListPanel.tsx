@@ -1,7 +1,9 @@
 import type { StatementStatus } from "@cashflow/core";
+import { fmt } from "@cashflow/core";
 import { Button } from "../../atoms/Button/Button.js";
 import { Chip } from "../../atoms/Chip/Chip.js";
 import { MoneyAmount } from "../../atoms/MoneyAmount/MoneyAmount.js";
+import { useMessages } from "../../i18n/LanguageContext.js";
 import {
   formatShortDate,
   formatShortDateWithYear,
@@ -47,10 +49,11 @@ function isPartialPayment(row: StatementListRow): boolean {
   return row.plannedPaymentCents != null && row.plannedPaymentCents < row.computedTotalCents;
 }
 
-function statusLabel(row: StatementListRow): string {
-  if (isPaid(row)) return "paid";
-  if (isPartialPayment(row)) return "partial";
-  return row.status;
+function statusLabel(m: ReturnType<typeof useMessages>, row: StatementListRow): string {
+  if (isPaid(row)) return m.common.paid;
+  if (isPartialPayment(row)) return m.common.partial;
+  if (row.status === "closed") return m.common.closed;
+  return m.common.open;
 }
 
 function PeriodRange({
@@ -79,6 +82,11 @@ export function StatementListPanel({
   onNavigateToTransaction,
   onViewItems,
 }: Props) {
+  const m = useMessages();
+  const h = m.statements.headers;
+  const horizonSuffix =
+    statements.length === 1 ? m.statements.countInHorizonOne : m.statements.countInHorizonMany;
+
   return (
     <div
       className={[styles.overlay, open && styles.open].filter(Boolean).join(" ")}
@@ -87,7 +95,7 @@ export function StatementListPanel({
       <button
         type="button"
         className={styles.backdrop}
-        aria-label="Close statements"
+        aria-label={m.common.aria.closeStatements}
         onClick={onClose}
       />
       <aside
@@ -100,16 +108,19 @@ export function StatementListPanel({
           <div className={styles.headerTop}>
             <div>
               <h2 className={styles.title} id="statement-list-title">
-                {cardName} — Statements
+                {cardName} {m.statements.listTitleSuffix}
               </h2>
               <p className={styles.subtitle}>
-                {statements.length} statement{statements.length === 1 ? "" : "s"} in horizon
+                {fmt(m.statements.countInHorizon, {
+                  count: statements.length,
+                  suffix: horizonSuffix,
+                })}
               </p>
             </div>
             <button
               type="button"
               className={styles.close}
-              aria-label="Close statements"
+              aria-label={m.common.aria.closeStatements}
               onClick={onClose}
             >
               ×
@@ -119,22 +130,21 @@ export function StatementListPanel({
 
         <div className={styles.body}>
           {statements.length === 0 ? (
-            <p className={styles.empty}>No statements materialized for this card yet.</p>
+            <p className={styles.empty}>{m.statements.empty}</p>
           ) : (
-            <div className={styles.table} role="table" aria-label="Credit card statements">
+            <div className={styles.table} role="table" aria-label={m.statements.tableAria}>
               <div className={styles.tableHeader} role="row">
-                <span role="columnheader">Period</span>
-                <span role="columnheader">Close</span>
-                <span role="columnheader">Due</span>
-                <span role="columnheader">Total</span>
-                <span role="columnheader">Pay</span>
-                <span role="columnheader">Status</span>
+                <span role="columnheader">{h.period}</span>
+                <span role="columnheader">{h.close}</span>
+                <span role="columnheader">{h.due}</span>
+                <span role="columnheader">{h.total}</span>
+                <span role="columnheader">{h.pay}</span>
+                <span role="columnheader">{h.status}</span>
                 <span role="columnheader" aria-hidden />
               </div>
 
               {statements.map((row) => {
                 const paid = isPaid(row);
-                const partial = isPartialPayment(row);
 
                 return (
                   <div key={row.id} className={styles.tableRow} role="row">
@@ -154,7 +164,7 @@ export function StatementListPanel({
                       <span className={styles.payCell}>
                         <MoneyAmount cents={payAmountCents(row)} />
                         {hasPaymentOverride(row) && !paid && (
-                          <Chip variant="statement">Override</Chip>
+                          <Chip variant="statement">{m.common.override}</Chip>
                         )}
                       </span>
                     </span>
@@ -162,22 +172,28 @@ export function StatementListPanel({
                       <span className={styles.statusCell}>
                         {paid ? (
                           <>
-                            <Chip variant="actual">paid ✓</Chip>
+                            <Chip variant="actual">{m.common.paidCheck}</Chip>
                             {row.paymentTransactionId && onNavigateToTransaction && (
                               <button
                                 type="button"
                                 className={styles.paidLink}
                                 onClick={() => onNavigateToTransaction(row.paymentTransactionId!)}
                               >
-                                View
+                                {m.statements.view}
                               </button>
                             )}
                           </>
-                        ) : partial ? (
-                          <Chip variant="statement">{statusLabel(row)}</Chip>
                         ) : (
-                          <Chip variant={row.status === "closed" ? "default" : "statement"}>
-                            {statusLabel(row)}
+                          <Chip
+                            variant={
+                              isPartialPayment(row)
+                                ? "statement"
+                                : row.status === "closed"
+                                  ? "default"
+                                  : "statement"
+                            }
+                          >
+                            {statusLabel(m, row)}
                           </Chip>
                         )}
                       </span>
@@ -189,7 +205,7 @@ export function StatementListPanel({
                           className={styles.editButton}
                           onClick={() => onViewItems(row.id)}
                         >
-                          Items
+                          {m.statements.items}
                         </Button>
                       )}
                       {!paid && onEdit && (
@@ -198,7 +214,7 @@ export function StatementListPanel({
                           className={styles.editButton}
                           onClick={() => onEdit(row.id)}
                         >
-                          Edit
+                          {m.statements.edit}
                         </Button>
                       )}
                     </span>

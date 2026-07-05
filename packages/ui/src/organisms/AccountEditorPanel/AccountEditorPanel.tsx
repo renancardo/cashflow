@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import {
-  ACCOUNT_TYPE_LABELS,
   ACCOUNT_TYPES,
+  accountTypeLabel,
+  fmt,
   formatCents,
   parseMoney,
   type AccountType,
@@ -10,6 +11,7 @@ import { Button } from "../../atoms/Button/Button.js";
 import { Toggle } from "../../atoms/Toggle/Toggle.js";
 import { Tooltip } from "../../atoms/Tooltip/Tooltip.js";
 import { FormField } from "../../molecules/FormField/FormField.js";
+import { useMessages } from "../../i18n/LanguageContext.js";
 import { EditorPanel, EditorPanelFooterActions } from "../EditorPanel/EditorPanel.js";
 import styles from "./AccountEditorPanel.module.css";
 
@@ -50,6 +52,7 @@ type MoneyFieldProps = {
   label: string;
   currency: string;
   cents: number | undefined;
+  placeholder: string;
   required?: boolean;
   hint?: string;
   onCentsChange: (cents: number | undefined) => void;
@@ -65,6 +68,7 @@ function MoneyField({
   label,
   currency,
   cents,
+  placeholder,
   required,
   hint,
   onCentsChange,
@@ -82,7 +86,7 @@ function MoneyField({
       type="text"
       inputMode="decimal"
       prefix={currency}
-      placeholder="0.00"
+      placeholder={placeholder}
       value={draft}
       required={required}
       hint={hint}
@@ -107,21 +111,30 @@ export function AccountEditorPanel({
   onSave,
   onArchive,
 }: Props) {
+  const m = useMessages();
   const isCreditCard = values.type === "credit_card";
   const workingLocked = isCreditCard || values.type === "investment";
   const canSave = values.name.trim().length > 0;
   const canArchive = balanceCents === 0;
+  const typeLabel = accountTypeLabel(m, values.type);
 
   const subtitle =
     mode === "edit"
-      ? `${values.name} · ${ACCOUNT_TYPE_LABELS[values.type]} · ${values.currency}`
-      : `New ${ACCOUNT_TYPE_LABELS[values.type].toLowerCase()} account · ${values.currency}`;
+      ? fmt(m.accounts.editAccountSubtitle, {
+          name: values.name,
+          type: typeLabel,
+          currency: values.currency,
+        })
+      : fmt(m.accounts.newAccountSubtitle, {
+          type: typeLabel.toLowerCase(),
+          currency: values.currency,
+        });
 
   return (
     <EditorPanel
       open={open}
       labelId="account-editor-title"
-      title={mode === "create" ? "Add account" : "Edit account"}
+      title={mode === "create" ? m.accounts.editor.addTitle : m.accounts.editor.editTitle}
       subtitle={subtitle}
       onClose={onClose}
       onSubmit={() => {
@@ -130,25 +143,20 @@ export function AccountEditorPanel({
       footer={
         <>
           {mode === "edit" && onArchive && (
-            <Tooltip
-              align="start"
-              content={
-                canArchive ? undefined : "Accounts can only be archived when the balance is zero."
-              }
-            >
+            <Tooltip align="start" content={canArchive ? undefined : m.accounts.archiveTooltip}>
               <Button
                 variant="ghost"
                 className={styles.archiveButton}
                 disabled={!canArchive}
                 onClick={onArchive}
               >
-                Archive
+                {m.common.archive}
               </Button>
             </Tooltip>
           )}
           <EditorPanelFooterActions>
             <Button variant="ghost" onClick={onClose}>
-              Cancel
+              {m.common.cancel}
             </Button>
             <Button
               variant="primary"
@@ -156,7 +164,7 @@ export function AccountEditorPanel({
               disabled={!canSave}
               className={styles.saveButton}
             >
-              {mode === "create" ? "Add account" : "Save changes"}
+              {mode === "create" ? m.accounts.editor.addSubmit : m.common.saveChanges}
             </Button>
           </EditorPanelFooterActions>
         </>
@@ -164,61 +172,58 @@ export function AccountEditorPanel({
     >
       <FormField
         id="account-name"
-        label="Name"
+        label={m.common.form.name}
         value={values.name}
-        placeholder="e.g. Nubank Checking"
+        placeholder={m.common.form.placeholderAccountName}
         onChange={(event) => onChange({ name: event.target.value })}
         required
       />
 
       <FormField
         id="account-type"
-        label="Type"
+        label={m.common.form.type}
         inputType="select"
         value={values.type}
         onChange={(event) => onChange({ type: event.target.value as AccountType })}
       >
         {ACCOUNT_TYPES.map((type) => (
           <option key={type} value={type}>
-            {ACCOUNT_TYPE_LABELS[type]}
+            {accountTypeLabel(m, type)}
           </option>
         ))}
       </FormField>
 
       <div className={styles.toggleRow}>
         <div>
-          <div className={styles.toggleLabel}>Working account</div>
+          <div className={styles.toggleLabel}>{m.accounts.working.on}</div>
           <div className={styles.toggleHint}>
-            {workingLocked
-              ? "Credit cards and investments are excluded by default"
-              : "Include in working balance"}
+            {workingLocked ? m.accounts.working.lockedHint : m.accounts.working.hint}
           </div>
         </div>
         <Toggle
           checked={values.isWorking}
           disabled={workingLocked}
-          aria-label="Working account"
+          aria-label={m.accounts.working.on}
           onChange={(checked) => onChange({ isWorking: checked })}
         />
       </div>
 
       <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Balance anchor</h3>
-        <p className={styles.sectionHint}>
-          Forecasts are projected forward from this known balance.
-        </p>
+        <h3 className={styles.sectionTitle}>{m.accounts.balanceAnchor.title}</h3>
+        <p className={styles.sectionHint}>{m.accounts.balanceAnchor.hint}</p>
         <div className={styles.row}>
           <MoneyField
             id="anchor-balance"
-            label={isCreditCard ? "Amount owed" : "Opening balance"}
+            label={isCreditCard ? m.common.form.amountOwed : m.common.form.openingBalance}
             currency={values.currency}
             cents={values.anchorBalanceCents}
+            placeholder={m.common.form.placeholderAmount}
             required
             onCentsChange={(cents) => onChange({ anchorBalanceCents: cents ?? 0 })}
           />
           <FormField
             id="anchor-date"
-            label="As of date"
+            label={m.common.form.asOfDate}
             type="date"
             value={values.anchorDate}
             onChange={(event) => onChange({ anchorDate: event.target.value })}
@@ -229,18 +234,16 @@ export function AccountEditorPanel({
 
       {isCreditCard && (
         <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Credit card cycle</h3>
-          <p className={styles.sectionHint}>
-            Used to schedule statement closing and payment due dates.
-          </p>
+          <h3 className={styles.sectionTitle}>{m.accounts.creditCardCycle.title}</h3>
+          <p className={styles.sectionHint}>{m.accounts.creditCardCycle.hint}</p>
           <div className={styles.row}>
             <FormField
               id="closing-day"
-              label="Closing day"
+              label={m.common.form.closingDay}
               type="number"
               min="1"
               max="31"
-              placeholder="1–31"
+              placeholder={m.common.form.placeholderClosingDay}
               value={values.closingDay ?? ""}
               onChange={(event) =>
                 onChange({ closingDay: Number.parseInt(event.target.value, 10) || undefined })
@@ -248,11 +251,11 @@ export function AccountEditorPanel({
             />
             <FormField
               id="due-day"
-              label="Due day"
+              label={m.common.form.dueDay}
               type="number"
               min="1"
               max="31"
-              placeholder="1–31"
+              placeholder={m.common.form.placeholderClosingDay}
               value={values.dueDay ?? ""}
               onChange={(event) =>
                 onChange({ dueDay: Number.parseInt(event.target.value, 10) || undefined })
@@ -261,22 +264,22 @@ export function AccountEditorPanel({
           </div>
           <MoneyField
             id="credit-limit"
-            label="Credit limit"
+            label={m.common.form.creditLimit}
             currency={values.currency}
             cents={values.creditLimitCents}
+            placeholder={m.common.form.placeholderAmount}
             onCentsChange={(cents) => onChange({ creditLimitCents: cents })}
           />
           <FormField
             id="pay-from"
-            label="Default pay from"
+            label={m.common.form.payFromAccount}
             inputType="select"
             value={values.defaultPayFromAccountId ?? ""}
-            hint="Account that pays this card's statement"
             onChange={(event) =>
               onChange({ defaultPayFromAccountId: event.target.value || undefined })
             }
           >
-            <option value="">Select account</option>
+            <option value="">{m.common.form.selectAccount}</option>
             {payFromOptions.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.name}
@@ -287,22 +290,22 @@ export function AccountEditorPanel({
       )}
 
       <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Details</h3>
+        <h3 className={styles.sectionTitle}>{m.accounts.details.title}</h3>
         <FormField
           id="institution"
-          label="Institution"
-          placeholder="e.g. Nubank, Cora, Itaú"
+          label={m.common.form.institution}
+          placeholder={m.common.form.placeholderInstitution}
           value={values.institution ?? ""}
-          hint="Optional"
+          hint={m.common.optional}
           onChange={(event) => onChange({ institution: event.target.value || undefined })}
         />
         <FormField
           id="notes"
-          label="Notes"
+          label={m.common.form.notes}
           inputType="textarea"
-          placeholder="Account number, branch, or anything else worth remembering"
+          placeholder={m.common.form.placeholderNotes}
           value={values.notes ?? ""}
-          hint="Optional"
+          hint={m.common.optional}
           onChange={(event) => onChange({ notes: event.target.value || undefined })}
         />
       </div>
