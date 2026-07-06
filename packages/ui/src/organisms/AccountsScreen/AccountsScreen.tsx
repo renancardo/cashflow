@@ -3,6 +3,7 @@ import { Button } from "../../atoms/Button/Button.js";
 import { MoneyAmount } from "../../atoms/MoneyAmount/MoneyAmount.js";
 import { Metric } from "../../molecules/Metric/Metric.js";
 import { SummaryStrip, SummaryStripItem } from "../../molecules/SummaryStrip/SummaryStrip.js";
+import { useMessages } from "../../i18n/LanguageContext.js";
 import { AccountList } from "../AccountList/AccountList.js";
 import { AccountRow, type AccountRowData } from "../AccountRow/AccountRow.js";
 import { HeaderStrip } from "../HeaderStrip/HeaderStrip.js";
@@ -32,13 +33,14 @@ export function AccountsScreen({
   onEdit,
   onStatements,
 }: Props) {
+  const m = useMessages();
   const workingCount = accounts.filter((account) => account.isWorking).length;
 
   if (status === "loading") {
     return (
       <div className={styles.status}>
-        <h2 className={styles.statusTitle}>Loading accounts…</h2>
-        <p>Fetching balances and settings.</p>
+        <h2 className={styles.statusTitle}>{m.accounts.loading.title}</h2>
+        <p>{m.accounts.loading.description}</p>
       </div>
     );
   }
@@ -46,8 +48,8 @@ export function AccountsScreen({
   if (status === "error") {
     return (
       <div className={styles.status}>
-        <h2 className={styles.statusTitle}>Could not load accounts</h2>
-        <p>{errorMessage ?? "Something went wrong. Try again."}</p>
+        <h2 className={styles.statusTitle}>{m.accounts.error.title}</h2>
+        <p>{errorMessage ?? m.common.errorFallback}</p>
       </div>
     );
   }
@@ -57,31 +59,28 @@ export function AccountsScreen({
       <HeaderStrip
         metric={
           accounts.length > 0 ? (
-            <Metric label="Working balance">
+            <Metric label={m.common.workingBalance}>
               <MoneyAmount cents={workingBalanceCents} />
             </Metric>
           ) : null
         }
         action={
           <Button variant="primary" onClick={onAddAccount}>
-            + Add account
+            {m.accounts.addAccount}
           </Button>
         }
       />
 
       <div className={styles.page}>
-        <PageHeader
-          title="Accounts"
-          subtitle="Manage balances, working flags, and credit card cycles"
-        />
+        <PageHeader title={m.accounts.title} subtitle={m.accounts.subtitle} />
 
         {accounts.length > 0 && (
           <SummaryStrip className={styles.summary}>
-            <SummaryStripItem label="Total accounts">{accounts.length}</SummaryStripItem>
-            <SummaryStripItem label="Working accounts" tone="working">
+            <SummaryStripItem label={m.accounts.totalAccounts}>{accounts.length}</SummaryStripItem>
+            <SummaryStripItem label={m.accounts.workingAccounts} tone="working">
               {workingCount}
             </SummaryStripItem>
-            <SummaryStripItem label="Aggregate working">
+            <SummaryStripItem label={m.accounts.aggregateWorking}>
               <MoneyAmount cents={workingBalanceCents} />
             </SummaryStripItem>
           </SummaryStrip>

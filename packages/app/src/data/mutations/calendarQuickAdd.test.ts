@@ -48,7 +48,7 @@ describe("calendarQuickAdd", () => {
         },
         accounts,
       ),
-    ).toContain("statement payment");
+    ).toBe("transferToCreditCard");
   });
 
   it("uses a transaction for today or past and a planned item for future dates", () => {

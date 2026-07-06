@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Button } from "../../atoms/Button/Button.js";
+import { useMessages } from "../../i18n/LanguageContext.js";
 import styles from "./AccountList.module.css";
 
 type Props = {
@@ -9,17 +10,17 @@ type Props = {
 };
 
 export function AccountList({ children, empty = false, onAddAccount }: Props) {
+  const m = useMessages();
+
   if (empty) {
     return (
-      <section className={styles.list} aria-label="Account list">
+      <section className={styles.list} aria-label={m.common.aria.accountList}>
         <div className={styles.empty}>
-          <h2 className={styles.emptyTitle}>No accounts yet</h2>
-          <p className={styles.emptyBody}>
-            Add your first account to start forecasting cash flow from real balances.
-          </p>
+          <h2 className={styles.emptyTitle}>{m.accounts.empty.title}</h2>
+          <p className={styles.emptyBody}>{m.accounts.empty.body}</p>
           {onAddAccount && (
             <Button variant="primary" onClick={onAddAccount}>
-              + Add first account
+              {m.accounts.addFirstAccount}
             </Button>
           )}
         </div>
@@ -28,11 +29,11 @@ export function AccountList({ children, empty = false, onAddAccount }: Props) {
   }
 
   return (
-    <section className={styles.list} aria-label="Account list">
+    <section className={styles.list} aria-label={m.common.aria.accountList}>
       <div className={styles.header}>
-        <span>Account</span>
-        <span>Working</span>
-        <span>Balance</span>
+        <span>{m.accounts.list.account}</span>
+        <span>{m.accounts.list.working}</span>
+        <span>{m.accounts.list.balance}</span>
         <span />
       </div>
       {children}

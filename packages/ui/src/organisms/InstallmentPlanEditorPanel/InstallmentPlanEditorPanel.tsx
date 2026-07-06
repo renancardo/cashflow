@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { formatCents, parseMoney } from "@cashflow/core";
+import { fmt, formatCents, parseMoney } from "@cashflow/core";
 import { Button } from "../../atoms/Button/Button.js";
 import { Toggle } from "../../atoms/Toggle/Toggle.js";
 import { FormattedDate } from "../../atoms/FormattedDate/FormattedDate.js";
 import { MoneyAmount } from "../../atoms/MoneyAmount/MoneyAmount.js";
 import { Chip } from "../../atoms/Chip/Chip.js";
 import { FormField } from "../../molecules/FormField/FormField.js";
+import { useMessages } from "../../i18n/LanguageContext.js";
 import { EditorPanel, EditorPanelFooterActions } from "../EditorPanel/EditorPanel.js";
 import styles from "./InstallmentPlanEditorPanel.module.css";
 
@@ -47,6 +48,7 @@ type Props = {
 function MoneyField({
   id,
   label,
+  placeholder,
   currency,
   cents,
   required,
@@ -54,6 +56,7 @@ function MoneyField({
 }: {
   id: string;
   label: string;
+  placeholder: string;
   currency: string;
   cents: number;
   required?: boolean;
@@ -72,7 +75,7 @@ function MoneyField({
       type="text"
       inputMode="decimal"
       prefix={currency}
-      placeholder="0.00"
+      placeholder={placeholder}
       value={draft}
       required={required}
       onChange={(event) => {
@@ -98,6 +101,9 @@ export function InstallmentPlanEditorPanel({
   onSave,
   onDelete,
 }: Props) {
+  const m = useMessages();
+  const e = m.forecast.editor;
+
   const canSave =
     values.description.trim().length > 0 &&
     values.installmentAmountCents > 0 &&
@@ -107,14 +113,17 @@ export function InstallmentPlanEditorPanel({
 
   const subtitle =
     mode === "edit"
-      ? `${values.description || "Installment plan"} · ${values.installmentCount} installments`
-      : "New installment plan";
+      ? fmt(e.editInstallmentPlanSubtitle, {
+          description: values.description || m.common.unknown,
+          count: values.installmentCount,
+        })
+      : e.newInstallmentPlanSubtitle;
 
   return (
     <EditorPanel
       open={open}
       labelId="installment-plan-editor-title"
-      title={mode === "create" ? "Add installment plan" : "Edit installment plan"}
+      title={mode === "create" ? e.addInstallmentPlan : e.editInstallmentPlan}
       subtitle={subtitle}
       onClose={onClose}
       onSubmit={() => {
@@ -124,15 +133,15 @@ export function InstallmentPlanEditorPanel({
         <>
           {mode === "edit" && onDelete && (
             <Button variant="ghost" className={styles.deleteButton} onClick={onDelete}>
-              Delete
+              {m.common.delete}
             </Button>
           )}
           <EditorPanelFooterActions>
             <Button variant="ghost" onClick={onClose}>
-              Cancel
+              {m.common.cancel}
             </Button>
             <Button variant="primary" type="submit" disabled={!canSave}>
-              {mode === "create" ? "Add plan" : "Save changes"}
+              {mode === "create" ? e.addPlan : m.common.saveChanges}
             </Button>
           </EditorPanelFooterActions>
         </>
@@ -140,7 +149,7 @@ export function InstallmentPlanEditorPanel({
     >
       <FormField
         id="ip-description"
-        label="Description"
+        label={m.common.form.description}
         value={values.description}
         required
         onChange={(e) => onChange({ description: e.target.value })}
@@ -149,7 +158,8 @@ export function InstallmentPlanEditorPanel({
       <div className={styles.row}>
         <MoneyField
           id="ip-amount"
-          label="Installment amount"
+          label={e.installmentAmount}
+          placeholder={m.common.form.placeholderAmount}
           currency={currency}
           cents={values.installmentAmountCents}
           required
@@ -157,7 +167,7 @@ export function InstallmentPlanEditorPanel({
         />
         <FormField
           id="ip-count"
-          label="Installment count"
+          label={e.installmentCount}
           type="number"
           min={1}
           value={String(values.installmentCount)}
@@ -169,7 +179,7 @@ export function InstallmentPlanEditorPanel({
       <div className={styles.row}>
         <FormField
           id="ip-first-due"
-          label="First due date"
+          label={e.firstDueDate}
           type="date"
           value={values.firstDueDate}
           required
@@ -181,7 +191,7 @@ export function InstallmentPlanEditorPanel({
         />
         <FormField
           id="ip-day-of-month"
-          label="Day of month"
+          label={m.common.form.dayOfMonth}
           type="number"
           min={1}
           max={31}
@@ -193,13 +203,13 @@ export function InstallmentPlanEditorPanel({
       <div className={styles.row}>
         <FormField
           id="ip-account"
-          label="Account"
+          label={m.common.form.account}
           inputType="select"
           value={values.accountId}
           required
           onChange={(e) => onChange({ accountId: e.target.value })}
         >
-          <option value="">Select account</option>
+          <option value="">{m.common.form.selectAccount}</option>
           {accountOptions.map((account) => (
             <option key={account.id} value={account.id}>
               {account.name}
@@ -208,12 +218,12 @@ export function InstallmentPlanEditorPanel({
         </FormField>
         <FormField
           id="ip-category"
-          label="Category"
+          label={m.common.form.category}
           inputType="select"
           value={values.categoryId ?? ""}
           onChange={(e) => onChange({ categoryId: e.target.value || undefined })}
         >
-          <option value="">Optional</option>
+          <option value="">{m.common.optional}</option>
           {categoryOptions.map((cat) => (
             <option key={cat.id} value={cat.id}>
               {cat.name}
@@ -224,27 +234,25 @@ export function InstallmentPlanEditorPanel({
 
       <div className={styles.toggleRow}>
         <div>
-          <div className={styles.toggleLabel}>Active</div>
-          <div className={styles.toggleHint}>
-            Paused plans stay visible but are excluded from projection
-          </div>
+          <div className={styles.toggleLabel}>{m.common.active}</div>
+          <div className={styles.toggleHint}>{e.activePlanHint}</div>
         </div>
         <Toggle
           checked={values.isActive}
-          aria-label="Active"
+          aria-label={m.common.active}
           onChange={(checked) => onChange({ isActive: checked })}
         />
       </div>
 
       {schedulePreview.length > 0 && (
         <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Schedule preview</h3>
+          <h3 className={styles.sectionTitle}>{m.common.form.schedulePreview}</h3>
           <div className={styles.schedule}>
             <div className={styles.scheduleHeader}>
-              <span>#</span>
-              <span>Due</span>
-              <span>Amount</span>
-              <span>Status</span>
+              <span>{m.forecast.headers.schedule.number}</span>
+              <span>{m.forecast.headers.schedule.due}</span>
+              <span>{m.forecast.headers.schedule.amount}</span>
+              <span>{m.forecast.headers.schedule.status}</span>
             </div>
             {schedulePreview.slice(0, 8).map((row) => (
               <div key={row.index} className={styles.scheduleRow}>
@@ -257,13 +265,15 @@ export function InstallmentPlanEditorPanel({
                 </span>
                 <span>
                   <Chip variant={row.status === "paid" ? "income" : "default"}>
-                    {row.status === "paid" ? "Paid" : "Scheduled"}
+                    {row.status === "paid" ? m.common.paid : m.common.scheduled}
                   </Chip>
                 </span>
               </div>
             ))}
             {schedulePreview.length > 8 && (
-              <p className={styles.scheduleMore}>+ {schedulePreview.length - 8} more</p>
+              <p className={styles.scheduleMore}>
+                {fmt(e.scheduleMore, { count: schedulePreview.length - 8 })}
+              </p>
             )}
           </div>
         </div>

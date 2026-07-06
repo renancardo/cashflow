@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import type { AccountType, TxType } from "@cashflow/core";
-import { TX_TYPES, TX_TYPE_LABELS, formatCents, parseMoney } from "@cashflow/core";
+import { TX_TYPES, formatCents, parseMoney, txTypeLabel } from "@cashflow/core";
 import { Button } from "../../atoms/Button/Button.js";
 import { FormattedDate } from "../../atoms/FormattedDate/FormattedDate.js";
 import { FormField } from "../../molecules/FormField/FormField.js";
 import { SegmentedControl } from "../../molecules/SegmentedControl/SegmentedControl.js";
+import { useMessages } from "../../i18n/LanguageContext.js";
 import { validateTransferDestination } from "../../lib/transferValidation.js";
 import styles from "./QuickAddCard.module.css";
 
@@ -35,12 +36,14 @@ type Props = {
 function MoneyField({
   id,
   label,
+  placeholder,
   currency,
   cents,
   onCentsChange,
 }: {
   id: string;
   label: string;
+  placeholder: string;
   currency: string;
   cents: number;
   onCentsChange: (cents: number) => void;
@@ -58,7 +61,7 @@ function MoneyField({
       type="text"
       inputMode="decimal"
       prefix={currency}
-      placeholder="0.00"
+      placeholder={placeholder}
       value={draft}
       required
       onChange={(event) => {
@@ -81,6 +84,7 @@ export function QuickAddCard({
   onChange,
   onSubmit,
 }: Props) {
+  const m = useMessages();
   const isTransfer = values.type === "transfer";
   const filteredCategories = categoryOptions.filter((category) =>
     values.type === "income" ? category.kind === "income" : category.kind === "expense",
@@ -101,14 +105,14 @@ export function QuickAddCard({
   return (
     <div className={styles.card}>
       <div className={styles.header}>
-        <h3 className={styles.title}>Quick add</h3>
+        <h3 className={styles.title}>{m.quickAdd.title}</h3>
         <span className={styles.date}>
           <FormattedDate isoDate={values.effectiveDate} />
         </span>
       </div>
 
       <SegmentedControl
-        aria-label="Transaction type"
+        aria-label={m.common.form.transactionType}
         value={values.type}
         onChange={(type) =>
           onChange({
@@ -117,13 +121,14 @@ export function QuickAddCard({
             toAccountId: type === "transfer" ? values.toAccountId : undefined,
           })
         }
-        options={TX_TYPES.map((type) => ({ value: type, label: TX_TYPE_LABELS[type] }))}
+        options={TX_TYPES.map((type) => ({ value: type, label: txTypeLabel(m, type) }))}
       />
 
       <div className={styles.row}>
         <MoneyField
           id="quick-add-amount"
-          label="Amount"
+          label={m.common.form.amount}
+          placeholder={m.common.form.placeholderAmount}
           currency={currency}
           cents={values.amountCents}
           onCentsChange={(amountCents) => onChange({ amountCents })}
@@ -131,13 +136,13 @@ export function QuickAddCard({
         {!isTransfer ? (
           <FormField
             id="quick-add-category"
-            label="Category"
+            label={m.common.form.category}
             inputType="select"
             value={values.categoryId ?? ""}
             required
             onChange={(event) => onChange({ categoryId: event.target.value || undefined })}
           >
-            <option value="">Select category</option>
+            <option value="">{m.common.form.selectCategory}</option>
             {filteredCategories.map((category) => (
               <option key={category.id} value={category.id}>
                 {category.name}
@@ -147,13 +152,13 @@ export function QuickAddCard({
         ) : (
           <FormField
             id="quick-add-to"
-            label="To account"
+            label={m.common.form.toAccount}
             inputType="select"
             value={values.toAccountId ?? ""}
             required
             onChange={(event) => onChange({ toAccountId: event.target.value || undefined })}
           >
-            <option value="">Select account</option>
+            <option value="">{m.common.form.selectAccount}</option>
             {toAccountOptions.map((account) => (
               <option key={account.id} value={account.id}>
                 {account.name}
@@ -166,7 +171,7 @@ export function QuickAddCard({
       <div className={styles.row}>
         <FormField
           id="quick-add-account"
-          label={isTransfer ? "From account" : "Account"}
+          label={isTransfer ? m.common.form.fromAccount : m.common.form.account}
           inputType="select"
           value={values.accountId}
           required
@@ -178,7 +183,7 @@ export function QuickAddCard({
             });
           }}
         >
-          <option value="">Select account</option>
+          <option value="">{m.common.form.selectAccount}</option>
           {accountOptions.map((account) => (
             <option key={account.id} value={account.id}>
               {account.name}
@@ -187,14 +192,14 @@ export function QuickAddCard({
         </FormField>
         <FormField
           id="quick-add-description"
-          label="Description"
+          label={m.common.form.description}
           value={values.description}
-          placeholder="Optional memo"
+          placeholder={m.common.form.placeholderOptionalMemo}
           onChange={(event) => onChange({ description: event.target.value })}
         />
       </div>
 
-      {transferError && <p className={styles.error}>{transferError}</p>}
+      {transferError && <p className={styles.error}>{m.common.errors.transferToCreditCard}</p>}
 
       <Button
         variant="primary"
@@ -203,7 +208,7 @@ export function QuickAddCard({
         disabled={!canSubmit || saving}
         onClick={onSubmit}
       >
-        {saving ? "Adding…" : "Add transaction"}
+        {saving ? m.quickAdd.adding : m.quickAdd.addTransaction}
       </Button>
     </div>
   );

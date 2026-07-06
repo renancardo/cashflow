@@ -1,10 +1,11 @@
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import { Button } from "../../atoms/Button/Button.js";
 import { FormattedDate } from "../../atoms/FormattedDate/FormattedDate.js";
 import { MoneyAmount } from "../../atoms/MoneyAmount/MoneyAmount.js";
 import { Metric } from "../../molecules/Metric/Metric.js";
 import { SegmentedControl } from "../../molecules/SegmentedControl/SegmentedControl.js";
 import { SummaryStrip, SummaryStripItem } from "../../molecules/SummaryStrip/SummaryStrip.js";
+import { useMessages } from "../../i18n/LanguageContext.js";
 import { HeaderStrip } from "../HeaderStrip/HeaderStrip.js";
 import { PageHeader } from "../PageHeader/PageHeader.js";
 import { ForecastItemRow, type ForecastItemRowData } from "../ForecastItemRow/ForecastItemRow.js";
@@ -27,16 +28,6 @@ export type ForecastSummary = {
   nextOutflow: { date: string; amountCents: number } | null;
   nextInflow: { date: string; amountCents: number } | null;
 };
-
-const FILTER_OPTIONS: { value: ForecastFilter; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "subscription", label: "Subscriptions" },
-  { value: "income", label: "Income" },
-  { value: "expense", label: "Expense" },
-  { value: "transfer", label: "Transfer" },
-  { value: "installment", label: "Installments" },
-  { value: "statement", label: "Statements" },
-];
 
 type Props = {
   plannedRows: ForecastItemRowData[];
@@ -104,9 +95,12 @@ function ForecastGroup({
   onMarkStatementPaid?: (statementId: string) => void;
   onViewStatementItems?: (statementId: string) => void;
 }) {
+  const m = useMessages();
   const hasContent =
     recurring.length > 0 || oneOff.length > 0 || installments.length > 0 || statements.length > 0;
   if (!hasContent) return null;
+
+  const h = m.forecast.headers;
 
   return (
     <section
@@ -114,21 +108,21 @@ function ForecastGroup({
     >
       <h2 className={styles.sectionTitle}>
         {title}
-        {dormant && <span className={styles.sectionHint}>excluded from projection</span>}
+        {dormant && <span className={styles.sectionHint}>{m.forecast.excludedFromProjection}</span>}
       </h2>
 
       {recurring.length > 0 && (
         <div className={styles.group}>
-          <h3 className={styles.groupLabel}>Recurring</h3>
+          <h3 className={styles.groupLabel}>{m.forecast.groups.recurring}</h3>
           <div className={styles.list}>
             {plannedHeader && (
               <div className={styles.listHeader}>
-                <span>Item</span>
-                <span>Account</span>
-                <span>Recurrence</span>
-                <span>Next</span>
-                <span>Amount</span>
-                <span>Active</span>
+                <span>{h.planned.item}</span>
+                <span>{h.planned.account}</span>
+                <span>{h.planned.recurrence}</span>
+                <span>{h.planned.next}</span>
+                <span>{h.planned.amount}</span>
+                <span>{h.planned.active}</span>
                 <span />
               </div>
             )}
@@ -148,16 +142,16 @@ function ForecastGroup({
 
       {oneOff.length > 0 && (
         <div className={styles.group}>
-          <h3 className={styles.groupLabel}>One-off</h3>
+          <h3 className={styles.groupLabel}>{m.forecast.groups.oneOff}</h3>
           <div className={styles.list}>
             {plannedHeader && recurring.length === 0 && (
               <div className={styles.listHeader}>
-                <span>Item</span>
-                <span>Account</span>
-                <span>Recurrence</span>
-                <span>Next</span>
-                <span>Amount</span>
-                <span>Active</span>
+                <span>{h.planned.item}</span>
+                <span>{h.planned.account}</span>
+                <span>{h.planned.recurrence}</span>
+                <span>{h.planned.next}</span>
+                <span>{h.planned.amount}</span>
+                <span>{h.planned.active}</span>
                 <span />
               </div>
             )}
@@ -177,16 +171,16 @@ function ForecastGroup({
 
       {installments.length > 0 && (
         <div className={styles.group}>
-          <h3 className={styles.groupLabel}>Installments</h3>
+          <h3 className={styles.groupLabel}>{m.forecast.groups.installments}</h3>
           <div className={styles.list}>
             {installmentHeader && (
               <div className={styles.listHeaderInstallments}>
-                <span>Plan</span>
-                <span>Account</span>
-                <span>Progress</span>
-                <span>Payoff</span>
-                <span>Next</span>
-                <span>Active</span>
+                <span>{h.installments.plan}</span>
+                <span>{h.installments.account}</span>
+                <span>{h.installments.progress}</span>
+                <span>{h.installments.payoff}</span>
+                <span>{h.installments.next}</span>
+                <span>{h.installments.active}</span>
                 <span />
               </div>
             )}
@@ -206,14 +200,14 @@ function ForecastGroup({
 
       {statements.length > 0 && (
         <div className={styles.group}>
-          <h3 className={styles.groupLabel}>Credit card statements</h3>
+          <h3 className={styles.groupLabel}>{m.forecast.groups.creditCardStatements}</h3>
           <div className={styles.list}>
             {statementHeader && (
               <div className={styles.listHeaderStatements}>
-                <span>Card</span>
-                <span>Pay from</span>
-                <span>Horizon</span>
-                <span>Next due</span>
+                <span>{h.statements.card}</span>
+                <span>{h.statements.payFrom}</span>
+                <span>{h.statements.horizon}</span>
+                <span>{h.statements.nextDue}</span>
                 <span />
               </div>
             )}
@@ -259,11 +253,26 @@ export function ForecastScreen({
   onMarkStatementPaid,
   onViewStatementItems,
 }: Props) {
+  const m = useMessages();
+
+  const filterOptions = useMemo(
+    () => [
+      { value: "all" as const, label: m.forecast.filters.all },
+      { value: "subscription" as const, label: m.forecast.filters.subscriptions },
+      { value: "income" as const, label: m.forecast.filters.income },
+      { value: "expense" as const, label: m.forecast.filters.expense },
+      { value: "transfer" as const, label: m.forecast.filters.transfer },
+      { value: "installment" as const, label: m.forecast.filters.installments },
+      { value: "statement" as const, label: m.forecast.filters.statements },
+    ],
+    [m],
+  );
+
   if (status === "loading") {
     return (
       <div className={styles.status}>
-        <h2 className={styles.statusTitle}>Loading forecast items…</h2>
-        <p>Fetching planned income, expenses, and installment plans.</p>
+        <h2 className={styles.statusTitle}>{m.forecast.loading.title}</h2>
+        <p>{m.forecast.loading.description}</p>
       </div>
     );
   }
@@ -271,8 +280,8 @@ export function ForecastScreen({
   if (status === "error") {
     return (
       <div className={styles.status}>
-        <h2 className={styles.statusTitle}>Could not load forecast items</h2>
-        <p>{errorMessage ?? "Something went wrong. Try again."}</p>
+        <h2 className={styles.statusTitle}>{m.forecast.error.title}</h2>
+        <p>{errorMessage ?? m.common.errorFallback}</p>
       </div>
     );
   }
@@ -298,72 +307,68 @@ export function ForecastScreen({
     <>
       <HeaderStrip
         metric={
-          <Metric label="Working balance">
+          <Metric label={m.common.workingBalance}>
             <MoneyAmount cents={workingBalanceCents} />
           </Metric>
         }
         action={
           <div className={styles.headerActions}>
             <Button variant="ghost" onClick={onAddInstallmentPlan}>
-              + Add installment plan
+              {m.forecast.addInstallmentPlan}
             </Button>
             <Button variant="primary" onClick={onAddForecastItem}>
-              + Add forecast item
+              {m.forecast.addForecastItem}
             </Button>
           </div>
         }
       />
 
       <div className={styles.page}>
-        <PageHeader
-          title="Forecast Items"
-          subtitle="Recurring obligations, one-off plans, installment debt, card statements, and subscriptions"
-        />
+        <PageHeader title={m.forecast.title} subtitle={m.forecast.subtitle} />
 
         {isEmpty ? (
           <div className={styles.empty}>
             <div className={styles.emptyIcon} aria-hidden="true">
               📅
             </div>
-            <h2 className={styles.emptyTitle}>No forecast items yet</h2>
-            <p className={styles.emptyDesc}>
-              Add planned income, recurring bills, installment plans, or one-off transfers to see
-              them on your calendar.
-            </p>
+            <h2 className={styles.emptyTitle}>{m.forecast.empty.title}</h2>
+            <p className={styles.emptyDesc}>{m.forecast.empty.description}</p>
             <div className={styles.emptyActions}>
               <Button variant="primary" onClick={onAddForecastItem}>
-                + Add forecast item
+                {m.forecast.addForecastItem}
               </Button>
               <Button variant="ghost" onClick={onAddInstallmentPlan}>
-                + Add installment plan
+                {m.forecast.addInstallmentPlan}
               </Button>
             </div>
           </div>
         ) : (
           <>
             <SummaryStrip className={styles.summary}>
-              <SummaryStripItem label="Active items">{summary.activeItemCount}</SummaryStripItem>
-              <SummaryStripItem label="Subscriptions" tone="default">
+              <SummaryStripItem label={m.forecast.summary.activeItems}>
+                {summary.activeItemCount}
+              </SummaryStripItem>
+              <SummaryStripItem label={m.forecast.summary.subscriptions} tone="default">
                 {summary.subscriptionCount}
               </SummaryStripItem>
-              <SummaryStripItem label="Next outflow" tone="warning">
+              <SummaryStripItem label={m.forecast.summary.nextOutflow} tone="warning">
                 {summary.nextOutflow ? (
                   <>
                     <FormattedDate isoDate={summary.nextOutflow.date} /> ·{" "}
                     <MoneyAmount cents={summary.nextOutflow.amountCents} />
                   </>
                 ) : (
-                  "—"
+                  m.common.dash
                 )}
               </SummaryStripItem>
-              <SummaryStripItem label="Next inflow" tone="success">
+              <SummaryStripItem label={m.forecast.summary.nextInflow} tone="success">
                 {summary.nextInflow ? (
                   <>
                     <FormattedDate isoDate={summary.nextInflow.date} /> ·{" "}
                     <MoneyAmount cents={summary.nextInflow.amountCents} />
                   </>
                 ) : (
-                  "—"
+                  m.common.dash
                 )}
               </SummaryStripItem>
             </SummaryStrip>
@@ -372,17 +377,17 @@ export function ForecastScreen({
               <div className={styles.filtersHeader}>
                 <div className={styles.typeFilters}>
                   <SegmentedControl
-                    aria-label="Filter by type"
+                    aria-label={m.common.aria.filterByType}
                     value={filter}
                     onChange={(value) => onFilterChange?.(value)}
-                    options={FILTER_OPTIONS}
+                    options={filterOptions}
                   />
                 </div>
               </div>
             </div>
 
             <ForecastGroup
-              title="Active"
+              title={m.forecast.sections.active}
               plannedHeader
               installmentHeader
               statementHeader
@@ -403,7 +408,7 @@ export function ForecastScreen({
             />
 
             <ForecastGroup
-              title="Dormant"
+              title={m.forecast.sections.dormant}
               plannedHeader
               installmentHeader
               statementHeader

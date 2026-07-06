@@ -33,6 +33,31 @@ export function formatDate(isoDate: string, language: Language = PT_BR): string 
   }).format(date);
 }
 
+/** Formats an ISO date using an explicit pattern (e.g. DD/MM/YYYY from Settings). */
+export function formatDateWithPattern(isoDate: string, dateFormat: string): string {
+  const [y, m, d] = isoDate.split("-").map(Number);
+  const pad = (value: number) => String(value).padStart(2, "0");
+  switch (dateFormat) {
+    case "MM/DD/YYYY":
+      return `${pad(m)}/${pad(d)}/${y}`;
+    case "YYYY-MM-DD":
+      return `${y}-${pad(m)}-${pad(d)}`;
+    default:
+      return `${pad(d)}/${pad(m)}/${y}`;
+  }
+}
+
+export function formatDisplayDate(
+  isoDate: string,
+  language: Language = PT_BR,
+  dateFormat?: string,
+): string {
+  if (dateFormat) {
+    return formatDateWithPattern(isoDate, dateFormat);
+  }
+  return formatDate(isoDate, language);
+}
+
 /** Decimal string for money input fields (e.g. "1850.00"). Empty when cents is undefined. */
 export function formatCents(cents: number | undefined): string {
   return cents == null ? "" : (cents / 100).toFixed(2);

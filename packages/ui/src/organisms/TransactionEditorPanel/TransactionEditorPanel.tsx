@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import type { AccountType, TxType } from "@cashflow/core";
-import { TX_TYPES, TX_TYPE_LABELS, formatCents, parseMoney } from "@cashflow/core";
+import { TX_TYPES, fmt, formatCents, parseMoney, txTypeLabel } from "@cashflow/core";
 import { Button } from "../../atoms/Button/Button.js";
 import { FormField } from "../../molecules/FormField/FormField.js";
 import { EditorPanel, EditorPanelFooterActions } from "../EditorPanel/EditorPanel.js";
+import { useMessages } from "../../i18n/LanguageContext.js";
 import { validateTransferDestination } from "../../lib/transferValidation.js";
 import styles from "./TransactionEditorPanel.module.css";
 
@@ -37,13 +38,22 @@ type Props = {
 type MoneyFieldProps = {
   id: string;
   label: string;
+  placeholder: string;
   currency: string;
   cents: number;
   required?: boolean;
   onCentsChange: (cents: number) => void;
 };
 
-function MoneyField({ id, label, currency, cents, required, onCentsChange }: MoneyFieldProps) {
+function MoneyField({
+  id,
+  label,
+  placeholder,
+  currency,
+  cents,
+  required,
+  onCentsChange,
+}: MoneyFieldProps) {
   const [draft, setDraft] = useState(() => formatCents(cents));
 
   useEffect(() => {
@@ -57,7 +67,7 @@ function MoneyField({ id, label, currency, cents, required, onCentsChange }: Mon
       type="text"
       inputMode="decimal"
       prefix={currency}
-      placeholder="0.00"
+      placeholder={placeholder}
       value={draft}
       required={required}
       onChange={(event) => {
@@ -83,6 +93,7 @@ export function TransactionEditorPanel({
   onSave,
   onDelete,
 }: Props) {
+  const m = useMessages();
   const isTransfer = values.type === "transfer";
   const filteredCategories = categoryOptions.filter((c) =>
     values.type === "income" ? c.kind === "income" : c.kind === "expense",
@@ -111,14 +122,19 @@ export function TransactionEditorPanel({
 
   const subtitle =
     mode === "edit"
-      ? `${values.description || "Transaction"} · ${values.effectiveDate}`
-      : `New ${TX_TYPE_LABELS[values.type].toLowerCase()} transaction`;
+      ? fmt(m.transactions.editTransactionSubtitle, {
+          description: values.description || m.common.unknown,
+          date: values.effectiveDate,
+        })
+      : fmt(m.transactions.newTransactionSubtitle, {
+          type: txTypeLabel(m, values.type).toLowerCase(),
+        });
 
   return (
     <EditorPanel
       open={open}
       labelId="transaction-editor-title"
-      title={mode === "create" ? "Add transaction" : "Edit transaction"}
+      title={mode === "create" ? m.quickAdd.addTransaction : m.transactions.editTransaction}
       subtitle={subtitle}
       onClose={onClose}
       onSubmit={() => {
@@ -128,12 +144,12 @@ export function TransactionEditorPanel({
         <>
           {mode === "edit" && onDelete && (
             <Button variant="ghost" className={styles.deleteButton} onClick={onDelete}>
-              Delete
+              {m.common.delete}
             </Button>
           )}
           <EditorPanelFooterActions>
             <Button variant="ghost" onClick={onClose}>
-              Cancel
+              {m.common.cancel}
             </Button>
             <Button
               variant="primary"
@@ -141,13 +157,13 @@ export function TransactionEditorPanel({
               disabled={!canSave}
               className={styles.saveButton}
             >
-              {mode === "create" ? "Add transaction" : "Save changes"}
+              {mode === "create" ? m.quickAdd.addTransaction : m.common.saveChanges}
             </Button>
           </EditorPanelFooterActions>
         </>
       }
     >
-      <div className={styles.typeGroup} role="group" aria-label="Transaction type">
+      <div className={styles.typeGroup} role="group" aria-label={m.common.form.transactionType}>
         {TX_TYPES.map((type) => (
           <button
             key={type}
@@ -163,7 +179,7 @@ export function TransactionEditorPanel({
               })
             }
           >
-            {TX_TYPE_LABELS[type]}
+            {txTypeLabel(m, type)}
           </button>
         ))}
       </div>
@@ -171,7 +187,7 @@ export function TransactionEditorPanel({
       <div className={styles.row}>
         <FormField
           id="txn-date"
-          label="Date"
+          label={m.common.form.date}
           type="date"
           value={values.effectiveDate}
           required
@@ -179,7 +195,8 @@ export function TransactionEditorPanel({
         />
         <MoneyField
           id="txn-amount"
-          label="Amount"
+          label={m.common.form.amount}
+          placeholder={m.common.form.placeholderAmount}
           currency={currency}
           cents={values.amountCents}
           required
@@ -189,9 +206,9 @@ export function TransactionEditorPanel({
 
       <FormField
         id="txn-description"
-        label="Description"
+        label={m.common.form.description}
         value={values.description}
-        placeholder="What was this for?"
+        placeholder={m.common.form.placeholderDescription}
         required
         onChange={(event) => onChange({ description: event.target.value })}
       />
@@ -199,13 +216,13 @@ export function TransactionEditorPanel({
       {!isTransfer && (
         <FormField
           id="txn-category"
-          label="Category"
+          label={m.common.form.category}
           inputType="select"
           value={values.categoryId ?? ""}
           required
           onChange={(event) => onChange({ categoryId: event.target.value || undefined })}
         >
-          <option value="">Select category</option>
+          <option value="">{m.common.form.selectCategory}</option>
           {filteredCategories.map((option) => (
             <option key={option.id} value={option.id}>
               {option.name}
@@ -217,7 +234,7 @@ export function TransactionEditorPanel({
       <div className={styles.row}>
         <FormField
           id="txn-account"
-          label={isTransfer ? "From account" : "Account"}
+          label={isTransfer ? m.common.form.fromAccount : m.common.form.account}
           inputType="select"
           value={values.accountId}
           required
@@ -229,7 +246,7 @@ export function TransactionEditorPanel({
             });
           }}
         >
-          <option value="">Select account</option>
+          <option value="">{m.common.form.selectAccount}</option>
           {accountOptions.map((option) => (
             <option key={option.id} value={option.id}>
               {option.name}
@@ -240,13 +257,13 @@ export function TransactionEditorPanel({
         {isTransfer && (
           <FormField
             id="txn-to"
-            label="To account"
+            label={m.common.form.toAccount}
             inputType="select"
             value={values.toAccountId ?? ""}
             required
             onChange={(event) => onChange({ toAccountId: event.target.value || undefined })}
           >
-            <option value="">Select account</option>
+            <option value="">{m.common.form.selectAccount}</option>
             {toAccountOptions.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.name}
@@ -257,13 +274,12 @@ export function TransactionEditorPanel({
       </div>
 
       {isTransfer && !allowCreditCardDestination && (
-        <p className={styles.transferHint}>
-          To pay a credit card, open Forecast Items, expand the card statement, set the payment
-          amount, then use Record payment.
-        </p>
+        <p className={styles.transferHint}>{m.transactions.transferHint}</p>
       )}
 
-      {transferError && <p className={styles.validationError}>{transferError}</p>}
+      {transferError && (
+        <p className={styles.validationError}>{m.common.errors.transferToCreditCard}</p>
+      )}
     </EditorPanel>
   );
 }

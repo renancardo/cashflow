@@ -1,5 +1,6 @@
 import type { NavItem } from "../../lib/nav.js";
 import { SIDE_NAV_ITEMS } from "../../lib/nav.js";
+import { useMessages } from "../../i18n/LanguageContext.js";
 import styles from "./SideNav.module.css";
 
 type Props = {
@@ -17,6 +18,8 @@ export function SideNav({
   onNavigate,
   onClose,
 }: Props) {
+  const m = useMessages();
+
   return (
     <>
       <button
@@ -29,9 +32,9 @@ export function SideNav({
       <nav
         id="nav-drawer"
         className={[styles.nav, open && styles.open].filter(Boolean).join(" ")}
-        aria-label="Main navigation"
+        aria-label={m.common.aria.mainNav}
       >
-        <div className={styles.brand}>Cashflow</div>
+        <div className={styles.brand}>{m.common.brand}</div>
         <div>
           <ul className={styles.list}>
             {items.map((item) => {

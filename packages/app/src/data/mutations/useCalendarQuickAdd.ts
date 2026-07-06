@@ -1,11 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { todayIso } from "@cashflow/core";
+import { messagesFor, todayIso } from "@cashflow/core";
 import type { QuickAddValues } from "@cashflow/ui";
 import { queryKeys } from "../keys";
+import { useSettings } from "../queries/useSettings";
 import { submitCalendarQuickAdd } from "./calendarQuickAdd";
 
 export function useCalendarQuickAdd(asOfDate: string = todayIso()) {
   const queryClient = useQueryClient();
+  const { data: settings } = useSettings();
+  const defaultDescription = messagesFor(settings?.language ?? "pt-BR").quickAdd.defaultDescription;
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: queryKeys.plannedItems });
@@ -16,7 +19,8 @@ export function useCalendarQuickAdd(asOfDate: string = todayIso()) {
   };
 
   return useMutation({
-    mutationFn: (values: QuickAddValues) => submitCalendarQuickAdd(values, asOfDate),
+    mutationFn: (values: QuickAddValues) =>
+      submitCalendarQuickAdd(values, asOfDate, defaultDescription),
     onSuccess: invalidate,
   });
 }

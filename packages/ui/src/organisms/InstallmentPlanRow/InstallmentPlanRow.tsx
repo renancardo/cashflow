@@ -1,10 +1,12 @@
 import { useState, type CSSProperties } from "react";
+import { fmt } from "@cashflow/core";
 import { Chip } from "../../atoms/Chip/Chip.js";
 import { FormattedDate } from "../../atoms/FormattedDate/FormattedDate.js";
 import { MoneyAmount } from "../../atoms/MoneyAmount/MoneyAmount.js";
 import { Toggle } from "../../atoms/Toggle/Toggle.js";
 import { Button } from "../../atoms/Button/Button.js";
 import { IconButton } from "../../molecules/IconButton/IconButton.js";
+import { useMessages } from "../../i18n/LanguageContext.js";
 import styles from "./InstallmentPlanRow.module.css";
 
 export type InstallmentScheduleRow = {
@@ -45,6 +47,7 @@ export function InstallmentPlanRow({
   onEdit,
   onMarkPaid,
 }: Props) {
+  const m = useMessages();
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -57,7 +60,7 @@ export function InstallmentPlanRow({
         <div className={styles.info}>
           <div className={styles.name}>{row.description}</div>
           <div className={styles.meta}>
-            <Chip variant="expense">Expense</Chip>
+            <Chip variant="expense">{m.common.kind.expense}</Chip>
             {row.categoryName && <Chip>{row.categoryName}</Chip>}
           </div>
         </div>
@@ -74,20 +77,23 @@ export function InstallmentPlanRow({
             aria-valuemax={row.totalCount}
           />
           <span className={styles.progressText}>
-            {row.paidCount} / {row.totalCount} paid
+            {fmt(m.forecast.editor.progressPaid, {
+              paid: row.paidCount,
+              total: row.totalCount,
+            })}
           </span>
         </div>
 
         <div className={styles.payoff}>
           <span className={styles.cellLabel} aria-hidden="true">
-            Payoff
+            {m.common.form.payoff}
           </span>
-          {row.isActive ? <FormattedDate isoDate={row.payoffDate} /> : "—"}
+          {row.isActive ? <FormattedDate isoDate={row.payoffDate} /> : m.common.dash}
         </div>
 
         <div className={[styles.next, !row.nextDueDate && styles.muted].filter(Boolean).join(" ")}>
           <span className={styles.cellLabel} aria-hidden="true">
-            Next
+            {m.common.form.next}
           </span>
           {row.nextDueDate ? (
             <>
@@ -101,7 +107,7 @@ export function InstallmentPlanRow({
               )}
             </>
           ) : (
-            "—"
+            m.common.dash
           )}
         </div>
 
@@ -109,25 +115,27 @@ export function InstallmentPlanRow({
           <div className={styles.active}>
             <Toggle
               checked={row.isActive}
-              aria-label={row.isActive ? "Active" : "Paused"}
+              aria-label={row.isActive ? m.common.active : m.common.paused}
               onChange={(checked) => onActiveChange?.(row.id, checked)}
             />
             <span className={styles.activeLabel} aria-hidden="true">
-              {row.isActive ? "Active" : "Paused"}
+              {row.isActive ? m.common.active : m.common.paused}
             </span>
           </div>
 
           <div className={styles.actions}>
             <IconButton
-              title={expanded ? "Collapse schedule" : "Expand schedule"}
+              title={
+                expanded ? m.forecast.editor.collapseSchedule : m.forecast.editor.expandSchedule
+              }
               aria-expanded={expanded}
               onClick={() => setExpanded((value) => !value)}
             >
               {expanded ? "▴" : "▾"}
             </IconButton>
             <IconButton
-              title="Edit installment plan"
-              aria-label={`Edit ${row.description}`}
+              title={m.forecast.editor.editInstallmentPlanAction}
+              aria-label={fmt(m.common.aria.editDescription, { description: row.description })}
               onClick={() => onEdit?.(row.id)}
             >
               ✎
@@ -139,10 +147,10 @@ export function InstallmentPlanRow({
       {expanded && (
         <div className={styles.schedule}>
           <div className={styles.scheduleHeader}>
-            <span>#</span>
-            <span>Due</span>
-            <span>Amount</span>
-            <span>Status</span>
+            <span>{m.forecast.headers.schedule.number}</span>
+            <span>{m.forecast.headers.schedule.due}</span>
+            <span>{m.forecast.headers.schedule.amount}</span>
+            <span>{m.forecast.headers.schedule.status}</span>
             <span />
           </div>
           {row.installments.map((inst) => (
@@ -161,7 +169,7 @@ export function InstallmentPlanRow({
               </span>
               <span>
                 <Chip variant={inst.status === "paid" ? "income" : "default"}>
-                  {inst.status === "paid" ? "Paid" : "Scheduled"}
+                  {inst.status === "paid" ? m.common.paid : m.common.scheduled}
                 </Chip>
               </span>
               <span>
@@ -171,7 +179,7 @@ export function InstallmentPlanRow({
                     className={styles.markPaid}
                     onClick={() => onMarkPaid(inst.id)}
                   >
-                    Mark paid
+                    {m.common.markPaid}
                   </Button>
                 )}
               </span>

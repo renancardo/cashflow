@@ -1,38 +1,43 @@
 import { Button } from "../../atoms/Button/Button.js";
+import { useMessages } from "../../i18n/LanguageContext.js";
 import styles from "./CalendarLegend.module.css";
 
 type Props = {
   variant?: "year" | "month";
 };
 
-const INDICATOR_ITEMS = [
-  { kind: "danger", label: "Below buffer — projected balance under your threshold" },
-  { kind: "success", label: "Income day — net inflow on this date" },
-  { kind: "warning", label: "Large outflow — net outflow above your limit" },
-  { kind: "card", label: "Card statement due" },
-] as const;
-
-const ENTRY_ITEMS = [
-  { kind: "actual-income", label: "Actual income" },
-  { kind: "projected-income", label: "Projected income" },
-  { kind: "actual-outflow", label: "Actual outflow" },
-  { kind: "projected-outflow", label: "Projected outflow" },
-  { kind: "past-due", label: "Past due payment" },
-] as const;
-
 export function CalendarLegend({ variant = "year" }: Props) {
+  const m = useMessages();
+  const legend = m.calendar.legend;
+
+  const indicatorItems = [
+    { kind: "danger", label: legend.belowBuffer },
+    { kind: "success", label: legend.incomeDay },
+    { kind: "warning", label: legend.largeOutflow },
+    { kind: "card", label: legend.cardDue },
+  ] as const;
+
+  const entryItems = [
+    { kind: "actual-income", label: legend.actualIncome },
+    { kind: "projected-income", label: legend.projectedIncome },
+    { kind: "actual-outflow", label: legend.actualOutflow },
+    { kind: "projected-outflow", label: legend.projectedOutflow },
+    { kind: "past-due", label: legend.pastDue },
+  ] as const;
+
   return (
     <div className={styles.root}>
       <Button
         type="button"
         variant="ghost"
         className={styles.trigger}
+        aria-label={m.calendar.aria.legend}
         aria-describedby="calendar-legend-tip"
       >
         <span className={styles.icon} aria-hidden>
           ?
         </span>
-        Legend
+        {legend.trigger}
       </Button>
       <div
         className={[styles.panel, variant === "month" && styles.panelMonth]
@@ -41,9 +46,9 @@ export function CalendarLegend({ variant = "year" }: Props) {
         id="calendar-legend-tip"
         role="tooltip"
       >
-        <p className={styles.title}>Day indicators</p>
+        <p className={styles.title}>{legend.dayIndicators}</p>
         <ul className={styles.list}>
-          {INDICATOR_ITEMS.map((item) => (
+          {indicatorItems.map((item) => (
             <li key={item.kind}>
               <span className={[styles.marker, styles[item.kind]].join(" ")} aria-hidden />
               {item.label}
@@ -53,18 +58,16 @@ export function CalendarLegend({ variant = "year" }: Props) {
 
         {variant === "month" && (
           <>
-            <p className={styles.sectionTitle}>Day entry colors</p>
+            <p className={styles.sectionTitle}>{legend.entryColors}</p>
             <ul className={styles.list}>
-              {ENTRY_ITEMS.map((item) => (
+              {entryItems.map((item) => (
                 <li key={item.kind}>
                   <span className={[styles.marker, styles[item.kind]].join(" ")} aria-hidden />
                   {item.label}
                 </li>
               ))}
             </ul>
-            <p className={styles.note}>
-              Month totals reflect projected inflows and outflows for the selected month.
-            </p>
+            <p className={styles.note}>{legend.monthTotalsNote}</p>
           </>
         )}
       </div>

@@ -1,10 +1,13 @@
 import { useState, type ReactNode } from "react";
 import type { CategoryKind } from "@cashflow/core";
+import { fmt } from "@cashflow/core";
 import { Button } from "../../atoms/Button/Button.js";
 import { MoneyAmount } from "../../atoms/MoneyAmount/MoneyAmount.js";
 import { Metric } from "../../molecules/Metric/Metric.js";
 import { SegmentedControl } from "../../molecules/SegmentedControl/SegmentedControl.js";
 import { SummaryStrip, SummaryStripItem } from "../../molecules/SummaryStrip/SummaryStrip.js";
+import { formatMonthYear } from "../../lib/calendar.js";
+import { useLanguage, useMessages } from "../../i18n/LanguageContext.js";
 import { HeaderStrip } from "../HeaderStrip/HeaderStrip.js";
 import { PageHeader } from "../PageHeader/PageHeader.js";
 import styles from "./CategoriesScreen.module.css";
@@ -37,10 +40,10 @@ type Props = {
 
 type KindFilter = "all" | "expense" | "income";
 
-// ─── Progress bar ────────────────────────────────────────────────────────────
-
 function ProgressBar({ actual, budget }: { actual: number; budget?: number }) {
-  if (!budget || budget === 0) return <span className={styles.empty}>—</span>;
+  const m = useMessages();
+
+  if (!budget || budget === 0) return <span className={styles.empty}>{m.common.dash}</span>;
   const pct = Math.min(actual / budget, 1);
   const over = actual > budget;
   return (
@@ -58,13 +61,11 @@ function ProgressBar({ actual, budget }: { actual: number; budget?: number }) {
           .filter(Boolean)
           .join(" ")}
       >
-        {Math.round(pct * 100)}%{over ? " · over" : ""}
+        {Math.round(pct * 100)}%{over ? m.categories.over : ""}
       </span>
     </div>
   );
 }
-
-// ─── Budget row ───────────────────────────────────────────────────────────────
 
 function BudgetRow({
   row,
@@ -75,6 +76,7 @@ function BudgetRow({
   depth?: number;
   onEdit?: (id: string) => void;
 }) {
+  const m = useMessages();
   const variance = row.budgetCents !== undefined ? row.budgetCents - row.actualCents : undefined;
   const over = variance !== undefined && variance < 0;
   const under = variance !== undefined && variance >= 0;
@@ -95,13 +97,15 @@ function BudgetRow({
           <div>
             <div className={styles.rowName}>{row.name}</div>
             {hasChildren && (
-              <div className={styles.rowMeta}>{row.children.length} subcategories</div>
+              <div className={styles.rowMeta}>
+                {fmt(m.categories.subcategories, { count: row.children.length })}
+              </div>
             )}
           </div>
         </div>
 
         <div className={[styles.cell, !row.budgetCents && styles.empty].filter(Boolean).join(" ")}>
-          {row.budgetCents ? <MoneyAmount cents={row.budgetCents} /> : "—"}
+          {row.budgetCents ? <MoneyAmount cents={row.budgetCents} /> : m.common.dash}
         </div>
 
         <div className={styles.cell}>
@@ -120,7 +124,7 @@ function BudgetRow({
             .join(" ")}
         >
           {variance === undefined ? (
-            "—"
+            m.common.dash
           ) : over ? (
             <>
               −&nbsp;
@@ -142,8 +146,8 @@ function BudgetRow({
           <button
             type="button"
             className={styles.editBtn}
-            title="Edit category"
-            aria-label={`Edit ${row.name}`}
+            title={m.categories.editor.editCategory}
+            aria-label={fmt(m.common.aria.editName, { name: row.name })}
             onClick={() => onEdit?.(row.id)}
           >
             ✎
@@ -159,9 +163,9 @@ function BudgetRow({
   );
 }
 
-// ─── Income row ───────────────────────────────────────────────────────────────
-
 function IncomeRow({ row, onEdit }: { row: CategoryRowData; onEdit?: (id: string) => void }) {
+  const m = useMessages();
+
   return (
     <article className={[styles.row, styles.rowIncome].filter(Boolean).join(" ")} data-id={row.id}>
       <div className={styles.rowInfo}>
@@ -181,8 +185,8 @@ function IncomeRow({ row, onEdit }: { row: CategoryRowData; onEdit?: (id: string
         <button
           type="button"
           className={styles.editBtn}
-          title="Edit category"
-          aria-label={`Edit ${row.name}`}
+          title={m.categories.editor.editCategory}
+          aria-label={fmt(m.common.aria.editName, { name: row.name })}
           onClick={() => onEdit?.(row.id)}
         >
           ✎
@@ -191,8 +195,6 @@ function IncomeRow({ row, onEdit }: { row: CategoryRowData; onEdit?: (id: string
     </article>
   );
 }
-
-// ─── Main component ───────────────────────────────────────────────────────────
 
 export function CategoriesScreen({
   categories,
@@ -208,12 +210,16 @@ export function CategoriesScreen({
   onEditCategory,
   onMonthChange,
 }: Props) {
+  const m = useMessages();
+  const language = useLanguage();
   const [kindFilter, setKindFilter] = useState<KindFilter>("all");
+  const monthLocale = language === "pt-BR" ? "pt-BR" : "en-US";
 
   if (status === "loading") {
     return (
       <div className={styles.statusPage}>
-        <h2 className={styles.statusTitle}>Loading categories…</h2>
+        <h2 className={styles.statusTitle}>{m.categories.loading.title}</h2>
+        <p>{m.categories.loading.description}</p>
       </div>
     );
   }
@@ -221,8 +227,8 @@ export function CategoriesScreen({
   if (status === "error") {
     return (
       <div className={styles.statusPage}>
-        <h2 className={styles.statusTitle}>Could not load categories</h2>
-        <p>{errorMessage ?? "Something went wrong. Try again."}</p>
+        <h2 className={styles.statusTitle}>{m.categories.error.title}</h2>
+        <p>{errorMessage ?? m.common.errorFallback}</p>
       </div>
     );
   }
@@ -234,11 +240,7 @@ export function CategoriesScreen({
   const showExpense = kindFilter === "all" || kindFilter === "expense";
   const showIncome = kindFilter === "all" || kindFilter === "income";
 
-  const [filterY, filterM] = selectedMonth.split("-");
-  const monthLabel = new Date(Number(filterY), Number(filterM) - 1, 1).toLocaleDateString("en-US", {
-    month: "long",
-    year: "numeric",
-  });
+  const monthLabel = formatMonthYear(selectedMonth, monthLocale);
 
   const budgetUsedPct =
     totalBudgetedCents > 0
@@ -246,61 +248,71 @@ export function CategoriesScreen({
       : 0;
   const budgetOver = totalSpentCents > totalBudgetedCents && totalBudgetedCents > 0;
 
+  const expenseCategorySuffix =
+    expenseCategories.length === 1
+      ? m.categories.summary.expenseCategory
+      : m.categories.summary.expenseCategories;
+
   return (
     <>
       <HeaderStrip
         metric={
-          <Metric label="Working balance">
+          <Metric label={m.common.workingBalance}>
             <MoneyAmount cents={workingBalanceCents} />
           </Metric>
         }
         action={
           <Button variant="primary" onClick={onAddCategory}>
-            + Add category
+            {m.categories.addCategory}
           </Button>
         }
       />
 
       <div className={styles.page}>
-        <PageHeader
-          title="Categories & Budgets"
-          subtitle="Manage income and expense categories, set monthly budgets, and track actual vs target"
-        />
+        <PageHeader title={m.categories.title} subtitle={m.categories.subtitle} />
 
         {isEmpty ? (
           <div className={styles.empty}>
             <div className={styles.emptyIcon}>🏷</div>
-            <h2 className={styles.emptyTitle}>No categories yet</h2>
-            <p className={styles.emptyDesc}>
-              Create your first income or expense category to classify transactions and set monthly
-              spending targets.
-            </p>
+            <h2 className={styles.emptyTitle}>{m.categories.empty.title}</h2>
+            <p className={styles.emptyDesc}>{m.categories.empty.description}</p>
             <Button variant="primary" onClick={onAddCategory}>
-              + Add category
+              {m.categories.addCategory}
             </Button>
           </div>
         ) : (
           <>
             <div className={styles.controlsCard}>
               <SummaryStrip className={styles.summary}>
-                <SummaryStripItem label="Remaining" className={styles.summaryHero}>
+                <SummaryStripItem
+                  label={m.categories.summary.remaining}
+                  className={styles.summaryHero}
+                >
                   <span className={remainingCents < 0 ? styles.danger : styles.positive}>
                     {remainingCents < 0 ? "−\u00a0" : "+\u00a0"}
                     <MoneyAmount cents={Math.abs(remainingCents)} />
                   </span>
                 </SummaryStripItem>
-                <SummaryStripItem label="Budgeted" className={styles.summaryMetric}>
+                <SummaryStripItem
+                  label={m.categories.summary.budgeted}
+                  className={styles.summaryMetric}
+                >
                   <MoneyAmount cents={totalBudgetedCents} />
                 </SummaryStripItem>
-                <SummaryStripItem label="Spent" className={styles.summaryMetric}>
+                <SummaryStripItem
+                  label={m.categories.summary.spent}
+                  className={styles.summaryMetric}
+                >
                   <MoneyAmount
                     cents={totalSpentCents}
                     className={totalSpentCents > totalBudgetedCents ? styles.danger : undefined}
                   />
                 </SummaryStripItem>
                 <p className={styles.summaryMeta}>
-                  {expenseCategories.length} expense{" "}
-                  {expenseCategories.length === 1 ? "category" : "categories"}
+                  {fmt(m.categories.summary.expenseCategoriesCount, {
+                    count: expenseCategories.length,
+                    suffix: expenseCategorySuffix,
+                  })}
                 </p>
                 {totalBudgetedCents > 0 && (
                   <div
@@ -309,7 +321,7 @@ export function CategoriesScreen({
                     aria-valuenow={totalSpentCents}
                     aria-valuemin={0}
                     aria-valuemax={totalBudgetedCents}
-                    aria-label={`${budgetUsedPct}% of budget spent`}
+                    aria-label={fmt(m.categories.summary.budgetSpentPct, { pct: budgetUsedPct })}
                   >
                     <div
                       className={[
@@ -324,47 +336,46 @@ export function CategoriesScreen({
                 )}
               </SummaryStrip>
 
-              <div className={styles.toolbar} aria-label="Category view controls">
+              <div className={styles.toolbar} aria-label={m.common.aria.categoryViewControls}>
                 <div className={styles.toolbarGroup}>
                   <label className={styles.toolbarLabel} htmlFor="filter-month">
-                    Month
+                    {m.categories.toolbar.month}
                   </label>
                   <input
                     id="filter-month"
                     type="month"
                     className={styles.toolbarSelect}
                     value={selectedMonth}
-                    aria-label="Filter by month"
+                    aria-label={m.common.aria.filterByMonth}
                     onChange={(e) => onMonthChange?.(e.target.value)}
                   />
                 </div>
 
                 <SegmentedControl
                   className={styles.toolbarFilters}
-                  aria-label="Filter by kind"
+                  aria-label={m.common.aria.filterByKind}
                   value={kindFilter}
                   onChange={setKindFilter}
                   options={[
-                    { value: "all", label: "All" },
-                    { value: "expense", label: "Expense" },
-                    { value: "income", label: "Income" },
+                    { value: "all", label: m.categories.filters.all },
+                    { value: "expense", label: m.categories.filters.expense },
+                    { value: "income", label: m.categories.filters.income },
                   ]}
                 />
               </div>
             </div>
 
-            {/* Expense budget section */}
             {showExpense && expenseCategories.length > 0 && (
-              <section className={styles.section} aria-label="Expense categories and budgets">
-                <h2 className={styles.sectionTitle}>Expense budgets</h2>
+              <section className={styles.section} aria-label={m.common.aria.expenseCategories}>
+                <h2 className={styles.sectionTitle}>{m.categories.sections.expenseBudgets}</h2>
 
                 <div className={styles.budgetList}>
                   <div className={styles.listHeader}>
-                    <span>Category</span>
-                    <span>Budget</span>
-                    <span>Actual ({monthLabel})</span>
-                    <span>Variance</span>
-                    <span>Progress</span>
+                    <span>{m.categories.headers.category}</span>
+                    <span>{m.categories.headers.budget}</span>
+                    <span>{fmt(m.categories.headers.actualWithMonth, { month: monthLabel })}</span>
+                    <span>{m.categories.headers.variance}</span>
+                    <span>{m.categories.headers.progress}</span>
                     <span />
                   </div>
                   {expenseCategories.map((row) => (
@@ -374,15 +385,14 @@ export function CategoriesScreen({
               </section>
             )}
 
-            {/* Income section */}
             {showIncome && incomeCategories.length > 0 && (
-              <section className={styles.section} aria-label="Income categories">
-                <h2 className={styles.sectionTitle}>Income categories</h2>
+              <section className={styles.section} aria-label={m.common.aria.incomeCategories}>
+                <h2 className={styles.sectionTitle}>{m.categories.sections.incomeCategories}</h2>
 
                 <div className={styles.incomeList}>
                   <div className={[styles.listHeader, styles.listHeaderIncome].join(" ")}>
-                    <span>Category</span>
-                    <span>Actual ({monthLabel})</span>
+                    <span>{m.categories.headers.category}</span>
+                    <span>{fmt(m.categories.headers.actualWithMonth, { month: monthLabel })}</span>
                     <span />
                   </div>
                   {incomeCategories.map((row) => (

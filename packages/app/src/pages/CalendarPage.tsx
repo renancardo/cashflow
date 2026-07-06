@@ -5,6 +5,7 @@ import { DayDetailPanel, YearCalendarScreen, type QuickAddValues } from "@cashfl
 import { validateCalendarQuickAdd } from "../data/mutations/calendarQuickAdd";
 import { useCalendarQuickAdd } from "../data/mutations/useCalendarQuickAdd";
 import { createEmptyTransactionInput } from "../data/mutations/useTransactionMutations";
+import { useAccounts } from "../data/queries/useAccounts";
 import { useCalendarScreen } from "../data/queries/useCalendarScreen";
 
 type Props = {
@@ -15,6 +16,7 @@ type Props = {
 export function CalendarPage({ selectedDay = null, onSelectedDayChange }: Props) {
   const navigate = useNavigate();
   const { data, isPending, isError, error } = useCalendarScreen();
+  const { data: accountsData } = useAccounts();
   const quickAdd = useCalendarQuickAdd(data?.today);
   const [year, setYear] = useState(() => Number(todayIso().slice(0, 4)));
   const [quickAddValues, setQuickAddValues] = useState<QuickAddValues>(() => ({
@@ -82,9 +84,8 @@ export function CalendarPage({ selectedDay = null, onSelectedDayChange }: Props)
     <YearCalendarScreen
       year={year}
       days={data?.projection.days ?? []}
-      workingBalanceCents={data?.projection.workingBalanceTodayCents ?? 0}
+      workingBalanceCents={accountsData?.workingBalanceCents ?? 0}
       nextNegativeDate={data?.projection.nextNegativeDate ?? null}
-      alertLeadTimeDays={data?.settings.alertLeadTimeDays ?? 14}
       today={data?.today ?? todayIso()}
       selectedDate={selectedDay}
       status={isPending ? "loading" : isError ? "error" : "ready"}
