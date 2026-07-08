@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { PlannedItem } from "@cashflow/core";
 import { compareIso, isRecurring } from "@cashflow/core";
 import {
@@ -30,6 +30,18 @@ import { useAccounts } from "../data/queries/useAccounts";
 
 type EditorKind = "planned" | "installment" | "statement";
 
+type ForecastEditorSearch = {
+  new?: "planned" | "installment";
+  planned?: string;
+  installment?: string;
+  statement?: string;
+};
+
+type Props = {
+  editorSearch?: ForecastEditorSearch;
+  onEditorSearchChange?: (search: ForecastEditorSearch) => void;
+};
+
 function toPlannedEditorValues(item: PlannedItem): PlannedItemEditorValues {
   return {
     type: item.type,
@@ -50,7 +62,7 @@ function toPlannedEditorValues(item: PlannedItem): PlannedItemEditorValues {
   };
 }
 
-export function ForecastPage() {
+export function ForecastPage({ editorSearch = {}, onEditorSearchChange }: Props) {
   const [filter, setFilter] = useState<ForecastFilter>("all");
   const [detailStatementId, setDetailStatementId] = useState<string | null>(null);
   const { data, isPending, isError, error } = useForecastScreen(filter);
@@ -62,12 +74,21 @@ export function ForecastPage() {
   const installmentMutations = useInstallmentMutations();
   const statementMutations = useStatementMutations();
 
-  const [editorOpen, setEditorOpen] = useState(false);
-  const [editorKind, setEditorKind] = useState<EditorKind>("planned");
-  const [editorMode, setEditorMode] = useState<"create" | "edit">("create");
-  const [editingPlannedId, setEditingPlannedId] = useState<string | null>(null);
-  const [editingInstallmentId, setEditingInstallmentId] = useState<string | null>(null);
-  const [editingStatementId, setEditingStatementId] = useState<string | null>(null);
+  const editorOpen = Boolean(
+    editorSearch.new ||
+      editorSearch.planned ||
+      editorSearch.installment ||
+      editorSearch.statement,
+  );
+  const editorKind: EditorKind = editorSearch.statement
+    ? "statement"
+    : editorSearch.installment || editorSearch.new === "installment"
+      ? "installment"
+      : "planned";
+  const editorMode = editorSearch.new ? "create" : "edit";
+  const editingPlannedId = editorSearch.planned ?? null;
+  const editingInstallmentId = editorSearch.installment ?? null;
+  const editingStatementId = editorSearch.statement ?? null;
   const [statementValues, setStatementValues] = useState<StatementEditorValues>({});
   const [plannedValues, setPlannedValues] = useState<PlannedItemEditorValues>(() =>
     createEmptyPlannedItemInput(),
@@ -80,6 +101,49 @@ export function ForecastPage() {
   const [scopeOccurrenceDate, setScopeOccurrenceDate] = useState<string>("");
 
   const defaultAccountId = data?.accountOptions[0]?.id;
+
+  useEffect(() => {
+    if (editorSearch.planned) {
+      const item = data?.rawPlannedItems.find((row) => row.id === editorSearch.planned);
+      if (item) setPlannedValues(toPlannedEditorValues(item));
+      return;
+    }
+
+    if (editorSearch.installment) {
+      const plan = data?.rawInstallmentPlans.find((row) => row.id === editorSearch.installment);
+      if (plan) setInstallmentValues(toInstallmentEditorValues(plan));
+      return;
+    }
+
+    if (editorSearch.statement) {
+      const statement = data?.rawStatements.find((row) => row.id === editorSearch.statement);
+      if (statement) {
+        setStatementValues({
+          plannedPaymentCents: statement.plannedPaymentCents,
+          payFromAccountId: statement.payFromAccountId,
+        });
+      }
+      return;
+    }
+
+    if (editorSearch.new === "planned") {
+      setPlannedValues(createEmptyPlannedItemInput(defaultAccountId));
+      return;
+    }
+
+    if (editorSearch.new === "installment") {
+      setInstallmentValues(createEmptyInstallmentPlanInput(defaultAccountId));
+    }
+  }, [
+    editorSearch.new,
+    editorSearch.planned,
+    editorSearch.installment,
+    editorSearch.statement,
+    data?.rawPlannedItems,
+    data?.rawInstallmentPlans,
+    data?.rawStatements,
+    defaultAccountId,
+  ]);
 
   const payFromOptions = useMemo(
     () =>
@@ -116,59 +180,41 @@ export function ForecastPage() {
   }, [data?.rawStatements, editingStatement, editingStatementCard]);
 
   const openCreatePlanned = () => {
-    setEditorKind("planned");
-    setEditorMode("create");
-    setEditingPlannedId(null);
-    setEditingInstallmentId(null);
     setPlannedValues(createEmptyPlannedItemInput(defaultAccountId));
-    setEditorOpen(true);
+    onEditorSearchChange?.({ new: "planned" });
   };
 
   const openCreateInstallment = () => {
-    setEditorKind("installment");
-    setEditorMode("create");
-    setEditingPlannedId(null);
-    setEditingInstallmentId(null);
     setInstallmentValues(createEmptyInstallmentPlanInput(defaultAccountId));
-    setEditorOpen(true);
+    onEditorSearchChange?.({ new: "installment" });
   };
 
   const openEditPlanned = (id: string) => {
     const item = data?.rawPlannedItems.find((row) => row.id === id);
     if (!item) return;
-    setEditorKind("planned");
-    setEditorMode("edit");
-    setEditingPlannedId(id);
-    setEditingInstallmentId(null);
     setPlannedValues(toPlannedEditorValues(item));
-    setEditorOpen(true);
+    onEditorSearchChange?.({ planned: id });
   };
 
   const openEditInstallment = (id: string) => {
     const plan = data?.rawInstallmentPlans.find((row) => row.id === id);
     if (!plan) return;
-    setEditorKind("installment");
-    setEditorMode("edit");
-    setEditingInstallmentId(id);
-    setEditingPlannedId(null);
-    setEditingStatementId(null);
     setInstallmentValues(toInstallmentEditorValues(plan));
-    setEditorOpen(true);
+    onEditorSearchChange?.({ installment: id });
   };
 
   const openEditStatement = (id: string) => {
     const statement = data?.rawStatements.find((row) => row.id === id);
     if (!statement) return;
-    setEditorKind("statement");
-    setEditorMode("edit");
-    setEditingStatementId(id);
-    setEditingPlannedId(null);
-    setEditingInstallmentId(null);
     setStatementValues({
       plannedPaymentCents: statement.plannedPaymentCents,
       payFromAccountId: statement.payFromAccountId,
     });
-    setEditorOpen(true);
+    onEditorSearchChange?.({ statement: id });
+  };
+
+  const closeEditor = () => {
+    onEditorSearchChange?.({});
   };
 
   const handlePlannedSave = async () => {
@@ -177,7 +223,7 @@ export function ForecastPage() {
 
     if (editorMode === "create") {
       await plannedMutations.create.mutateAsync(input);
-      setEditorOpen(false);
+      closeEditor();
       return;
     }
 
@@ -187,7 +233,7 @@ export function ForecastPage() {
 
     if (!isRecurring(original.recurrence)) {
       await plannedMutations.update.mutateAsync({ id: editingPlannedId, input });
-      setEditorOpen(false);
+      closeEditor();
       return;
     }
 
@@ -213,7 +259,7 @@ export function ForecastPage() {
 
     setScopeDialogOpen(false);
     setPendingSave(null);
-    setEditorOpen(false);
+    closeEditor();
   };
 
   const handleInstallmentSave = async () => {
@@ -229,7 +275,7 @@ export function ForecastPage() {
         input: installmentValues,
       });
     }
-    setEditorOpen(false);
+    closeEditor();
   };
 
   const handleStatementReset = async () => {
@@ -244,7 +290,7 @@ export function ForecastPage() {
       id: editingStatementId,
       input: statementValues,
     });
-    setEditorOpen(false);
+    closeEditor();
   };
 
   const occurrencePreview = useMemo(() => {
@@ -320,13 +366,13 @@ export function ForecastPage() {
                   : undefined
               }
               onChange={(patch) => setPlannedValues((current) => ({ ...current, ...patch }))}
-              onClose={() => setEditorOpen(false)}
+              onClose={closeEditor}
               onSave={handlePlannedSave}
               onDelete={
                 editorMode === "edit" && editingPlannedId
                   ? async () => {
                       await plannedMutations.remove.mutateAsync(editingPlannedId);
-                      setEditorOpen(false);
+                      closeEditor();
                     }
                   : undefined
               }
@@ -343,13 +389,13 @@ export function ForecastPage() {
               }))}
               schedulePreview={schedulePreview}
               onChange={(patch) => setInstallmentValues((current) => ({ ...current, ...patch }))}
-              onClose={() => setEditorOpen(false)}
+              onClose={closeEditor}
               onSave={handleInstallmentSave}
               onDelete={
                 editorMode === "edit" && editingInstallmentId
                   ? async () => {
                       await installmentMutations.remove.mutateAsync(editingInstallmentId);
-                      setEditorOpen(false);
+                      closeEditor();
                     }
                   : undefined
               }
@@ -372,7 +418,7 @@ export function ForecastPage() {
                 statementMutations.recordPayment.isPending
               }
               onChange={(patch) => setStatementValues((current) => ({ ...current, ...patch }))}
-              onClose={() => setEditorOpen(false)}
+              onClose={closeEditor}
               onResetToFull={handleStatementReset}
               onRecordPayment={handleStatementRecordPayment}
             />

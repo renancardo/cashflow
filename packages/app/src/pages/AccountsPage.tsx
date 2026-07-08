@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import type { Account } from "@cashflow/core";
 import { defaultIsWorking } from "@cashflow/core";
@@ -53,14 +53,24 @@ function toAccountInput(values: AccountEditorValues): AccountInput {
   };
 }
 
-export function AccountsPage() {
+type EditorSearch = {
+  new?: true;
+  edit?: string;
+};
+
+type Props = {
+  editorSearch?: EditorSearch;
+  onEditorSearchChange?: (search: EditorSearch) => void;
+};
+
+export function AccountsPage({ editorSearch = {}, onEditorSearchChange }: Props) {
   const navigate = useNavigate();
   const { data, isPending, isError, error } = useAccounts();
   const { data: settingsData } = useSettings();
   const { create, update, setWorking, archive } = useAccountMutations();
-  const [editorOpen, setEditorOpen] = useState(false);
-  const [editorMode, setEditorMode] = useState<"create" | "edit">("create");
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const editorOpen = Boolean(editorSearch.new || editorSearch.edit);
+  const editorMode = editorSearch.edit ? "edit" : "create";
+  const editingId = editorSearch.edit ?? null;
   const [statementsCardId, setStatementsCardId] = useState<string | null>(null);
   const [detailStatementId, setDetailStatementId] = useState<string | null>(null);
   const [editorValues, setEditorValues] = useState<AccountEditorValues>(() =>
@@ -88,20 +98,32 @@ export function AccountsPage() {
     return data?.rawAccounts.find((account) => account.id === statementsCardId)?.name ?? "";
   }, [data?.rawAccounts, statementsCardId]);
 
+  useEffect(() => {
+    if (editorSearch.edit) {
+      const account = data?.rawAccounts.find((row) => row.id === editorSearch.edit);
+      if (account) setEditorValues(toEditorValues(account));
+      return;
+    }
+
+    if (editorSearch.new) {
+      setEditorValues(createEmptyAccountInput("BRL", settingsData));
+    }
+  }, [editorSearch.edit, editorSearch.new, data?.rawAccounts, settingsData]);
+
   const openCreate = () => {
-    setEditorMode("create");
-    setEditingId(null);
     setEditorValues(createEmptyAccountInput("BRL", settingsData));
-    setEditorOpen(true);
+    onEditorSearchChange?.({ new: true });
   };
 
   const openEdit = (id: string) => {
     const account = data?.rawAccounts.find((row) => row.id === id);
     if (!account) return;
-    setEditorMode("edit");
-    setEditingId(id);
     setEditorValues(toEditorValues(account));
-    setEditorOpen(true);
+    onEditorSearchChange?.({ edit: id });
+  };
+
+  const closeEditor = () => {
+    onEditorSearchChange?.({});
   };
 
   const handleSave = async () => {
@@ -114,13 +136,13 @@ export function AccountsPage() {
       await update.mutateAsync({ id: editingId, input });
     }
 
-    setEditorOpen(false);
+    closeEditor();
   };
 
   const handleArchive = async () => {
     if (!editingId) return;
     await archive.mutateAsync(editingId);
-    setEditorOpen(false);
+    closeEditor();
   };
 
   const handleTypeChange = (patch: Partial<AccountEditorValues>) => {
@@ -152,7 +174,7 @@ export function AccountsPage() {
             balanceCents={editingBalanceCents}
             payFromOptions={payFromOptions}
             onChange={handleTypeChange}
-            onClose={() => setEditorOpen(false)}
+            onClose={closeEditor}
             onSave={handleSave}
             onArchive={editorMode === "edit" ? handleArchive : undefined}
           />

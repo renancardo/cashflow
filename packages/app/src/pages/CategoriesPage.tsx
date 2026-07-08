@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Category } from "@cashflow/core";
 import {
   CategoriesScreen,
@@ -42,15 +42,37 @@ function toCategoryInput(values: CategoryEditorValues): CategoryInput {
   };
 }
 
-export function CategoriesPage() {
+type EditorSearch = {
+  new?: true;
+  edit?: string;
+};
+
+type Props = {
+  editorSearch?: EditorSearch;
+  onEditorSearchChange?: (search: EditorSearch) => void;
+};
+
+function findCategoryRow(
+  rows: CategoryRowData[],
+  id: string,
+): CategoryRowData | undefined {
+  for (const row of rows) {
+    if (row.id === id) return row;
+    const child = row.children.find((entry) => entry.id === id);
+    if (child) return child;
+  }
+  return undefined;
+}
+
+export function CategoriesPage({ editorSearch = {}, onEditorSearchChange }: Props) {
   const [selectedMonth, setSelectedMonth] = useState(todayMonth);
   const { data, isPending, isError, error } = useCategories(selectedMonth);
   const { data: accountsData } = useAccounts();
   const { create, update, archive, upsertBudget, removeBudget } = useCategoryMutations();
 
-  const [editorOpen, setEditorOpen] = useState(false);
-  const [editorMode, setEditorMode] = useState<"create" | "edit">("create");
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const editorOpen = Boolean(editorSearch.new || editorSearch.edit);
+  const editorMode = editorSearch.edit ? "edit" : "create";
+  const editingId = editorSearch.edit ?? null;
   const [editorValues, setEditorValues] = useState<CategoryEditorValues>(() => ({
     ...createEmptyCategoryInput(),
     color: "#6B7280",
@@ -64,37 +86,44 @@ export function CategoriesPage() {
       .map((c) => ({ id: c.id, name: c.name }));
   }, [data, editorValues.kind]);
 
+  useEffect(() => {
+    if (editorSearch.edit) {
+      const category = data?.rawCategories.find((entry) => entry.id === editorSearch.edit);
+      if (!category) return;
+      const row = findCategoryRow(data?.rows ?? [], editorSearch.edit);
+      setEditorValues(toEditorValues(category, row?.budgetCents, selectedMonth));
+      return;
+    }
+
+    if (editorSearch.new) {
+      setEditorValues({
+        ...createEmptyCategoryInput(),
+        color: "#6B7280",
+        budgetEffectiveFromMonth: selectedMonth,
+      });
+    }
+  }, [editorSearch.edit, editorSearch.new, data?.rawCategories, data?.rows, selectedMonth]);
+
   const openCreate = () => {
-    setEditorMode("create");
-    setEditingId(null);
     setEditorValues({
       ...createEmptyCategoryInput(),
       color: "#6B7280",
       budgetEffectiveFromMonth: selectedMonth,
     });
-    setEditorOpen(true);
+    onEditorSearchChange?.({ new: true });
   };
 
   const openEdit = (id: string) => {
-    const category = data?.rawCategories.find((c) => c.id === id);
+    const category = data?.rawCategories.find((entry) => entry.id === id);
     if (!category) return;
 
-    const row = (() => {
-      const find = (rows: CategoryRowData[]): CategoryRowData | undefined => {
-        for (const r of rows) {
-          if (r.id === id) return r;
-          const child = r.children.find((c) => c.id === id);
-          if (child) return child;
-        }
-        return undefined;
-      };
-      return find(data?.rows ?? []);
-    })();
-
-    setEditorMode("edit");
-    setEditingId(id);
+    const row = findCategoryRow(data?.rows ?? [], id);
     setEditorValues(toEditorValues(category, row?.budgetCents, selectedMonth));
-    setEditorOpen(true);
+    onEditorSearchChange?.({ edit: id });
+  };
+
+  const closeEditor = () => {
+    onEditorSearchChange?.({});
   };
 
   const handleSave = async () => {
@@ -123,13 +152,13 @@ export function CategoriesPage() {
       }
     }
 
-    setEditorOpen(false);
+    closeEditor();
   };
 
   const handleArchive = async () => {
     if (!editingId) return;
     await archive.mutateAsync(editingId);
-    setEditorOpen(false);
+    closeEditor();
   };
 
   return (
@@ -152,7 +181,7 @@ export function CategoriesPage() {
           values={editorValues}
           parentOptions={parentOptions}
           onChange={(patch) => setEditorValues((v) => ({ ...v, ...patch }))}
-          onClose={() => setEditorOpen(false)}
+          onClose={closeEditor}
           onSave={handleSave}
           onArchive={editorMode === "edit" ? handleArchive : undefined}
         />
