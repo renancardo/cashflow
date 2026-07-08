@@ -89,3 +89,33 @@ Planned income/expense, recurrence, subscriptions, and investment outflows.
 
 - [x] Planned transfer: `accountId` (working) + `toAccountId` (investment)
 - [x] Working balance decreases on effective date; no portfolio analytics in Phase 1
+
+---
+
+## US-5.6 — Missed income & late receipt
+
+**Persona:** User
+
+**Story:** As a user, I want **unsettled income occurrences to stay visible after their due date** and to **record receipt on the actual day money arrived**, so late payroll does not disappear from the forecast or pollute working balance.
+
+**Priority:** P1  
+**Depends on:** US-5.1, US-4.4, US-3.9  
+**Design:** [002-unsettled-planned-occurrences.md](../ideas/002-unsettled-planned-occurrences.md)
+
+### Problem
+
+If today passes an expected income date without settlement, the occurrence should not silently vanish or appear as already received. Users need a path for “expected on the 5th, received on the 12th.”
+
+### Acceptance criteria
+
+- [ ] Unsettled income on `effectiveDate < today` shows **awaiting** state (distinct from projected and actual) on month calendar entry lines
+- [ ] `workingBalanceTodayCents` does **not** treat unsettled past income as received
+- [ ] **Confirm receipt** (day panel or Forecast) creates `Transaction` with `effectiveDate` = receipt day and `settlesPlannedOccurrenceDate` = original occurrence
+- [ ] Original scheduled day shows settled link or “received on {date}” after late settlement
+- [ ] Optional: **Reschedule** occurrence via `PlannedItemOverride.dateOverride` from day panel
+- [ ] Engine exposes `isSettled` on projection items; unsettled past items keep `isProjected: true` (or explicit `status: overdue | awaiting`)
+
+### Open questions
+
+- Forecast “next” row when occurrence is overdue: show overdue row vs next future occurrence?
+- Year calendar: dot indicator for awaiting income (P2)?

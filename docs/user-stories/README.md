@@ -81,9 +81,9 @@ flowchart LR
 - Persistent storage (data survives reload)
 - Credit card partial payments + carryover (US-6.5)
 - Calendar day panel actions (settle + inline edit)
+- **Unsettled planned occurrences** — missed income & overdue bills ([US-5.6](./05-forecast.md#us-56--missed-income--late-receipt), [US-3.12](./03-calendar.md#us-312--overdue-bill-indicators-unsettled-expenses); [idea doc](../ideas/002-unsettled-planned-occurrences.md))
 - Accounts polish (validation, re-anchor, archived list)
 - Skip single forecast occurrence
-- Time-travel dev tools (for QA)
 - Design system cards + mobile calendar polish
 - App design improvement
 - Multi-day selection on year calendar (US-3.11)

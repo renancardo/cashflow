@@ -334,3 +334,34 @@ Non-contiguous days (e.g. Mon + Wed + Fri) are in scope — sum and list include
 - If mobile select proves unusable on year grid, design may limit Select mode to desktop (`min-width: 769px`) and defer mobile to month view — document any breakpoint gate.
 
 ---
+
+## US-3.12 — Overdue bill indicators (unsettled expenses)
+
+**Persona:** User
+
+**Story:** As a user, I want **overdue unpaid planned expenses** to stand out on the calendar so I can see which bills passed their due date without settlement.
+
+**Priority:** P1  
+**Depends on:** US-3.4, US-3.9, US-5.1  
+**Design:** [002-unsettled-planned-occurrences.md](../ideas/002-unsettled-planned-occurrences.md) · spec: [003-screen-specs.md §2.6](../specs/003-screen-specs.md)
+
+### Problem
+
+Month calendar entry styling for **past-due payment** is specified (strong red `#dc2626`) but the engine currently marks past unsettled items as `isProjected: false`, so overdue expenses may render as actual outflows instead of overdue.
+
+### Acceptance criteria
+
+- [ ] Unsettled expense with `effectiveDate < today` uses **past-due** entry color on month calendar (§2.6)
+- [ ] Year calendar shows an **overdue** dot (or reuse danger variant) on days with at least one past-due unsettled expense
+- [ ] Legend documents overdue semantics alongside below-buffer red dot
+- [ ] `workingBalanceTodayCents` does **not** treat unsettled past expenses as paid (engine fix aligned with US-5.6)
+- [ ] Day panel lists overdue items with primary **Confirm payment** action (see US-3.9)
+- [ ] Late payment: settlement `effectiveDate` = payment day, `settlesPlannedOccurrenceDate` = original due date
+- [ ] Optional: Forecast row badge “Overdue” on `nextDate < today` for active planned expenses
+
+### Open questions
+
+- Aggregate “N bills overdue” in calendar header (P2)?
+- Credit-card subscriptions: overdue on card vs working account — follow statement accrual rules (US-1.4)
+
+---
