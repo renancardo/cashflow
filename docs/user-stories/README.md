@@ -74,3 +74,15 @@ flowchart LR
 | [001-data-model.md](../specs/001-data-model.md) | Entity fields engine and CRUD must honor |
 | [003-screen-specs.md](../specs/003-screen-specs.md) | UI behavior per screen |
 | [006-project-structure.md](../specs/006-project-structure.md) | Monorepo layout, runtime layers, typical user flows |
+
+
+# Current priority list:
+
+- Persistent storage (data survives reload)
+- Credit card partial payments + carryover (US-6.5)
+- Calendar day panel actions (settle + inline edit)
+- Accounts polish (validation, re-anchor, archived list)
+- Skip single forecast occurrence
+- Time-travel dev tools (for QA)
+- Design system cards + mobile calendar polish
+- App design improvement

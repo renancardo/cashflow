@@ -325,7 +325,7 @@ Quick reference for implementers wiring the projection engine:
 | Actual transaction | — | Solid flow color (darker) | `.chip--actual`, solid `.day-item` |
 | Planned / projected | — | Lighter flow color | Dashed `.day-item--projected`, `.chip--planned` |
 | Past due | — | Red flow entry | — |
-| Alert within lead time | Header `.badge--alert` | Same | Same |
+| Next negative date set | Header `.badge--alert` | Same | Same |
 
 ---
 

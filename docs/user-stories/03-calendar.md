@@ -57,7 +57,7 @@ Year and month calendar views driven by real engine output.
 
 - [x] Displays `workingBalanceTodayCents` formatted per locale — `CalendarHeaderMetrics` + `MoneyAmount`
 - [x] Displays `nextNegativeDate` or “no risk in horizon”
-- [x] Alert badge when `nextNegativeDate` is within `Settings.alertLeadTimeDays` — `isAlertActive()`
+- [x] Alert badge when `nextNegativeDate` is set — `isAlertActive()`
 - [x] Header visible on Year and Month calendar screens — `HeaderStrip` on both screens
 
 ---

@@ -159,7 +159,7 @@ else:
 **Purpose:** The hub. Answer "will my working balance go below buffer on any future day?" at a glance across a rolling 24-month horizon.
 
 **Layout regions**
-- **Header strip:** current working balance (`ProjectionResult.workingBalanceTodayCents`), next negative date (`nextNegativeDate`), alert badge when within `alertLeadTimeDays`.
+- **Header strip:** current working balance (`ProjectionResult.workingBalanceTodayCents`), next negative date (`nextNegativeDate`), alert badge when `nextNegativeDate` is set.
 - **Linear grid:** months as rows, weekdays as columns; weekend columns subtly banded. Horizontally scrollable across the horizon; "jump to today" control.
 - **Legend:** red dot (below buffer), green (income day), amber (large outflow — net outflow ≥ `Settings.largeOutflowThresholdCents`), card-due marker.
 
@@ -442,7 +442,6 @@ When implemented in Phase 2:
 | `negativeBufferCents` | money | red-dot threshold; default 0 |
 | `largeOutflowThresholdCents` | money | amber large-outflow threshold; default R$ 500; `0` disables |
 | `horizonMonths` | integer | default 24 |
-| `alertLeadTimeDays` | integer | in-app alert lead time |
 | `defaultWorkingForType` | per-type toggles | defaults for new accounts |
 | `dateFormat` | select | e.g. DD/MM/YYYY |
 

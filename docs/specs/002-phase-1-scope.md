@@ -22,7 +22,7 @@ Answer one question every day:
 **North-star metrics (calendar header, not a separate dashboard):**
 - Current **working balance** (sum of accounts marked `isWorking`)
 - **Next negative date** (first day projected balance &lt; buffer)
-- Proactive **in-app** alert (calendar header badge/banner) when next negative date is within lead time (`Settings.alertLeadTimeDays`); no push notifications in Phase 1
+- Proactive **in-app** alert (calendar header badge/banner) when `nextNegativeDate` is set; no push notifications in Phase 1
 
 ---
 
@@ -96,7 +96,7 @@ Answer one question every day:
 |---|---|
 | Horizon | Rolling 24 months from today |
 | Detection | Aggregate working balance vs configurable buffer (default R$ 0) |
-| Alert delivery | In-app only — calendar header badge/banner when `nextNegativeDate` is within `alertLeadTimeDays` |
+| Alert delivery | In-app only — calendar header badge/banner when `nextNegativeDate` is set |
 | Output | Daily balance, inflows/outflows, items[], `belowBuffer`, `nextNegativeDate` |
 | Sources | Anchors + actuals + planned + installments + statement due payments |
 
@@ -133,7 +133,7 @@ Phase 1 ships **8 screens/panels**. No separate Dashboard, Investments, Installm
 | 5 | **Accounts** | List, balances, working flag, card cycle config, re-anchor |
 | 6 | **Forecast Items** | Recurring + one-off planned items, **installment plans**, subscriptions (filter), investment outflows |
 | 7 | **Categories & Budgets** | Category CRUD; set monthly budget per category; track current-month actual vs target (child + parent roll-up) |
-| 8 | **Settings** | Language, buffer, large-outflow threshold, horizon, alert lead time, export/backup, card defaults |
+| 8 | **Settings** | Language, buffer, large-outflow threshold, horizon, export/backup, card defaults |
 
 ### Screen decisions (locked)
 
@@ -261,7 +261,7 @@ Copied from [000-initial-ideas.md §9](../ideas/000-initial-ideas.md) and [001-d
 - [ ] Year calendar shows red dots on days below buffer
 - [ ] Month view shows same data with denser detail
 - [ ] Day panel shows balance breakdown and supports quick-add
-- [ ] Calendar header shows working balance, next negative date, and in-app lead-time alert badge
+- [ ] Calendar header shows working balance, next negative date, and in-app alert badge when at risk
 - [ ] User can set monthly category budgets on **Categories & Budgets** and see current-month actual vs target (with parent roll-up)
 - [ ] CSV import loads initial data
 - [ ] UI works in pt-BR and en
