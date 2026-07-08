@@ -7,7 +7,7 @@ import {
   useParams,
   useSearch,
 } from "@tanstack/react-router";
-import { todayIso } from "@cashflow/core";
+import { readStoredClockToday } from "./dev/useAppClock";
 import { AppShell } from "./layout/AppShell";
 import { CalendarPage } from "./pages/CalendarPage";
 import { MonthCalendarPage } from "./pages/MonthCalendarPage";
@@ -32,11 +32,7 @@ function parseEditorSearch(search: Record<string, unknown>): EditorSearch {
 
   const rawNew = search.new;
   const isNew =
-    rawNew === true ||
-    rawNew === "" ||
-    rawNew === "true" ||
-    rawNew === "1" ||
-    rawNew === 1;
+    rawNew === true || rawNew === "" || rawNew === "true" || rawNew === "1" || rawNew === 1;
 
   return isNew ? { new: true } : {};
 }
@@ -122,7 +118,7 @@ const monthRedirectRoute = createRoute({
   beforeLoad: () => {
     throw redirect({
       to: "/month/$yearMonth",
-      params: { yearMonth: todayIso().slice(0, 7) },
+      params: { yearMonth: readStoredClockToday().slice(0, 7) },
     });
   },
 });

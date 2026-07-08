@@ -13,15 +13,17 @@ import {
 } from "../data/mutations/useCategoryMutations";
 import { useCategories } from "../data/queries/useCategories";
 import { useAccounts } from "../data/queries/useAccounts";
+import { useAppClock } from "../dev/useAppClock";
 
-function todayMonth(): string {
-  return new Date().toISOString().slice(0, 7);
+function monthFromToday(today: string): string {
+  return today.slice(0, 7);
 }
 
 function toEditorValues(
   category: Category,
   budgetCents?: number,
   budgetEffectiveFromMonth?: string,
+  fallbackMonth?: string,
 ): CategoryEditorValues {
   return {
     name: category.name,
@@ -29,7 +31,7 @@ function toEditorValues(
     color: category.color ?? "#6B7280",
     parentId: category.parentId,
     budgetCents,
-    budgetEffectiveFromMonth: budgetEffectiveFromMonth ?? todayMonth(),
+    budgetEffectiveFromMonth: budgetEffectiveFromMonth ?? fallbackMonth ?? "",
   };
 }
 
@@ -52,10 +54,7 @@ type Props = {
   onEditorSearchChange?: (search: EditorSearch) => void;
 };
 
-function findCategoryRow(
-  rows: CategoryRowData[],
-  id: string,
-): CategoryRowData | undefined {
+function findCategoryRow(rows: CategoryRowData[], id: string): CategoryRowData | undefined {
   for (const row of rows) {
     if (row.id === id) return row;
     const child = row.children.find((entry) => entry.id === id);
@@ -65,7 +64,9 @@ function findCategoryRow(
 }
 
 export function CategoriesPage({ editorSearch = {}, onEditorSearchChange }: Props) {
-  const [selectedMonth, setSelectedMonth] = useState(todayMonth);
+  const { today } = useAppClock();
+  const currentMonth = monthFromToday(today);
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const { data, isPending, isError, error } = useCategories(selectedMonth);
   const { data: accountsData } = useAccounts();
   const { create, update, archive, upsertBudget, removeBudget } = useCategoryMutations();
@@ -76,7 +77,7 @@ export function CategoriesPage({ editorSearch = {}, onEditorSearchChange }: Prop
   const [editorValues, setEditorValues] = useState<CategoryEditorValues>(() => ({
     ...createEmptyCategoryInput(),
     color: "#6B7280",
-    budgetEffectiveFromMonth: todayMonth(),
+    budgetEffectiveFromMonth: currentMonth,
   }));
 
   const parentOptions = useMemo(() => {
@@ -91,7 +92,7 @@ export function CategoriesPage({ editorSearch = {}, onEditorSearchChange }: Prop
       const category = data?.rawCategories.find((entry) => entry.id === editorSearch.edit);
       if (!category) return;
       const row = findCategoryRow(data?.rows ?? [], editorSearch.edit);
-      setEditorValues(toEditorValues(category, row?.budgetCents, selectedMonth));
+      setEditorValues(toEditorValues(category, row?.budgetCents, selectedMonth, currentMonth));
       return;
     }
 

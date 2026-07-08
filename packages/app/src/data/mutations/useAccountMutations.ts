@@ -73,6 +73,7 @@ export function useAccountMutations() {
 }
 
 export function createEmptyAccountInput(
+  today: string,
   currency = "BRL",
   settings?: Pick<Settings, "defaultWorkingForType">,
 ): AccountInput {
@@ -82,6 +83,6 @@ export function createEmptyAccountInput(
     currency,
     isWorking: defaultIsWorking("checking", settings),
     anchorBalanceCents: 0,
-    anchorDate: new Date().toISOString().slice(0, 10),
+    anchorDate: today,
   };
 }

@@ -36,14 +36,16 @@ export const creditCardStatementsRepo = {
     });
   },
 
-  async markUnpaid(id: string): Promise<CreditCardStatement> {
+  async markUnpaid(id: string, asOfDate?: string): Promise<CreditCardStatement> {
     const statement = await this.getById(id);
     if (!statement) {
       throw new Error(`CreditCardStatement not found: ${id}`);
     }
 
+    const effectiveDate = asOfDate ?? todayIso();
+
     return this.update(id, {
-      status: compareIso(statement.closingDate, todayIso()) < 0 ? "closed" : "open",
+      status: compareIso(statement.closingDate, effectiveDate) < 0 ? "closed" : "open",
       paymentTransactionId: undefined,
     });
   },

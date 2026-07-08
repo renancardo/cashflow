@@ -27,6 +27,7 @@ import { useStatementMutations } from "../data/mutations/useStatementMutations";
 import { useForecastScreen } from "../data/queries/useForecastScreen";
 import { useStatementDetail } from "../data/queries/useStatementDetail";
 import { useAccounts } from "../data/queries/useAccounts";
+import { useAppClock } from "../dev/useAppClock";
 
 type EditorKind = "planned" | "installment" | "statement";
 
@@ -63,6 +64,7 @@ function toPlannedEditorValues(item: PlannedItem): PlannedItemEditorValues {
 }
 
 export function ForecastPage({ editorSearch = {}, onEditorSearchChange }: Props) {
+  const { today } = useAppClock();
   const [filter, setFilter] = useState<ForecastFilter>("all");
   const [detailStatementId, setDetailStatementId] = useState<string | null>(null);
   const { data, isPending, isError, error } = useForecastScreen(filter);
@@ -75,10 +77,7 @@ export function ForecastPage({ editorSearch = {}, onEditorSearchChange }: Props)
   const statementMutations = useStatementMutations();
 
   const editorOpen = Boolean(
-    editorSearch.new ||
-      editorSearch.planned ||
-      editorSearch.installment ||
-      editorSearch.statement,
+    editorSearch.new || editorSearch.planned || editorSearch.installment || editorSearch.statement,
   );
   const editorKind: EditorKind = editorSearch.statement
     ? "statement"
@@ -91,10 +90,10 @@ export function ForecastPage({ editorSearch = {}, onEditorSearchChange }: Props)
   const editingStatementId = editorSearch.statement ?? null;
   const [statementValues, setStatementValues] = useState<StatementEditorValues>({});
   const [plannedValues, setPlannedValues] = useState<PlannedItemEditorValues>(() =>
-    createEmptyPlannedItemInput(),
+    createEmptyPlannedItemInput(today),
   );
   const [installmentValues, setInstallmentValues] = useState(() =>
-    createEmptyInstallmentPlanInput(),
+    createEmptyInstallmentPlanInput(today),
   );
   const [scopeDialogOpen, setScopeDialogOpen] = useState(false);
   const [pendingSave, setPendingSave] = useState<PlannedItemEditorInput | null>(null);
@@ -127,12 +126,12 @@ export function ForecastPage({ editorSearch = {}, onEditorSearchChange }: Props)
     }
 
     if (editorSearch.new === "planned") {
-      setPlannedValues(createEmptyPlannedItemInput(defaultAccountId));
+      setPlannedValues(createEmptyPlannedItemInput(today, defaultAccountId));
       return;
     }
 
     if (editorSearch.new === "installment") {
-      setInstallmentValues(createEmptyInstallmentPlanInput(defaultAccountId));
+      setInstallmentValues(createEmptyInstallmentPlanInput(today, defaultAccountId));
     }
   }, [
     editorSearch.new,
@@ -180,12 +179,12 @@ export function ForecastPage({ editorSearch = {}, onEditorSearchChange }: Props)
   }, [data?.rawStatements, editingStatement, editingStatementCard]);
 
   const openCreatePlanned = () => {
-    setPlannedValues(createEmptyPlannedItemInput(defaultAccountId));
+    setPlannedValues(createEmptyPlannedItemInput(today, defaultAccountId));
     onEditorSearchChange?.({ new: "planned" });
   };
 
   const openCreateInstallment = () => {
-    setInstallmentValues(createEmptyInstallmentPlanInput(defaultAccountId));
+    setInstallmentValues(createEmptyInstallmentPlanInput(today, defaultAccountId));
     onEditorSearchChange?.({ new: "installment" });
   };
 

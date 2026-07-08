@@ -2,9 +2,21 @@
 
 Dev-only utilities for manual QA and flow testing without waiting for real calendar dates.
 
-**Status (2026-07-05):** Not implemented. The app uses `todayIso()` from `@cashflow/core` (wraps `new Date()`) in dozens of call sites — queries, mutations, statement materialization, and settlement defaults. Some hooks already accept `asOfDate` (`useCalendarScreen`, `useProjection`) but nothing in the UI exposes it. Seed data is pinned to June 2026 (`main.tsx` uses `materializeAllCreditCardStatements("2026-06-28")`), so testing statement due dates, carryover, and mark-paid flows requires either fixture tests or manually editing data.
+**Status (2026-07-07):** Implemented. Forward-only fast-forward from seed anchor `2026-06-28`, **Restore seed** (no Reset, no presets). `AppClockProvider` + dev panel wired across queries, mutations, and statement materialization. Manual QA scenarios in [US-12.5](#us-125--time-travel-flow-test-scenarios).
 
-**Motivation:** Credit card flows (US-6.6), calendar projection, installment payoffs, and category budgets all depend on “today”. A **time travel** panel lets developers jump to any date and walk through end-to-end behavior in the running app.
+**Motivation:** Credit card flows (US-6.6), calendar projection, installment payoffs, and category budgets all depend on “today”. A **fast-forward** dev panel lets developers walk forward from the seed anchor date through end-to-end behavior in the running app.
+
+### Forward-only model
+
+Time travel is **fast-forward from seed**, not a bidirectional time machine. In dev builds, “today” **always starts at the seed anchor** (`2026-06-28`); there is no jump to the real wall-clock date and no preset shortcuts.
+
+| Action | Rule |
+|---|---|
+| **App load (dev)** | Effective today = seed anchor `2026-06-28` (or last forward position in sessionStorage) |
+| **+1 day / +7 days / date picker / Apply** | Only dates **≥ current effective today** |
+| **Restore seed** | Reload in-memory DB to bootstrap seed **and** reset effective today to `2026-06-28` |
+
+Going back in simulated time is **not supported**. To revisit the seed anchor or discard QA mutations, use **Restore seed**.
 
 ---
 
@@ -29,29 +41,42 @@ When the simulated date changes, all of these must agree.
 
 ### Design
 
-Introduce a **clock provider** in `packages/app` (not persisted user Settings):
+Introduce a **clock provider** in `packages/app` (not persisted user Settings). Share the seed anchor with bootstrap code:
 
 ```ts
+/** Matches seed materialization in main.tsx / bootstrapSeed(). */
+export const SEED_ANCHOR_DATE = "2026-06-28";
+
 type AppClock = {
-  /** Effective today for the whole app. Real calendar date when not overridden. */
+  /** Effective today for the whole app. Seed anchor in dev; real date in production. */
   today: string; // ISO YYYY-MM-DD
-  isOverridden: boolean;
+  /** Set simulated today. Forward-only: rejects iso < today. */
   setToday: (iso: string) => void;
-  resetToday: () => void;
+  /** Reset DB to seed and today to SEED_ANCHOR_DATE. */
+  restoreSeed: () => void;
 };
 ```
 
-- `today` defaults to real `todayIso()` from `@cashflow/core`.
-- Override stored in **sessionStorage** (survives reload during a QA session; cleared when tab closes).
-- `@cashflow/core` keeps `todayIso()` as the real-clock helper for tests and server-less engine runs; the app reads `useAppClock().today` instead of calling `todayIso()` at runtime.
+- **Dev builds:** `today` defaults to `SEED_ANCHOR_DATE`, not real `todayIso()`.
+- **Production builds:** no dev clock — app keeps using real `todayIso()`; panel not mounted.
+- Forward steps persisted in **sessionStorage** (survives reload during a QA session; missing/invalid key falls back to `SEED_ANCHOR_DATE`).
+- `@cashflow/core` keeps `todayIso()` as the real-clock helper for tests and server-less engine runs; the app reads `useAppClock().today` in dev instead of calling `todayIso()` at runtime.
+- **Forward-only:** `setToday(iso)` rejects `iso < today` (no-op or inline error).
+
+Extract `bootstrapSeed(asOfDate = SEED_ANCHOR_DATE)` from `main.tsx` (seed entities + `materializeAllCreditCardStatements` + Jul 3 paid-statement link). Used on first load and by `restoreSeed()`.
 
 ### Acceptance criteria
 
-- [ ] `AppClockProvider` wraps the app in `main.tsx` (inside `QueryClientProvider`)
-- [ ] `useAppClock()` hook returns `today`, `isOverridden`, `setToday`, `resetToday`
-- [ ] Override persisted in `sessionStorage` under a dev-only key (e.g. `cashflow:devClock`)
-- [ ] Invalid JSON / missing key falls back to real today
-- [ ] Unit test: provider returns override when sessionStorage is set
+- [ ] `AppClockProvider` wraps the app in `main.tsx` (inside `QueryClientProvider`); dev-only or no-op in production
+- [ ] `useAppClock()` hook returns `today`, `setToday`, `restoreSeed`
+- [ ] Dev default `today` is `SEED_ANCHOR_DATE`
+- [ ] Forward position persisted in `sessionStorage` under a dev-only key (e.g. `cashflow:devClock`)
+- [ ] Invalid JSON / missing key falls back to `SEED_ANCHOR_DATE`
+- [ ] `setToday` enforces forward-only (no-op or inline error)
+- [ ] `restoreSeed` calls `bootstrapSeed()` and sets `today` to `SEED_ANCHOR_DATE`
+- [ ] Unit test: provider returns sessionStorage forward position when set
+- [ ] Unit test: forward-only guard rejects backward date
+- [ ] Unit test: `restoreSeed` resets today to `SEED_ANCHOR_DATE`
 
 ---
 
@@ -59,10 +84,11 @@ type AppClock = {
 
 **Persona:** Developer
 
-**Story:** As a developer, I want an **overlapping panel** where I can choose the system’s current date so I can test dated flows without changing my OS clock.
+**Story:** As a developer, I want an **overlapping panel** where I can **fast-forward** from the seed anchor so I can test dated flows without changing my OS clock or rewinding the ledger.
 
 **Priority:** P1  
-**Depends on:** US-12.1, US-11.1
+**Depends on:** US-12.1  
+**Soft reference:** [US-11.1](./11-design-system.md#us-111--app-design-audit-and-pattern-inventory) (panel layout) — follow `StatementListPanel` / `EditorPanel` patterns; no need to wait on the audit.
 
 ### UI spec
 
@@ -72,23 +98,23 @@ Floating **dev tools** affordance — not part of the user-facing Settings scree
 |---|---|
 | **Trigger** | Fixed pill or icon button (e.g. bottom-right), visible only in dev builds |
 | **Panel** | Overlapping slide-over or popover (`role="dialog"`), same pattern as `StatementListPanel` / `EditorPanel` |
-| **Date picker** | ISO date input; default = current effective today |
-| **Apply** | Sets simulated today via `setToday` |
-| **Reset** | `resetToday()` → real calendar date |
-| **Badge** | When overridden, persistent banner or pill: “Simulated: 2026-08-01” so it is never confused with production |
-| **Keyboard** | `Esc` closes panel; focus trap while open |
+| **Date picker** | ISO date input; default = current effective today; `min` = effective today |
+| **Apply** | Sets simulated today via `setToday` (forward-only) |
+| **+1 day / +7 days** | Step forward only |
+| **Restore seed** | `restoreSeed()` — reload bootstrap seed and reset today to `2026-06-28` (**P1**; required to rerun US-12.5 scenarios; confirm if mutations exist) |
+| **Badge** | Persistent in dev: “Simulated: 2026-08-01” (always shows effective today) |
 
-Optional shortcuts (P2, can defer):
+No **−1 day**, **Reset** (to real calendar), or **preset** buttons.
 
-- **−1 day / +1 day** step buttons
-- **Presets:** “Seed anchor date”, “Next statement due”, “Next negative date” (derived from current projection)
+Mount in `AppShell` (badge + trigger). Presentational panel in `packages/ui`; wiring in `packages/app`.
 
 ### Acceptance criteria
 
-- [ ] Panel opens from dev trigger; does not appear in production builds (`import.meta.env.PROD` guard)
-- [ ] Date picker sets simulated today on Apply
-- [ ] Reset restores real today and clears sessionStorage
-- [ ] Simulated-date badge visible app-wide while override is active
+- [ ] Panel opens from dev trigger; does not appear in production builds (`import.meta.env.PROD` guard unless `VITE_ENABLE_TIME_TRAVEL=true`)
+- [ ] Date picker sets simulated today on Apply; rejects dates before effective today
+- [ ] +1 / +7 step buttons advance from current effective today only
+- [ ] Restore seed resets ledger and today to `SEED_ANCHOR_DATE` (confirm if mutations exist)
+- [ ] Simulated-date badge visible app-wide in dev builds
 - [ ] Storybook story for panel in isolated state (mock clock provider)
 - [ ] Panel z-index above main content but below modal editors if both open (document stacking rule)
 
@@ -114,6 +140,8 @@ Optional shortcuts (P2, can defer):
 | Statement charges (projected badge) | `listStatementCharges(..., todayIso())` | `clock.today` |
 | Statement status (`open` / `closed`) | `creditCardStatementsRepo` uses `todayIso()` | recompute or resolve status against `clock.today` |
 
+Also wire: `router.tsx` default month, `CalendarPage` year state, editor `createEmpty*` default dates (`new Date()` → `clock.today`), `useSettingsMutations` import rematerialize.
+
 ### Scope — writes (default effective date)
 
 | Action | Expected default |
@@ -124,21 +152,27 @@ Optional shortcuts (P2, can defer):
 | Calendar quick-add transaction | `effectiveDate = selectedDay ?? clock.today` |
 | New transaction / planned item | date fields default to `clock.today` |
 
-### Query invalidation
+### On clock change
 
-When `today` changes, invalidate all date-sensitive queries:
+When `setToday` advances the date:
 
-- `queryKeys.projection(asOfDate)` for **both** old and new date (or prefix `["projection"]`)
-- `accounts`, `forecast`, `creditCardStatements`, `statementDetail`, `categories`, `transactions`
+1. `materializeAllCreditCardStatements(clock.today)` (or `recomputeAllStatementTotals`)
+2. Invalidate date-sensitive queries:
+   - `queryKeys.projection(asOfDate)` for **both** old and new date (or prefix `["projection"]`)
+   - `accounts`, `forecast`, `creditCardStatements`, `statementDetail`, `categories`, `transactions`
 
-Consider including `clock.today` in TanStack Query keys where projection depends on it.
+Include `clock.today` in TanStack Query keys where needed (`forecast`, `statementDetail`).
+
+### Data persistence (no rollback)
+
+Mutations made while fast-forwarded **persist** in the in-memory DB. Stepping forward does not undo prior settlements or transactions. To discard QA changes and return to `2026-06-28`, use **Restore seed**.
 
 ### Acceptance criteria
 
 - [ ] Changing simulated date refreshes calendar red dots, working balance header, and forecast “next” rows without manual reload
-- [ ] Mark-paid on a future simulated date creates settlement with that date
+- [ ] Mark-paid on a forward simulated date creates settlement with that date
 - [ ] Statement list shows `closed` vs `open` correctly when simulated date passes `closingDate`
-- [ ] No remaining direct `todayIso()` calls in `packages/app` except inside `AppClockProvider` bootstrap
+- [ ] No remaining direct `todayIso()` or `new Date()` default-date calls in `packages/app` except inside `AppClockProvider` / production guard
 - [ ] Documented list of wired call sites in epic status or code comment at provider
 
 ---
@@ -154,10 +188,9 @@ Consider including `clock.today` in TanStack Query keys where projection depends
 
 ### Acceptance criteria
 
-- [ ] Trigger, panel, and badge compiled out or hidden when `import.meta.env.PROD === true`
-- [ ] Optional env flag `VITE_ENABLE_TIME_TRAVEL=true` for staging builds; default off
+- [ ] Trigger, panel, and badge compiled out or hidden when `import.meta.env.PROD === true` unless `VITE_ENABLE_TIME_TRAVEL=true`
 - [ ] Simulated date never written to `Settings` entity or export JSON
-- [ ] README / dev docs section: how to open panel, reset, and test credit-card checklist (link to US-6.6)
+- [ ] README / dev docs section: seed anchor date, fast-forward, restore seed, and credit-card checklist (link to US-6.6)
 - [ ] E2E tests continue using real dates or inject clock via test helper — panel not required in CI
 
 ---
@@ -171,42 +204,82 @@ Consider including `clock.today` in TanStack Query keys where projection depends
 **Priority:** P2  
 **Depends on:** US-12.3, US-6.6
 
+### How to run
+
+1. Open app in dev — today starts at `2026-06-28`.
+2. Run scenarios in order, using **+1 / +7** (or date picker) to reach each step’s date.
+3. To restart from scratch: **Restore seed** (back to `2026-06-28` + clean ledger).
+
 ### Scenario scripts (minimum)
 
-| # | Start date | Action | Expected |
+These cover flows that exist today. Partial payment and statement carryover (US-6.5) are **out of scope** — add scenarios when that lands (see US-6.6 checklist).
+
+| # | Reach date | Action | Expected |
 |---|---|---|---|
-| 1 | `2026-06-28` (seed) | Open Cora statements | Jul 3 due shows opening debt R$ 1.850 |
-| 2 | `2026-07-01` | Calendar month view | Statement due outflow on working account |
-| 3 | `2026-07-03` | Mark statement paid | Transfer created; projection suppresses duplicate |
-| 4 | `2026-06-27` | Add card purchase | Accrues to Jul 26 statement; working hit Aug 1 |
-| 5 | `2026-08-01` | After US-6.5 lands | Partial pay → carryover visible on next fatura |
-| 6 | Any | Step +7 days | Recurring planned items fire on correct `dayOfMonth` |
+| 1 | `2026-06-28` (start) | Open Cora statements | Jul 3 due shows opening debt R$ 1.850 |
+| 2 | +3 days → `2026-07-01` | Calendar month view | Statement due outflow on working account |
+| 3 | +2 days → `2026-07-03` | Mark statement paid | Transfer created; projection suppresses duplicate |
+| 4 | +23 days from #1 → `2026-07-26` | Open Cora statements | Jul fatura status `closed`; Aug 3 due row listed |
+| 5 | +7 days from current | Calendar / forecast | Recurring planned items fire on correct `dayOfMonth` |
 
 ### Acceptance criteria
 
 - [ ] Scenarios listed in this epic or linked from US-6.6 checklist
 - [ ] Each scenario pass/fail can be recorded manually during QA
-- [ ] Optional: panel preset buttons jump to dates from table above
 
 ---
+
+## Implementation notes
+
+**Suggested build order:** US-12.1 → US-12.3 → US-12.2 → US-12.4 (US-12.5 = manual QA after).
+
+**Suggested files:**
+
+| Piece | Path |
+|---|---|
+| Seed anchor + bootstrap | `packages/app/src/data/seed/bootstrap.ts` (`SEED_ANCHOR_DATE`, `bootstrapSeed()`) |
+| Clock provider | `packages/app/src/dev/AppClockProvider.tsx`, `useAppClock.ts` |
+| Dev panel shell | `packages/app/src/dev/TimeTravelDevTools.tsx` (trigger, badge, wiring) |
+| Presentational panel | `packages/ui/src/organisms/TimeTravelPanel/` |
+| Mount point | `packages/app/src/layout/AppShell.tsx` |
+| First-load seed | `packages/app/src/main.tsx` (call `bootstrapSeed` when DB empty) |
+
+**Staging guard:**
+
+```ts
+const devToolsEnabled =
+  !import.meta.env.PROD || import.meta.env.VITE_ENABLE_TIME_TRAVEL === "true";
+```
+
+**Other conventions:**
+
+- Dev panel copy: **English only** (hardcoded; no i18n keys).
+- E2E: inject clock via test helper wrapping `AppClockProvider`; panel not required in CI.
+- `creditCardStatementsRepo.markUnpaid` uses real `todayIso()` today — pass `asOfDate` from app layer or resolve status at query time when wiring US-12.3.
 
 ## Architecture sketch
 
 ```mermaid
 flowchart TD
   Panel[TimeTravelPanel] --> Provider[AppClockProvider]
+  Panel --> Seed[restoreSeed]
+  Seed --> Bootstrap[bootstrapSeed]
+  Bootstrap --> DB[(in-memory DB)]
   Provider --> Session[sessionStorage]
   Provider --> App[pages + mutations]
   App --> Queries[TanStack Query]
   Queries --> Engine[projectCashFlow asOfDate]
-  Queries --> DB[materialize / settle with clock.today]
+  Queries --> DB
   Provider --> Badge[Simulated date badge]
 ```
 
 ## Out of scope (Phase 1)
 
+- **Backward** simulated time (−1 day, date picker before effective today)
+- **Reset to real calendar date** or preset date shortcuts
+- **Rollback** of ledger mutations when the clock changes
 - Time travel in Storybook global decorator (use fixture `asOfDate` per story instead)
-- Simulating time **speed** (auto-advance days) — manual date pick only
+- Simulating time **speed** (auto-advance days) — manual date pick and step buttons only
 - Multi-user or persisted “scenario saves” beyond sessionStorage
 - Changing timezone; all dates remain local ISO calendar dates
 

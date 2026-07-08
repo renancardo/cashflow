@@ -1,15 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
-import { todayIso } from "@cashflow/core";
 import {
   accountsRepo,
   categoriesRepo,
   creditCardStatementsRepo,
   listStatementCharges,
 } from "@cashflow/db";
+import { useAppClock } from "../../dev/useAppClock";
 
 export function useStatementDetail(statementId: string | null) {
+  const { today } = useAppClock();
+
   return useQuery({
-    queryKey: ["statementDetail", statementId],
+    queryKey: ["statementDetail", statementId, today],
     queryFn: async () => {
       const [statement, accounts, categories] = await Promise.all([
         creditCardStatementsRepo.getById(statementId!),
@@ -23,7 +25,7 @@ export function useStatementDetail(statementId: string | null) {
 
       const card = accounts.find((row) => row.id === statement.cardAccountId);
       const categoryNames = new Map(categories.map((row) => [row.id, row.name]));
-      const charges = listStatementCharges(statementId!, todayIso()).map((charge) => ({
+      const charges = listStatementCharges(statementId!, today).map((charge) => ({
         id: charge.id,
         source: charge.source,
         description: charge.description,

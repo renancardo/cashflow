@@ -8,7 +8,6 @@ import {
   plannedItemGroup,
   previewUpcomingOccurrences,
   previewForecastSchedule,
-  todayIso,
 } from "@cashflow/core";
 import {
   accountsRepo,
@@ -21,6 +20,7 @@ import {
   transactionsRepo,
 } from "@cashflow/db";
 import { queryKeys } from "../keys";
+import { useAppClock } from "../../dev/useAppClock";
 
 export type ForecastFilter =
   "all" | "subscription" | "income" | "expense" | "transfer" | "installment" | "statement";
@@ -124,10 +124,12 @@ function filterPlannedRows(
 }
 
 export function useForecastScreen(filter: ForecastFilter = "all") {
+  const { today } = useAppClock();
+
   return useQuery({
-    queryKey: [...queryKeys.forecast, filter],
+    queryKey: [...queryKeys.forecast, filter, today],
     queryFn: async () => {
-      const asOfDate = todayIso();
+      const asOfDate = today;
       const [
         plannedItems,
         overrides,

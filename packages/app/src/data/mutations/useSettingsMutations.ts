@@ -8,7 +8,7 @@ import {
   settingsRepo,
   validateBackup,
 } from "@cashflow/db";
-import { todayIso } from "@cashflow/core";
+import { useAppClock } from "../../dev/useAppClock";
 
 export class SettingsImportError extends Error {
   constructor(public readonly code: "invalidJson" | "invalidBackupFormat") {
@@ -23,6 +23,7 @@ function invalidateAll(queryClient: ReturnType<typeof useQueryClient>) {
 
 export function useSettingsMutations() {
   const queryClient = useQueryClient();
+  const { today } = useAppClock();
 
   const update = useMutation({
     mutationFn: (patch: Partial<Settings>) => settingsRepo.update(patch),
@@ -38,7 +39,7 @@ export function useSettingsMutations() {
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = `cashflow-backup-${todayIso()}.json`;
+      anchor.download = `cashflow-backup-${today}.json`;
       anchor.click();
       URL.revokeObjectURL(url);
     },
@@ -57,7 +58,7 @@ export function useSettingsMutations() {
         throw new SettingsImportError("invalidBackupFormat");
       }
       restoreDatabase(parsed);
-      await materializeAllCreditCardStatements(todayIso());
+      await materializeAllCreditCardStatements(today);
       return settingsRepo.get();
     },
     onSuccess: () => {

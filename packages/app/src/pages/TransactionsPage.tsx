@@ -13,6 +13,7 @@ import {
 } from "../data/mutations/useTransactionMutations";
 import { useTransactions } from "../data/queries/useTransactions";
 import { useAccounts } from "../data/queries/useAccounts";
+import { useAppClock } from "../dev/useAppClock";
 
 const PAGE_SIZE = 10;
 
@@ -51,6 +52,7 @@ function toTransactionInput(values: TransactionEditorValues): TransactionInput {
 }
 
 export function TransactionsPage({ editorSearch = {}, onEditorSearchChange }: Props) {
+  const { today } = useAppClock();
   const [filters, setFilters] = useState<TransactionFiltersState>({});
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const { data, isPending, isError, error } = useTransactions(filters);
@@ -61,7 +63,7 @@ export function TransactionsPage({ editorSearch = {}, onEditorSearchChange }: Pr
   const editorMode = editorSearch.edit ? "edit" : "create";
   const editingId = editorSearch.edit ?? null;
   const [editorValues, setEditorValues] = useState<TransactionEditorValues>(() =>
-    createEmptyTransactionInput(),
+    createEmptyTransactionInput(today),
   );
 
   const visibleRows = useMemo(
@@ -81,7 +83,7 @@ export function TransactionsPage({ editorSearch = {}, onEditorSearchChange }: Pr
     }
 
     if (editorSearch.new) {
-      setEditorValues(createEmptyTransactionInput(defaultAccountId));
+      setEditorValues(createEmptyTransactionInput(today, defaultAccountId));
     }
   }, [editorSearch.edit, editorSearch.new, data?.rawTransactions, defaultAccountId]);
 
@@ -91,7 +93,7 @@ export function TransactionsPage({ editorSearch = {}, onEditorSearchChange }: Pr
   };
 
   const openCreate = () => {
-    setEditorValues(createEmptyTransactionInput(defaultAccountId));
+    setEditorValues(createEmptyTransactionInput(today, defaultAccountId));
     onEditorSearchChange?.({ new: true });
   };
 

@@ -18,6 +18,7 @@ import { useSettings } from "../data/queries/useSettings";
 import { useAccounts } from "../data/queries/useAccounts";
 import { useStatements } from "../data/queries/useStatements";
 import { useStatementDetail } from "../data/queries/useStatementDetail";
+import { useAppClock } from "../dev/useAppClock";
 
 function toEditorValues(account: Account): AccountEditorValues {
   return {
@@ -65,6 +66,7 @@ type Props = {
 
 export function AccountsPage({ editorSearch = {}, onEditorSearchChange }: Props) {
   const navigate = useNavigate();
+  const { today } = useAppClock();
   const { data, isPending, isError, error } = useAccounts();
   const { data: settingsData } = useSettings();
   const { create, update, setWorking, archive } = useAccountMutations();
@@ -74,7 +76,7 @@ export function AccountsPage({ editorSearch = {}, onEditorSearchChange }: Props)
   const [statementsCardId, setStatementsCardId] = useState<string | null>(null);
   const [detailStatementId, setDetailStatementId] = useState<string | null>(null);
   const [editorValues, setEditorValues] = useState<AccountEditorValues>(() =>
-    createEmptyAccountInput(),
+    createEmptyAccountInput(today),
   );
   const { data: statements = [] } = useStatements(statementsCardId);
   const { data: statementDetail, isPending: isDetailPending } =
@@ -106,12 +108,12 @@ export function AccountsPage({ editorSearch = {}, onEditorSearchChange }: Props)
     }
 
     if (editorSearch.new) {
-      setEditorValues(createEmptyAccountInput("BRL", settingsData));
+      setEditorValues(createEmptyAccountInput(today, "BRL", settingsData));
     }
   }, [editorSearch.edit, editorSearch.new, data?.rawAccounts, settingsData]);
 
   const openCreate = () => {
-    setEditorValues(createEmptyAccountInput("BRL", settingsData));
+    setEditorValues(createEmptyAccountInput(today, "BRL", settingsData));
     onEditorSearchChange?.({ new: true });
   };
 

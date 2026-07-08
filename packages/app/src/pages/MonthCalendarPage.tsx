@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { todayIso } from "@cashflow/core";
 import { DayDetailPanel, MonthCalendarScreen, type QuickAddValues } from "@cashflow/ui";
 import { validateCalendarQuickAdd } from "../data/mutations/calendarQuickAdd";
 import { useCalendarQuickAdd } from "../data/mutations/useCalendarQuickAdd";
 import { createEmptyTransactionInput } from "../data/mutations/useTransactionMutations";
 import { useAccounts } from "../data/queries/useAccounts";
 import { useCalendarScreen } from "../data/queries/useCalendarScreen";
+import { useAppClock } from "../dev/useAppClock";
 
 type Props = {
   month: string;
@@ -22,11 +22,12 @@ export function MonthCalendarPage({
   onMonthChange,
 }: Props) {
   const navigate = useNavigate();
+  const { today } = useAppClock();
   const { data, isPending, isError, error } = useCalendarScreen();
   const { data: accountsData } = useAccounts();
-  const quickAdd = useCalendarQuickAdd(data?.today);
+  const quickAdd = useCalendarQuickAdd(selectedDay ?? undefined);
   const [quickAddValues, setQuickAddValues] = useState<QuickAddValues>(() => ({
-    ...createEmptyTransactionInput(),
+    ...createEmptyTransactionInput(today),
     description: "",
   }));
 
@@ -59,7 +60,11 @@ export function MonthCalendarPage({
   const openDay = (date: string) => {
     onSelectedDayChange?.(date);
     setQuickAddValues((current) => ({
-      ...createEmptyTransactionInput(data?.accountOptions[0]?.id, data?.settings.defaultCurrency),
+      ...createEmptyTransactionInput(
+        today,
+        data?.accountOptions[0]?.id,
+        data?.settings.defaultCurrency,
+      ),
       description: "",
       effectiveDate: date,
       type: current.type,
@@ -79,7 +84,11 @@ export function MonthCalendarPage({
     await quickAdd.mutateAsync({ ...quickAddValues, effectiveDate: selectedDay });
 
     setQuickAddValues((current) => ({
-      ...createEmptyTransactionInput(data.accountOptions[0]?.id, data.settings.defaultCurrency),
+      ...createEmptyTransactionInput(
+        today,
+        data.accountOptions[0]?.id,
+        data.settings.defaultCurrency,
+      ),
       description: "",
       effectiveDate: selectedDay,
       type: current.type,
@@ -92,7 +101,7 @@ export function MonthCalendarPage({
       days={data?.projection.days ?? []}
       workingBalanceCents={accountsData?.workingBalanceCents ?? 0}
       nextNegativeDate={data?.projection.nextNegativeDate ?? null}
-      today={data?.today ?? todayIso()}
+      today={data?.today ?? today}
       selectedDate={selectedDay}
       status={isPending ? "loading" : isError ? "error" : "ready"}
       errorMessage={error instanceof Error ? error.message : undefined}
