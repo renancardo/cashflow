@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { todayIso } from "@cashflow/core";
 import { DayDetailPanel, YearCalendarScreen, type QuickAddValues } from "@cashflow/ui";
 import { validateCalendarQuickAdd } from "../data/mutations/calendarQuickAdd";
 import { useCalendarQuickAdd } from "../data/mutations/useCalendarQuickAdd";
 import { createEmptyTransactionInput } from "../data/mutations/useTransactionMutations";
 import { useAccounts } from "../data/queries/useAccounts";
 import { useCalendarScreen } from "../data/queries/useCalendarScreen";
+import { useAppClock } from "../dev/useAppClock";
 
 type Props = {
   selectedDay?: string | null;
@@ -15,12 +15,13 @@ type Props = {
 
 export function CalendarPage({ selectedDay = null, onSelectedDayChange }: Props) {
   const navigate = useNavigate();
+  const { today } = useAppClock();
   const { data, isPending, isError, error } = useCalendarScreen();
   const { data: accountsData } = useAccounts();
-  const quickAdd = useCalendarQuickAdd(data?.today);
-  const [year, setYear] = useState(() => Number(todayIso().slice(0, 4)));
+  const quickAdd = useCalendarQuickAdd(selectedDay ?? undefined);
+  const [year, setYear] = useState(() => Number(today.slice(0, 4)));
   const [quickAddValues, setQuickAddValues] = useState<QuickAddValues>(() => ({
-    ...createEmptyTransactionInput(),
+    ...createEmptyTransactionInput(today),
     description: "",
   }));
 
@@ -53,7 +54,11 @@ export function CalendarPage({ selectedDay = null, onSelectedDayChange }: Props)
   const openDay = (date: string) => {
     onSelectedDayChange?.(date);
     setQuickAddValues((current) => ({
-      ...createEmptyTransactionInput(data?.accountOptions[0]?.id, data?.settings.defaultCurrency),
+      ...createEmptyTransactionInput(
+        today,
+        data?.accountOptions[0]?.id,
+        data?.settings.defaultCurrency,
+      ),
       description: "",
       effectiveDate: date,
       type: current.type,
@@ -73,7 +78,11 @@ export function CalendarPage({ selectedDay = null, onSelectedDayChange }: Props)
     await quickAdd.mutateAsync({ ...quickAddValues, effectiveDate: selectedDay });
 
     setQuickAddValues((current) => ({
-      ...createEmptyTransactionInput(data.accountOptions[0]?.id, data.settings.defaultCurrency),
+      ...createEmptyTransactionInput(
+        today,
+        data.accountOptions[0]?.id,
+        data.settings.defaultCurrency,
+      ),
       description: "",
       effectiveDate: selectedDay,
       type: current.type,
@@ -86,7 +95,7 @@ export function CalendarPage({ selectedDay = null, onSelectedDayChange }: Props)
       days={data?.projection.days ?? []}
       workingBalanceCents={accountsData?.workingBalanceCents ?? 0}
       nextNegativeDate={data?.projection.nextNegativeDate ?? null}
-      today={data?.today ?? todayIso()}
+      today={data?.today ?? today}
       selectedDate={selectedDay}
       status={isPending ? "loading" : isError ? "error" : "ready"}
       errorMessage={error instanceof Error ? error.message : undefined}
@@ -94,7 +103,7 @@ export function CalendarPage({ selectedDay = null, onSelectedDayChange }: Props)
       onMonthView={() =>
         navigate({
           to: "/month/$yearMonth",
-          params: { yearMonth: (selectedDay ?? data?.today ?? todayIso()).slice(0, 7) },
+          params: { yearMonth: (selectedDay ?? data?.today ?? today).slice(0, 7) },
         })
       }
       onDaySelect={openDay}

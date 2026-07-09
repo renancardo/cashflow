@@ -57,7 +57,7 @@ Year and month calendar views driven by real engine output.
 
 - [x] Displays `workingBalanceTodayCents` formatted per locale — `CalendarHeaderMetrics` + `MoneyAmount`
 - [x] Displays `nextNegativeDate` or “no risk in horizon”
-- [x] Alert badge when `nextNegativeDate` is within `Settings.alertLeadTimeDays` — `isAlertActive()`
+- [x] Alert badge when `nextNegativeDate` is set — `isAlertActive()`
 - [x] Header visible on Year and Month calendar screens — `HeaderStrip` on both screens
 
 ---
@@ -204,5 +204,164 @@ Year and month calendar views driven by real engine output.
 - [ ] Visual regression or Playwright screenshot at mobile viewport for `/year`
 
 **Notes:** Year view uses `--day-cell-size: 28px` below 769px — likely too small for touch. Consider responsive token bump, vertical month stacking (P2), or defaulting mobile users to month view with prominent entry point.
+
+---
+
+## US-3.11 — Multi-day selection on year calendar
+
+**Persona:** User
+
+**Story:** As a user, I want to **select multiple days on the year calendar** and see **aggregated inflows, outflows, and all cash-flow entries** for those days so I can review a pay period, trip, or any custom date range without leaving the hub view.
+
+**Priority:** P2  
+**Depends on:** US-3.1, US-3.5  
+**Status:** Backlog — **design and UX pending** (see options below)
+
+### Problem
+
+Today `/year` supports **one selected day** at a time (`?day=YYYY-MM-DD`), which opens `DayDetailPanel` with that day’s balance breakdown, item list, and quick-add. There is no way to answer: *“What moves in and out across these five days?”*
+
+### UX open questions
+
+| Question | Notes |
+|---|---|
+| Same screen or new screen? | Year hub is scan-first; range review feels like an extension, not a new primary destination — but year cells are small and multi-select is awkward on mobile ([US-3.10](./03-calendar.md#us-310--year-calendar-mobile-layout)). |
+| How does it coexist with single-day inspect? | `DayDetailPanel` is optimized for **one day**: open/close balance, per-item actions (US-3.8, US-3.9), quick-add. Range view is **read-heavy aggregation** — mixing both in one panel risks clutter and conflicting actions. |
+| What selection gestures? | Click-toggle, Shift+click range, drag-to-select across cells, or explicit “select mode” toggle — TBD in design pass. |
+| Month view too? | Out of scope for first cut unless design reuses the same range panel from `/month/$yearMonth`. |
+
+### Design options (pick one in design review)
+
+#### Option A — Selection mode on `/year` **(recommended default)**
+
+Add an explicit toolbar control: **Inspect** (default, current behaviour) ↔ **Select**.
+
+| Mode | Grid behaviour | Panel |
+|---|---|---|
+| **Inspect** | Click day → `DayDetailPanel` (`?day=`) | Unchanged ([US-3.5](./03-calendar.md#us-35--day-detail-panel)) |
+| **Select** | Click toggles day in set; Shift+click adds inclusive range; selected cells show a **selection ring** (distinct from single-day “inspect” highlight) | **Range summary panel** — new component, not `DayDetailPanel` |
+
+When **2+ days** are selected, show the range panel with totals + merged entry list. **Do not** open `DayDetailPanel` until the user switches back to Inspect or chooses “Open day” on a specific row.
+
+When **1 day** is selected in Select mode, the range panel still works (totals = that day’s inflows/outflows; item list = that day’s items) — or design may auto-fallback to Inspect; document the choice in prototype.
+
+**Pros:** No new nav item; keeps `/year` as hub; clear separation between “edit one day” and “summarize many days”.  
+**Cons:** Mode toggle adds chrome; mobile needs a discoverable select mode ([US-3.10](./03-calendar.md#us-310--year-calendar-mobile-layout)).
+
+#### Option B — Extend `DayDetailPanel` for multi-day
+
+Single panel adapts: 1 day = current layout; 2+ days = range header + aggregated totals + items grouped by date. Quick-add and settle actions disabled until exactly one day is focused.
+
+**Pros:** One panel pattern.  
+**Cons:** Panel becomes two products; URL/state awkward (`?day=` vs `?days=`); edit actions harder to reason about.
+
+#### Option C — New screen (e.g. `/calendar/range` or report tab)
+
+Dedicated range-analysis view with date pickers and optional category breakdown.
+
+**Pros:** Room for richer reporting later.  
+**Cons:** Extra nav surface for a secondary workflow; duplicates data already on year view. Defer unless range analysis becomes a primary persona need.
+
+### Recommended direction
+
+**Option A** — dual mode on `/year` with a dedicated **Range summary panel** (`RangeDetailPanel` or similar in `@cashflow/ui`). Reuse slide-over / backdrop patterns from `DayDetailPanel` and `StatementListPanel`, but **do not** overload `DayDetailPanel`.
+
+```mermaid
+stateDiagram-v2
+  [*] --> Inspect: default
+  Inspect --> Select: toolbar "Select days"
+  Select --> Inspect: toolbar "Inspect" or Clear
+  Inspect --> DayPanel: click day
+  Select --> RangePanel: 2+ days selected
+  Select --> RangePanel: 1 day selected optional
+  RangePanel --> DayPanel: "Open day" on row then switch to Inspect
+  DayPanel --> Inspect: close panel
+  RangePanel --> Select: close panel keep selection
+```
+
+### Data and aggregation (no engine change)
+
+All data comes from existing `ProjectionResult.days[]` (`ProjectionDay` per [001-data-model.md §6](../specs/001-data-model.md)):
+
+| Metric | Rule |
+|---|---|
+| **Total inflows** | Sum of `inflowsCents` over selected days |
+| **Total outflows** | Sum of `outflowsCents` over selected days |
+| **Net** | Total inflows − total outflows (or show both; match month summary strip semantics when defined) |
+| **Opening balance** | `openingBalanceCents` of the **earliest** selected day (by date) |
+| **Closing balance** | `closingBalanceCents` of the **latest** selected day |
+| **Entries** | Concatenate `items[]` from each selected day; group by date (subsection per day) or flat chronological list — **TBD in design** |
+| **Empty selection** | Range panel closed; grid shows no selection ring |
+
+Non-contiguous days (e.g. Mon + Wed + Fri) are in scope — sum and list include only those dates, not the gaps between them.
+
+### URL and state (suggested)
+
+- Inspect mode: `?day=2026-07-15` (unchanged)
+- Select mode: `?select=2026-07-01,2026-07-05,2026-07-07` **or** `?from=2026-07-01&to=2026-07-07` for contiguous ranges — pick one encoding in implementation; document in [003-screen-specs.md §3](../specs/003-screen-specs.md) when design locks
+- Modes should not fight: entering Inspect with `?day=` clears multi-select (or design documents “preserve selection in sessionStorage” — default: clear)
+
+### Acceptance criteria
+
+**Design gate (required before build)**
+
+- [ ] Design review picks Option A, B, or C and records it in [003-screen-specs.md §3](../specs/003-screen-specs.md)
+- [ ] Prototype or Storybook story for: Select mode on grid, 1 day selected, 3+ days selected, empty clear, mobile affordance
+- [ ] Documented interaction with existing `?day=` / `DayDetailPanel` (Inspect vs Select)
+
+**Functional (after design lock)**
+
+- [ ] User can select **multiple non-contiguous days** on `/year` (exact gesture per design)
+- [ ] Selected days are visually distinct from red-dot / indicator semantics and from single-day inspect highlight
+- [ ] Range summary shows **total inflows**, **total outflows**, and **net** for the selection
+- [ ] Range summary lists **all projection items** across selected days (actual + projected), with date visible per row or grouped by day
+- [ ] **Clear selection** control resets grid and closes range panel
+- [ ] Totals match manual sum of `ProjectionDay.inflowsCents` / `outflowsCents` for the same dates (unit test on aggregation helper)
+- [ ] Selecting days does not trigger projection recompute (read-only aggregation)
+- [ ] Keyboard: Escape clears selection or closes range panel per design; focus management documented
+
+**Out of scope (v1 of this story)**
+
+- Settle, inline edit, or quick-add across multiple days at once
+- Category/subcategory breakdown for the range (future enhancement)
+- Multi-day select on month view (follow-up story if Option A ships)
+- Export range to CSV
+
+### Notes
+
+- Aggregation logic belongs in `packages/ui/src/lib/calendar.ts` (or `packages/core` if reused by month view later) — pure function over `ProjectionDay[]` + `Set<string>` of ISO dates.
+- Playwright: select three days with known fixture totals → assert range panel sums.
+- If mobile select proves unusable on year grid, design may limit Select mode to desktop (`min-width: 769px`) and defer mobile to month view — document any breakpoint gate.
+
+---
+
+## US-3.12 — Overdue bill indicators (unsettled expenses)
+
+**Persona:** User
+
+**Story:** As a user, I want **overdue unpaid planned expenses** to stand out on the calendar so I can see which bills passed their due date without settlement.
+
+**Priority:** P1  
+**Depends on:** US-3.4, US-3.9, US-5.1  
+**Design:** [002-unsettled-planned-occurrences.md](../ideas/002-unsettled-planned-occurrences.md) · spec: [003-screen-specs.md §2.6](../specs/003-screen-specs.md)
+
+### Problem
+
+Month calendar entry styling for **past-due payment** is specified (strong red `#dc2626`) but the engine currently marks past unsettled items as `isProjected: false`, so overdue expenses may render as actual outflows instead of overdue.
+
+### Acceptance criteria
+
+- [ ] Unsettled expense with `effectiveDate < today` uses **past-due** entry color on month calendar (§2.6)
+- [ ] Year calendar shows an **overdue** dot (or reuse danger variant) on days with at least one past-due unsettled expense
+- [ ] Legend documents overdue semantics alongside below-buffer red dot
+- [ ] `workingBalanceTodayCents` does **not** treat unsettled past expenses as paid (engine fix aligned with US-5.6)
+- [ ] Day panel lists overdue items with primary **Confirm payment** action (see US-3.9)
+- [ ] Late payment: settlement `effectiveDate` = payment day, `settlesPlannedOccurrenceDate` = original due date
+- [ ] Optional: Forecast row badge “Overdue” on `nextDate < today` for active planned expenses
+
+### Open questions
+
+- Aggregate “N bills overdue” in calendar header (P2)?
+- Credit-card subscriptions: overdue on card vs working account — follow statement accrual rules (US-1.4)
 
 ---

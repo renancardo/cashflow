@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { todayIso } from "@cashflow/core";
 import { creditCardStatementsRepo, settleStatement } from "@cashflow/db";
 import { queryKeys } from "../keys";
+import { useAppClock } from "../../dev/useAppClock";
 
 export type StatementEditorInput = {
   plannedPaymentCents?: number;
@@ -10,6 +10,7 @@ export type StatementEditorInput = {
 
 export function useStatementMutations() {
   const queryClient = useQueryClient();
+  const { today } = useAppClock();
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: queryKeys.forecast });
@@ -37,7 +38,7 @@ export function useStatementMutations() {
 
   const markPaid = useMutation({
     mutationFn: ({ id, effectiveDate }: { id: string; effectiveDate?: string }) =>
-      settleStatement(id, effectiveDate ?? todayIso()),
+      settleStatement(id, effectiveDate ?? today),
     onSuccess: invalidate,
   });
 
@@ -55,7 +56,7 @@ export function useStatementMutations() {
         plannedPaymentCents: input.plannedPaymentCents,
         payFromAccountId: input.payFromAccountId,
       });
-      return settleStatement(id, effectiveDate ?? todayIso());
+      return settleStatement(id, effectiveDate ?? today);
     },
     onSuccess: invalidate,
   });

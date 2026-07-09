@@ -1,15 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { projectCashFlow } from "@cashflow/engine";
 import { categoriesRepo, loadEngineInput } from "@cashflow/db";
-import { todayIso } from "@cashflow/core";
 import { queryKeys } from "../keys";
+import { useAppClock } from "../../dev/useAppClock";
 
-export function useCalendarScreen(asOfDate: string = todayIso()) {
+export function useCalendarScreen() {
+  const { today } = useAppClock();
+
   return useQuery({
-    queryKey: [...queryKeys.projection(asOfDate), "calendar"],
+    queryKey: [...queryKeys.projection(today), "calendar"],
     queryFn: async () => {
       const [input, categories] = await Promise.all([loadEngineInput(), categoriesRepo.getAll()]);
-      const projection = projectCashFlow(input, asOfDate);
+      const projection = projectCashFlow(input, today);
 
       const accountNames = new Map(input.accounts.map((account) => [account.id, account.name]));
       const categoryNames = new Map(categories.map((category) => [category.id, category.name]));
@@ -20,7 +22,7 @@ export function useCalendarScreen(asOfDate: string = todayIso()) {
       return {
         projection,
         settings: input.settings,
-        today: asOfDate,
+        today,
         accountOptions: input.accounts.map((account) => ({
           id: account.id,
           name: account.name,

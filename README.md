@@ -83,6 +83,22 @@ engine → core
 
 ---
 
+## Developer tools (time travel)
+
+Dev-only utilities for manual QA without changing the OS clock. See [`docs/user-stories/12-developer-tools.md`](docs/user-stories/12-developer-tools.md) for the full epic.
+
+| Topic              | Detail                                                                                                                                                                       |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Seed anchor**    | Effective “today” starts at `2026-06-28` in dev builds                                                                                                                       |
+| **Fast-forward**   | Use the **Dev tools** pill (bottom-right) to step +1/+7 days or pick a date (forward-only)                                                                                   |
+| **Restore seed**   | Reloads bootstrap seed data and resets simulated today to `2026-06-28`                                                                                                       |
+| **Production**     | Panel is hidden when `import.meta.env.PROD === true` unless `VITE_ENABLE_TIME_TRAVEL=true`                                                                                   |
+| **Credit card QA** | Walkthrough scenarios in [US-12.5](docs/user-stories/12-developer-tools.md#us-125--time-travel-flow-test-scenarios); also see [US-6.6](docs/user-stories/06-credit-cards.md) |
+
+Simulated date is stored in `sessionStorage` (`cashflow:devClock`) and is **not** written to Settings or backup JSON.
+
+---
+
 ## Current status
 
 - **US-0.2** — monorepo scaffold ✅

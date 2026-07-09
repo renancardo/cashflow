@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Transaction } from "@cashflow/core";
 import {
   TransactionEditorPanel,
@@ -13,8 +13,19 @@ import {
 } from "../data/mutations/useTransactionMutations";
 import { useTransactions } from "../data/queries/useTransactions";
 import { useAccounts } from "../data/queries/useAccounts";
+import { useAppClock } from "../dev/useAppClock";
 
 const PAGE_SIZE = 10;
+
+type EditorSearch = {
+  new?: true;
+  edit?: string;
+};
+
+type Props = {
+  editorSearch?: EditorSearch;
+  onEditorSearchChange?: (search: EditorSearch) => void;
+};
 
 function toEditorValues(tx: Transaction): TransactionEditorValues {
   return {
@@ -40,18 +51,19 @@ function toTransactionInput(values: TransactionEditorValues): TransactionInput {
   };
 }
 
-export function TransactionsPage() {
+export function TransactionsPage({ editorSearch = {}, onEditorSearchChange }: Props) {
+  const { today } = useAppClock();
   const [filters, setFilters] = useState<TransactionFiltersState>({});
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const { data, isPending, isError, error } = useTransactions(filters);
   const { data: accountsData } = useAccounts();
   const { create, update, remove, reorder } = useTransactionMutations();
 
-  const [editorOpen, setEditorOpen] = useState(false);
-  const [editorMode, setEditorMode] = useState<"create" | "edit">("create");
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const editorOpen = Boolean(editorSearch.new || editorSearch.edit);
+  const editorMode = editorSearch.edit ? "edit" : "create";
+  const editingId = editorSearch.edit ?? null;
   const [editorValues, setEditorValues] = useState<TransactionEditorValues>(() =>
-    createEmptyTransactionInput(),
+    createEmptyTransactionInput(today),
   );
 
   const visibleRows = useMemo(
@@ -63,25 +75,37 @@ export function TransactionsPage() {
 
   const defaultAccountId = data?.accounts[0]?.id;
 
+  useEffect(() => {
+    if (editorSearch.edit) {
+      const tx = data?.rawTransactions.find((row) => row.id === editorSearch.edit);
+      if (tx) setEditorValues(toEditorValues(tx));
+      return;
+    }
+
+    if (editorSearch.new) {
+      setEditorValues(createEmptyTransactionInput(today, defaultAccountId));
+    }
+  }, [editorSearch.edit, editorSearch.new, data?.rawTransactions, defaultAccountId]);
+
   const handleFiltersChange = (next: TransactionFiltersState) => {
     setFilters(next);
     setVisibleCount(PAGE_SIZE);
   };
 
   const openCreate = () => {
-    setEditorMode("create");
-    setEditingId(null);
-    setEditorValues(createEmptyTransactionInput(defaultAccountId));
-    setEditorOpen(true);
+    setEditorValues(createEmptyTransactionInput(today, defaultAccountId));
+    onEditorSearchChange?.({ new: true });
   };
 
   const openEdit = (id: string) => {
     const tx = data?.rawTransactions.find((row) => row.id === id);
     if (!tx) return;
-    setEditorMode("edit");
-    setEditingId(id);
     setEditorValues(toEditorValues(tx));
-    setEditorOpen(true);
+    onEditorSearchChange?.({ edit: id });
+  };
+
+  const closeEditor = () => {
+    onEditorSearchChange?.({});
   };
 
   const editingTx = editingId
@@ -98,13 +122,13 @@ export function TransactionsPage() {
       await update.mutateAsync({ id: editingId, input });
     }
 
-    setEditorOpen(false);
+    closeEditor();
   };
 
   const handleDelete = async () => {
     if (!editingId) return;
     await remove.mutateAsync(editingId);
-    setEditorOpen(false);
+    closeEditor();
   };
 
   const handleReorder = async (
@@ -140,7 +164,7 @@ export function TransactionsPage() {
           categoryOptions={data?.categories ?? []}
           allowCreditCardDestination={Boolean(editingTx?.paysStatementId)}
           onChange={(patch) => setEditorValues((current) => ({ ...current, ...patch }))}
-          onClose={() => setEditorOpen(false)}
+          onClose={closeEditor}
           onSave={handleSave}
           onDelete={editorMode === "edit" ? handleDelete : undefined}
         />

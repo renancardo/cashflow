@@ -11,7 +11,7 @@ User stories and acceptance criteria for the Cashflow app. The [PRD](../specs/00
 | 0 — Foundation | [00-foundation.md](./00-foundation.md) | US-0.1 – US-0.4 | **First** |
 | 1 — Projection engine | [01-projection-engine.md](./01-projection-engine.md) | US-1.1 – US-1.9 | **Second** (parallel with 0.3+) |
 | 2 — Accounts | [02-accounts.md](./02-accounts.md) | US-2.1 – US-2.5 | After engine + storage |
-| 3 — Calendar | [03-calendar.md](./03-calendar.md) | US-3.1 – US-3.10 | After engine |
+| 3 — Calendar | [03-calendar.md](./03-calendar.md) | US-3.1 – US-3.11 | After engine |
 | 4 — Transactions | [04-transactions.md](./04-transactions.md) | US-4.1 – US-4.5 | After accounts |
 | 5 — Forecast | [05-forecast.md](./05-forecast.md) | US-5.1 – US-5.5 | After engine |
 | 6 — Credit cards | [06-credit-cards.md](./06-credit-cards.md) | US-6.1 – US-6.6 | Engine + accounts |
@@ -74,3 +74,16 @@ flowchart LR
 | [001-data-model.md](../specs/001-data-model.md) | Entity fields engine and CRUD must honor |
 | [003-screen-specs.md](../specs/003-screen-specs.md) | UI behavior per screen |
 | [006-project-structure.md](../specs/006-project-structure.md) | Monorepo layout, runtime layers, typical user flows |
+
+
+# Current priority list:
+
+- Persistent storage (data survives reload)
+- Credit card partial payments + carryover (US-6.5)
+- Calendar day panel actions (settle + inline edit)
+- **Unsettled planned occurrences** — missed income & overdue bills ([US-5.6](./05-forecast.md#us-56--missed-income--late-receipt), [US-3.12](./03-calendar.md#us-312--overdue-bill-indicators-unsettled-expenses); [idea doc](../ideas/002-unsettled-planned-occurrences.md))
+- Accounts polish (validation, re-anchor, archived list)
+- Skip single forecast occurrence
+- Design system cards + mobile calendar polish
+- App design improvement
+- Multi-day selection on year calendar (US-3.11)

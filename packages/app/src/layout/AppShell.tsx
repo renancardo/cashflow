@@ -3,6 +3,8 @@ import type { Language } from "@cashflow/core";
 import { messagesFor } from "@cashflow/core";
 import { AppLayout, LanguageProvider, SIDE_NAV_ITEMS } from "@cashflow/ui";
 import { useSettings } from "../data/queries/useSettings";
+import { devToolsEnabled } from "../dev/devToolsEnabled";
+import { TimeTravelDevTools } from "../dev/TimeTravelDevTools";
 
 function navLabel(path: string, language: Language): string | undefined {
   const m = messagesFor(language);
@@ -52,6 +54,7 @@ export function AppShell() {
       >
         <Outlet />
       </AppLayout>
+      {devToolsEnabled ? <TimeTravelDevTools /> : null}
     </LanguageProvider>
   );
 }

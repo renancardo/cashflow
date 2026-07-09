@@ -216,4 +216,4 @@ flowchart TD
 - [ ] DB tests: `statements.test.ts`, `statementCharges.test.ts`, `statement.test.ts` (settlement)
 - [ ] New fixture for partial payment + carryover (add when US-6.5 implemented)
 - [ ] Manual walkthrough on seed data (`household-june-2026` or local card setup)
-- [ ] Time travel dev panel ([US-12.2](./12-developer-tools.md#us-122--time-travel-panel-ui)) for stepping through due dates without changing OS clock — see [US-12.5](./12-developer-tools.md#us-125--time-travel-flow-test-scenarios) scenario scripts
+- [x] Time travel dev panel ([US-12.2](./12-developer-tools.md#us-122--time-travel-panel-ui)) for stepping through due dates without changing OS clock — see [US-12.5](./12-developer-tools.md#us-125--time-travel-flow-test-scenarios) scenario scripts

@@ -113,6 +113,7 @@ export {
   type SettingsBanner,
   type SettingsDraft,
 } from "./organisms/SettingsScreen/SettingsScreen.js";
+export { TimeTravelPanel } from "./organisms/TimeTravelPanel/TimeTravelPanel.js";
 export {
   ACCOUNT_TYPE_LABELS,
   ACCOUNT_TYPES,

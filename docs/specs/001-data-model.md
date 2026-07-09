@@ -298,7 +298,6 @@ Frozen full clone of the forecast state for baseline-vs-actual variance. → *Sn
 | `negativeBufferCents` | integer | Red-dot threshold; default `0`. → *Negative threshold (configurable buffer)* |
 | `largeOutflowThresholdCents` | integer | Minimum single-day net outflow to flag the **amber "large outflow"** calendar indicator; default `50000` (R$ 500). `0` disables the indicator |
 | `horizonMonths` | integer | Default `24`. → *Horizon length (rolling 24 months)* |
-| `alertLeadTimeDays` | integer | Days before next-negative-date to warn. → *Alerts: proactive*. Delivery is in-app only (calendar header badge/banner); no push notifications in Phase 1 |
 | `defaultWorkingForType` | json | Map of `AccountType` → default `isWorking` for new accounts |
 | `dateFormat` | string | Locale formatting (e.g. `DD/MM/YYYY`) |
 
@@ -453,7 +452,7 @@ interface ProjectionResult {
 | Category budgets in Phase 1 | `CategoryBudget` |
 | BRL-only, cents | Conventions §1, all `*Cents` fields |
 | What-if (Phase 2) | Not persisted; future read-only engine run over a draft overlay |
-| Proactive alerts | `Settings.alertLeadTimeDays`, `ProjectionResult.nextNegativeDate` |
+| Proactive alerts | `ProjectionResult.nextNegativeDate` (in-app calendar header badge when set) |
 | Local-first + backup | Conventions §1; client-generated IDs, JSON export of all tables |
 | Snapshot full clone | `Snapshot` + `SnapshotPayload.payloadJson` |
 | Bulk-entry + CSV import (Phase 1) | Import maps CSV rows → `Transaction`/`PlannedItem`; no schema impact |
@@ -469,4 +468,4 @@ interface ProjectionResult {
 | Re-anchoring cutoff | `Account` re-anchoring rule, §3.1 |
 | Budgets expense-only | `CategoryBudget` invariants, §3.3 |
 | Weekly recurrence weekday | `PlannedItem.weekday` (0 = Sunday), §3.5 |
-| In-app alert delivery | `Settings.alertLeadTimeDays`, §3.11 |
+| In-app alert delivery | `ProjectionResult.nextNegativeDate`, calendar header badge |

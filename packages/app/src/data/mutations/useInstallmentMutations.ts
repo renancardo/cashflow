@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { InstallmentPlan } from "@cashflow/core";
-import { todayIso } from "@cashflow/core";
 import { installmentPlansRepo, settleInstallment, type InstallmentPlanInput } from "@cashflow/db";
 import { queryKeys } from "../keys";
+import { useAppClock } from "../../dev/useAppClock";
 
 export type { InstallmentPlanInput };
 
@@ -32,6 +32,7 @@ function toInstallmentPlanPayload(input: InstallmentPlanEditorInput): Installmen
 
 export function useInstallmentMutations() {
   const queryClient = useQueryClient();
+  const { today } = useAppClock();
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: queryKeys.installmentPlans });
@@ -65,7 +66,7 @@ export function useInstallmentMutations() {
   });
 
   const markPaid = useMutation({
-    mutationFn: (installmentId: string) => settleInstallment(installmentId, todayIso()),
+    mutationFn: (installmentId: string) => settleInstallment(installmentId, today),
     onSuccess: invalidate,
   });
 
@@ -73,9 +74,9 @@ export function useInstallmentMutations() {
 }
 
 export function createEmptyInstallmentPlanInput(
+  today: string,
   defaultAccountId?: string,
 ): InstallmentPlanEditorInput {
-  const today = new Date().toISOString().slice(0, 10);
   const day = Number(today.slice(8, 10));
   return {
     description: "",

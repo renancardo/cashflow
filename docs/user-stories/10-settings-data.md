@@ -4,20 +4,20 @@ App configuration, localization, export, and backup.
 
 ---
 
-## US-10.1 — Configure projection and alert settings
+## US-10.1 — Configure projection settings
 
 **Persona:** User
 
-**Story:** As a user, I want to **configure buffer, thresholds, and alert lead time** so warnings match my comfort level.
+**Story:** As a user, I want to **configure buffer and thresholds** so warnings match my comfort level.
 
 **Priority:** P0  
 **Depends on:** US-1.6
 
 ### Acceptance criteria
 
-- [ ] Settings: `negativeBufferCents`, `largeOutflowThresholdCents`, `alertLeadTimeDays`, `horizonMonths`
+- [ ] Settings: `negativeBufferCents`, `largeOutflowThresholdCents`, `horizonMonths`
 - [ ] Changes trigger projection recompute
-- [ ] Defaults: buffer R$ 0, large outflow R$ 500, lead time documented in screen spec
+- [ ] Defaults: buffer R$ 0, large outflow R$ 500 (documented in screen spec)
 
 ---
 

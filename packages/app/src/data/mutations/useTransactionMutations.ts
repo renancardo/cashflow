@@ -73,6 +73,7 @@ export function useTransactionMutations() {
 }
 
 export function createEmptyTransactionInput(
+  today: string,
   defaultAccountId?: string,
   currency = "BRL",
 ): TransactionInput {
@@ -82,6 +83,6 @@ export function createEmptyTransactionInput(
     amountCents: 0,
     accountId: defaultAccountId ?? "",
     description: "",
-    effectiveDate: new Date().toISOString().slice(0, 10),
+    effectiveDate: today,
   };
 }

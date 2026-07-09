@@ -1,16 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { accountsRepo, getDatabase } from "@cashflow/db";
 import { accountBalanceThrough, aggregateWorkingBalanceThrough } from "@cashflow/engine";
-import { todayIso } from "@cashflow/core";
 import { queryKeys } from "../keys";
+import { useAppClock } from "../../dev/useAppClock";
 
 export function useAccounts() {
+  const { today } = useAppClock();
+
   return useQuery({
-    queryKey: queryKeys.accounts,
+    queryKey: [...queryKeys.accounts, today],
     queryFn: async () => {
       const accounts = await accountsRepo.getAll();
       const { transactions } = getDatabase();
-      const asOfDate = todayIso();
 
       const rows = accounts.map((account) => ({
         id: account.id,
@@ -18,10 +19,10 @@ export function useAccounts() {
         type: account.type,
         isWorking: account.isWorking,
         anchorDate: account.anchorDate,
-        balanceCents: accountBalanceThrough(account, transactions, asOfDate),
+        balanceCents: accountBalanceThrough(account, transactions, today),
       }));
 
-      const workingBalanceCents = aggregateWorkingBalanceThrough(accounts, transactions, asOfDate);
+      const workingBalanceCents = aggregateWorkingBalanceThrough(accounts, transactions, today);
 
       return { accounts: rows, workingBalanceCents, rawAccounts: accounts };
     },

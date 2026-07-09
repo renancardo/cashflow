@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { PlannedItem, Recurrence } from "@cashflow/core";
-import { dayBefore, isRecurring, todayIso } from "@cashflow/core";
+import { dayBefore, isRecurring } from "@cashflow/core";
 import {
   plannedItemsRepo,
   plannedItemOverridesRepo,
@@ -8,6 +8,7 @@ import {
   type PlannedItemInput,
 } from "@cashflow/db";
 import { queryKeys } from "../keys";
+import { useAppClock } from "../../dev/useAppClock";
 
 export type { PlannedItemInput };
 
@@ -57,6 +58,7 @@ export function toPlannedItemPayload(input: PlannedItemEditorInput): PlannedItem
 
 export function usePlannedItemMutations() {
   const queryClient = useQueryClient();
+  const { today } = useAppClock();
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: queryKeys.plannedItems });
@@ -141,15 +143,17 @@ export function usePlannedItemMutations() {
     }: {
       plannedItemId: string;
       occurrenceDate: string;
-    }) => settlePlannedItem(plannedItemId, occurrenceDate, todayIso()),
+    }) => settlePlannedItem(plannedItemId, occurrenceDate, today),
     onSuccess: invalidate,
   });
 
   return { create, update, setActive, remove, archive, saveWithScope, markPaid };
 }
 
-export function createEmptyPlannedItemInput(defaultAccountId?: string): PlannedItemEditorInput {
-  const today = new Date().toISOString().slice(0, 10);
+export function createEmptyPlannedItemInput(
+  today: string,
+  defaultAccountId?: string,
+): PlannedItemEditorInput {
   const day = Number(today.slice(8, 10));
   return {
     type: "expense",

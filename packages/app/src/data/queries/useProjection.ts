@@ -1,15 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { projectCashFlow } from "@cashflow/engine";
 import { loadEngineInput } from "@cashflow/db";
-import { todayIso } from "@cashflow/core";
 import { queryKeys } from "../keys";
+import { useAppClock } from "../../dev/useAppClock";
 
-export function useProjection(asOfDate: string = todayIso()) {
+export function useProjection() {
+  const { today } = useAppClock();
+
   return useQuery({
-    queryKey: queryKeys.projection(asOfDate),
+    queryKey: queryKeys.projection(today),
     queryFn: async () => {
       const input = await loadEngineInput();
-      return projectCashFlow(input, asOfDate);
+      return projectCashFlow(input, today);
     },
   });
 }
