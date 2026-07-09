@@ -3,7 +3,15 @@
   "compilerOptions": {
     "noEmit": true,
     "rootDir": "src",
-    "types": ["vite/client"]
+    "types": ["vite/client"],
+    "plugins": [
+      {
+        "name": "@jetbrains/typescript-plugin-css-modules",
+        "options": {
+          "goToDefinition": "default"
+        }
+      }
+    ]
   },
   "include": ["src"]
 }

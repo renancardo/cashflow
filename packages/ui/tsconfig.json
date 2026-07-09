@@ -2,7 +2,15 @@
   "extends": "../../tooling/tsconfig/react.json",
   "compilerOptions": {
     "noEmit": true,
-    "rootDir": "src"
+    "rootDir": "src",
+    "plugins": [
+      {
+        "name": "@jetbrains/typescript-plugin-css-modules",
+        "options": {
+          "goToDefinition": "default"
+        }
+      }
+    ]
   },
   "include": ["src", ".storybook"]
 }
