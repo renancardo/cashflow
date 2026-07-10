@@ -166,6 +166,8 @@ export const ptBR: DeepStringRecord<MessageTree> = {
       statement: "Fatura",
       subscription: "Assinatura",
       projected: "Projetado",
+      awaiting: "Aguardando",
+      pastDue: "Em atraso",
       openingDebt: "Dívida inicial",
       transaction: "Lançamento",
     },
@@ -709,6 +711,7 @@ export const ptBR: DeepStringRecord<MessageTree> = {
       actualOutflow: "Saída realizada",
       projectedOutflow: "Saída prevista",
       pastDue: "Pagamento em atraso",
+      awaitingIncome: "Receita aguardando",
       monthTotalsNote: "Totais do mês refletem entradas e saídas previstas para o mês selecionado.",
     },
     loading: {

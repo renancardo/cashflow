@@ -163,6 +163,8 @@ export const en = {
       statement: "Statement",
       subscription: "Subscription",
       projected: "Projected",
+      awaiting: "Awaiting",
+      pastDue: "Past due",
       openingDebt: "Opening debt",
       transaction: "Transaction",
     },
@@ -702,6 +704,7 @@ export const en = {
       actualOutflow: "Actual outflow",
       projectedOutflow: "Projected outflow",
       pastDue: "Past due payment",
+      awaitingIncome: "Awaiting income",
       monthTotalsNote:
         "Month totals reflect projected inflows and outflows for the selected month.",
     },

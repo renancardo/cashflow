@@ -11,7 +11,12 @@ export type CalendarCell = {
 };
 
 export type EntryLineTone =
-  "actual-income" | "projected-income" | "actual-outflow" | "projected-outflow" | "past-due";
+  | "actual-income"
+  | "projected-income"
+  | "actual-outflow"
+  | "projected-outflow"
+  | "past-due"
+  | "awaiting-income";
 
 export type DayEntryLine = {
   id: string;
@@ -104,15 +109,11 @@ export function getDayIndicators(day: ProjectionDay): IndicatorKind[] {
   return indicators;
 }
 
-export function getEntryLineTone(
-  item: ProjectionItem,
-  dayDate: string,
-  today: string,
-): EntryLineTone {
+export function getEntryLineTone(item: ProjectionItem): EntryLineTone {
   const isIncome = item.type === "income";
 
-  if (item.isProjected && !isIncome && compareIso(dayDate, today) < 0) {
-    return "past-due";
+  if (item.isOverdue) {
+    return isIncome ? "awaiting-income" : "past-due";
   }
 
   if (item.isProjected) {
@@ -122,11 +123,11 @@ export function getEntryLineTone(
   return isIncome ? "actual-income" : "actual-outflow";
 }
 
-export function getDayEntryLines(day: ProjectionDay, today: string, maxLines = 3): DayEntryLine[] {
+export function getDayEntryLines(day: ProjectionDay, _today: string, maxLines = 3): DayEntryLine[] {
   return day.items.slice(0, maxLines).map((item) => ({
     id: `${item.source}-${item.refId}`,
     label: item.description,
-    tone: getEntryLineTone(item, day.date, today),
+    tone: getEntryLineTone(item),
   }));
 }
 

@@ -106,6 +106,7 @@
   --flow-actual-outflow: #b45309;
   --flow-projected-outflow: #fbbf24;
   --flow-past-due: #dc2626;
+  --flow-awaiting-income: #d97706;
 }
 
 .dayCell {
@@ -229,6 +230,11 @@
 
 .pastdue {
   color: var(--flow-past-due);
+  font-weight: 700;
+}
+
+.awaitingincome {
+  color: var(--flow-awaiting-income);
   font-weight: 700;
 }
 

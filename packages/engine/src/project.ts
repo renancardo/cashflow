@@ -40,7 +40,7 @@ export function projectCashFlow(
     input,
     accountMap,
     settlements,
-    asOfDate,
+    historyStart,
     horizonEnd,
     asOfDate,
   );
@@ -48,7 +48,7 @@ export function projectCashFlow(
     input,
     accountMap,
     settlements,
-    asOfDate,
+    historyStart,
     horizonEnd,
     asOfDate,
   );
@@ -56,7 +56,7 @@ export function projectCashFlow(
     input,
     accountMap,
     settlements,
-    asOfDate,
+    historyStart,
     horizonEnd,
     asOfDate,
   );

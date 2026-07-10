@@ -41,6 +41,20 @@ function mergeEffects(a: WorkingEffect, b: WorkingEffect): WorkingEffect {
   };
 }
 
+function forecastTiming(
+  effectiveDate: string,
+  asOfDate: string,
+): { isProjected: true; isOverdue: boolean } {
+  return {
+    isProjected: true,
+    isOverdue: compareIso(effectiveDate, asOfDate) < 0,
+  };
+}
+
+function applyForecastEffect(effect: WorkingEffect, isOverdue: boolean): WorkingEffect {
+  return isOverdue ? emptyEffect() : effect;
+}
+
 function accountById(accountMap: AccountMap, accountId: string): Account | undefined {
   return accountMap.get(accountId);
 }
@@ -66,6 +80,7 @@ export function transactionDayEvent(
         categoryId: tx.categoryId,
         description: tx.description,
         isProjected,
+        isOverdue: false,
       },
       effect: effectFromAmount(tx.amountCents, "inflow"),
     };
@@ -84,6 +99,7 @@ export function transactionDayEvent(
         categoryId: tx.categoryId,
         description: tx.description,
         isProjected,
+        isOverdue: false,
       },
       effect: effectFromAmount(tx.amountCents, "outflow"),
     };
@@ -110,6 +126,7 @@ export function transactionDayEvent(
         categoryId: tx.categoryId,
         description: tx.description,
         isProjected,
+        isOverdue: false,
       },
       effect,
     };
@@ -303,6 +320,7 @@ export function plannedDayEvents(
       const effect = plannedWorkingEffect(item, resolved.amountCents, accountMap);
       if (!effect) continue;
 
+      const timing = forecastTiming(resolved.date, asOfDate);
       const event: DayEvent = {
         item: {
           source: "planned",
@@ -312,9 +330,9 @@ export function plannedDayEvents(
           accountId: item.accountId,
           categoryId: item.categoryId,
           description: item.description,
-          isProjected: compareIso(resolved.date, asOfDate) >= 0,
+          ...timing,
         },
-        effect,
+        effect: applyForecastEffect(effect, timing.isOverdue),
       };
 
       const list = byDate.get(resolved.date) ?? [];
@@ -348,6 +366,7 @@ export function installmentDayEvents(
     if (!isWorkingAccount(payAccount)) continue;
 
     const amountCents = inst.amountCentsOverride ?? plan.installmentAmountCents;
+    const timing = forecastTiming(inst.dueDate, asOfDate);
     const event: DayEvent = {
       item: {
         source: "installment",
@@ -357,9 +376,9 @@ export function installmentDayEvents(
         accountId: plan.accountId,
         categoryId: plan.categoryId,
         description: plan.description,
-        isProjected: compareIso(inst.dueDate, asOfDate) >= 0,
+        ...timing,
       },
-      effect: effectFromAmount(amountCents, "outflow"),
+      effect: applyForecastEffect(effectFromAmount(amountCents, "outflow"), timing.isOverdue),
     };
 
     const list = byDate.get(inst.dueDate) ?? [];
@@ -394,6 +413,7 @@ export function statementDayEvents(
     const amountCents = stmt.plannedPaymentCents ?? stmt.computedTotalCents;
     if (amountCents <= 0) continue;
 
+    const timing = forecastTiming(stmt.dueDate, asOfDate);
     const event: DayEvent = {
       item: {
         source: "statement_payment",
@@ -402,9 +422,9 @@ export function statementDayEvents(
         amountCents,
         accountId: payFromId,
         description: `Credit card statement payment`,
-        isProjected: compareIso(stmt.dueDate, asOfDate) >= 0,
+        ...timing,
       },
-      effect: effectFromAmount(amountCents, "outflow"),
+      effect: applyForecastEffect(effectFromAmount(amountCents, "outflow"), timing.isOverdue),
     };
 
     const list = byDate.get(stmt.dueDate) ?? [];

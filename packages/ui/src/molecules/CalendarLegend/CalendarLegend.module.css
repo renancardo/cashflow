@@ -153,6 +153,10 @@
   background: #dc2626;
 }
 
+.awaiting-income {
+  background: #d97706;
+}
+
 .note {
   margin: var(--space-3) 0 0;
   font-size: 0.8125rem;

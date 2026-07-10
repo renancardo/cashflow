@@ -233,16 +233,38 @@ describe("projectCashFlow", () => {
       expect(jul11?.closingBalanceCents).toBe(jul1?.closingBalanceCents);
     });
 
-    it("does not project forecast items before asOfDate", () => {
+    it("shows overdue unsettled forecast items before asOfDate without affecting balance", () => {
       const result = projectCashFlow(fixture, "2026-07-12");
 
-      expect(projectedItemsOnDate(result, "2026-07-08", { refId: "plan-salary-a" })).toHaveLength(
-        0,
-      );
-      expect(
-        projectedItemsOnDate(result, "2026-07-10", { refId: "inst-loan-alpha-07" }),
-      ).toHaveLength(0);
-      expect(projectedItemsOnDate(result, "2026-07-12", { refId: "plan-hoa" })).toHaveLength(1);
+      const salaryJul8 = projectedItemsOnDate(result, "2026-07-08", { refId: "plan-salary-a" });
+      expect(salaryJul8).toHaveLength(1);
+      expect(salaryJul8[0]?.isOverdue).toBe(true);
+      expect(dayOf(result, "2026-07-08")?.inflowsCents).toBe(0);
+
+      const installmentJul10 = projectedItemsOnDate(result, "2026-07-10", {
+        refId: "inst-loan-alpha-07",
+      });
+      expect(installmentJul10).toHaveLength(1);
+      expect(installmentJul10[0]?.isOverdue).toBe(true);
+      expect(dayOf(result, "2026-07-10")?.outflowsCents).toBe(0);
+
+      expect(projectedItemsOnDate(result, "2026-07-12", { refId: "plan-hoa" })).toEqual([
+        expect.objectContaining({ isOverdue: false }),
+      ]);
+    });
+
+    it("marks overdue income and expenses in basic salary scenario", () => {
+      const salaryFixture = getFixture("basic-salary-rent");
+      const result = projectCashFlow(salaryFixture, "2026-06-10");
+
+      expect(projectedItemsOnDate(result, "2026-06-05", { refId: "plan-salary" })).toEqual([
+        expect.objectContaining({ type: "income", isOverdue: true }),
+      ]);
+      expect(dayOf(result, "2026-06-05")?.inflowsCents).toBe(0);
+
+      expect(projectedItemsOnDate(result, "2026-06-10", { refId: "plan-rent" })).toEqual([
+        expect.objectContaining({ type: "expense", isOverdue: false, isProjected: true }),
+      ]);
     });
 
     it("keeps workingBalanceTodayCents on asOfDate", () => {

@@ -23,6 +23,7 @@ export function CalendarLegend({ variant = "year" }: Props) {
     { kind: "actual-outflow", label: legend.actualOutflow },
     { kind: "projected-outflow", label: legend.projectedOutflow },
     { kind: "past-due", label: legend.pastDue },
+    { kind: "awaiting-income", label: legend.awaitingIncome },
   ] as const;
 
   return (

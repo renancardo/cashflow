@@ -35,6 +35,7 @@ type Props = {
 };
 
 function chipVariant(item: ProjectionItem): ChipVariant {
+  if (item.isOverdue) return item.type === "income" ? "income" : "expense";
   if (!item.isProjected) return "actual";
   if (item.source === "statement_payment") return "statement";
   if (item.source === "installment") return "installment";
@@ -46,6 +47,7 @@ function chipLabel(
   item: ProjectionItem,
   chips: ReturnType<typeof useMessages>["common"]["chips"],
 ): string {
+  if (item.isOverdue) return item.type === "income" ? chips.awaiting : chips.pastDue;
   if (!item.isProjected) return chips.actual;
   if (item.source === "statement_payment") return chips.statement;
   if (item.source === "installment") return chips.installment;
