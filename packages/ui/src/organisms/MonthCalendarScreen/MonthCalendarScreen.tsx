@@ -11,7 +11,9 @@ import {
   formatMonthYear,
   getDayEntryLines,
   getDayIndicators,
+  getDayTemporalState,
   indexProjectionDays,
+  isWeekend,
   shiftMonth,
   weekdayLongLabels,
 } from "../../lib/calendar.js";
@@ -174,6 +176,8 @@ export function MonthCalendarScreen({
               }
 
               const day = daysByDate.get(cell.date);
+              const temporal = getDayTemporalState(cell.date, today);
+              const weekend = isWeekend(cell.date);
               const indicators = day ? getDayIndicators(day) : [];
               const entries = day ? getDayEntryLines(day, today) : [];
 
@@ -183,6 +187,8 @@ export function MonthCalendarScreen({
                   type="button"
                   className={[
                     styles.dayCell,
+                    temporal !== "future" && styles[temporal],
+                    weekend && styles.weekend,
                     day?.belowBuffer && styles.belowBuffer,
                     selectedDate === cell.date && styles.selected,
                   ]
