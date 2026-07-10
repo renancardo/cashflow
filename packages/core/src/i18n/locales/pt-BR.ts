@@ -532,6 +532,7 @@ export const ptBR: DeepStringRecord<MessageTree> = {
     empty: "Nenhum item afetando este dia.",
     confirmPayment: "Confirmar pagamento",
     settling: "Salvando…",
+    editAmount: "Editar valor de {description}",
   },
   recurrence: {
     title: "Aplicar alterações a…",

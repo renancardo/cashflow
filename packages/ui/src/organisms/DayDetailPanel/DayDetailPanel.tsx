@@ -1,10 +1,13 @@
+import { useState } from "react";
 import type { ProjectionDay, ProjectionItem } from "@cashflow/core";
-import { formatMoney } from "@cashflow/core";
+import { fmt, formatMoney } from "@cashflow/core";
 import { Button } from "../../atoms/Button/Button.js";
 import { Chip, type ChipVariant } from "../../atoms/Chip/Chip.js";
 import { FormattedDate } from "../../atoms/FormattedDate/FormattedDate.js";
 import { MoneyAmount } from "../../atoms/MoneyAmount/MoneyAmount.js";
 import { formatWeekdayLong } from "../../lib/calendar.js";
+import { InlineEditableAmount } from "../../molecules/InlineEditableAmount/InlineEditableAmount.js";
+import { InlineEditableText } from "../../molecules/InlineEditableText/InlineEditableText.js";
 import {
   QuickAddCard,
   type QuickAddValues,
@@ -24,6 +27,23 @@ export type DayDetailSettleRequest =
   | { source: "installment"; installmentId: string }
   | { source: "statement_payment"; statementId: string };
 
+export type DayDetailAmountUpdateRequest = {
+  itemKey: string;
+} & (
+  | { source: "transaction"; transactionId: string; amountCents: number }
+  | { source: "planned"; plannedItemId: string; occurrenceDate: string; amountCents: number }
+  | { source: "installment"; installmentId: string; amountCents: number }
+  | { source: "statement_payment"; statementId: string; amountCents: number }
+);
+
+export type DayDetailDescriptionUpdateRequest = {
+  itemKey: string;
+} & (
+  | { source: "transaction"; transactionId: string; description: string }
+  | { source: "planned"; plannedItemId: string; description: string }
+  | { source: "installment"; installmentId: string; description: string }
+);
+
 type AccountOption = { id: string; name: string; type: import("@cashflow/core").AccountType };
 type CategoryOption = { id: string; name: string; kind: "income" | "expense" };
 
@@ -36,9 +56,12 @@ type Props = {
   currency?: string;
   saving?: boolean;
   settlingKey?: string | null;
+  updatingKey?: string | null;
   onQuickAddChange: (patch: Partial<QuickAddValues>) => void;
   onQuickAddSubmit: () => void;
   onSettle?: (request: DayDetailSettleRequest) => void;
+  onUpdateAmount?: (request: DayDetailAmountUpdateRequest) => void;
+  onUpdateDescription?: (request: DayDetailDescriptionUpdateRequest) => void;
   onClose: () => void;
 };
 
@@ -76,6 +99,12 @@ function amountTone(item: ProjectionItem): "income" | "danger" | "default" {
   return "default";
 }
 
+function amountSign(item: ProjectionItem): "+" | "−" | "" {
+  if (item.type === "income") return "+";
+  if (item.type === "expense") return "−";
+  return "";
+}
+
 function buildSettleRequest(item: ProjectionItem, dayDate: string): DayDetailSettleRequest | null {
   if (!item.isProjected) return null;
 
@@ -95,6 +124,10 @@ function buildSettleRequest(item: ProjectionItem, dayDate: string): DayDetailSet
   }
 }
 
+export function dayDetailItemKey(item: ProjectionItem, dayDate: string): string {
+  return `${item.source}-${item.refId}-${item.occurrenceDate ?? dayDate}`;
+}
+
 export function dayDetailSettleKeyFromRequest(request: DayDetailSettleRequest): string {
   if (request.source === "planned") {
     return `planned-${request.plannedItemId}-${request.occurrenceDate}`;
@@ -109,6 +142,56 @@ export function dayDetailSettleKey(item: ProjectionItem, dayDate: string): strin
   const request = buildSettleRequest(item, dayDate);
   if (!request) return `${item.source}-${item.refId}`;
   return dayDetailSettleKeyFromRequest(request);
+}
+
+function buildAmountUpdateRequest(
+  item: ProjectionItem,
+  dayDate: string,
+  amountCents: number,
+): DayDetailAmountUpdateRequest | null {
+  const itemKey = dayDetailItemKey(item, dayDate);
+
+  switch (item.source) {
+    case "transaction":
+      return { itemKey, source: "transaction", transactionId: item.refId, amountCents };
+    case "planned":
+      return {
+        itemKey,
+        source: "planned",
+        plannedItemId: item.refId,
+        occurrenceDate: item.occurrenceDate ?? dayDate,
+        amountCents,
+      };
+    case "installment":
+      return { itemKey, source: "installment", installmentId: item.refId, amountCents };
+    case "statement_payment":
+      return { itemKey, source: "statement_payment", statementId: item.refId, amountCents };
+    default:
+      return null;
+  }
+}
+
+function buildDescriptionUpdateRequest(
+  item: ProjectionItem,
+  dayDate: string,
+  description: string,
+): DayDetailDescriptionUpdateRequest | null {
+  const itemKey = dayDetailItemKey(item, dayDate);
+
+  switch (item.source) {
+    case "transaction":
+      return { itemKey, source: "transaction", transactionId: item.refId, description };
+    case "planned":
+      return { itemKey, source: "planned", plannedItemId: item.refId, description };
+    case "installment":
+      return { itemKey, source: "installment", installmentId: item.refId, description };
+    default:
+      return null;
+  }
+}
+
+function isDescriptionEditable(item: ProjectionItem): boolean {
+  return item.source === "transaction" || item.source === "planned" || item.source === "installment";
 }
 
 function settleLabel(
@@ -129,15 +212,19 @@ export function DayDetailPanel({
   currency = "BRL",
   saving = false,
   settlingKey = null,
+  updatingKey = null,
   onQuickAddChange,
   onQuickAddSubmit,
   onSettle,
+  onUpdateAmount,
+  onUpdateDescription,
   onClose,
 }: Props) {
   const m = useMessages();
   const language = useLanguage();
   const locale = language === "pt-BR" ? "pt-BR" : "en-US";
   const transferError = validateQuickAddTransfer(quickAddValues, accountOptions);
+  const [activeEditKey, setActiveEditKey] = useState<string | null>(null);
 
   const groups: { title: string; sources: ProjectionItem["source"][] }[] = [
     { title: m.dayDetail.groups.transactions, sources: ["transaction"] },
@@ -219,20 +306,47 @@ export function DayDetailPanel({
                     <ul className={styles.list}>
                       {items.map((item) => {
                         const settleRequest = buildSettleRequest(item, day.date);
+                        const itemKey = dayDetailItemKey(item, day.date);
                         const itemSettleKey = dayDetailSettleKey(item, day.date);
                         const isSettlingItem = settlingKey === itemSettleKey;
+                        const isUpdatingItem = updatingKey === itemKey;
+                        const amountRequest = buildAmountUpdateRequest(
+                          item,
+                          day.date,
+                          item.amountCents,
+                        );
 
                         return (
-                          <li
-                            key={`${item.source}-${item.refId}-${item.occurrenceDate ?? day.date}`}
-                          >
+                          <li key={itemKey}>
                             <article
                               className={[styles.item, item.isProjected && styles.itemProjected]
                                 .filter(Boolean)
                                 .join(" ")}
                             >
                               <div className={styles.itemMain}>
-                                <div className={styles.itemDesc}>{item.description}</div>
+                                {isDescriptionEditable(item) && onUpdateDescription ? (
+                                  <InlineEditableText
+                                    value={item.description}
+                                    className={styles.itemDesc}
+                                    ariaLabel={fmt(m.common.aria.editDescription, {
+                                      description: item.description,
+                                    })}
+                                    disabled={isUpdatingItem || isSettlingItem}
+                                    editKey={`${itemKey}-description`}
+                                    activeEditKey={activeEditKey}
+                                    onActiveEditKeyChange={setActiveEditKey}
+                                    onSave={(description) => {
+                                      const request = buildDescriptionUpdateRequest(
+                                        item,
+                                        day.date,
+                                        description,
+                                      );
+                                      if (request) onUpdateDescription(request);
+                                    }}
+                                  />
+                                ) : (
+                                  <div className={styles.itemDesc}>{item.description}</div>
+                                )}
                                 <div className={styles.itemMeta}>
                                   <Chip variant={chipVariant(item)}>
                                     {chipLabel(item, m.common.chips)}
@@ -240,24 +354,44 @@ export function DayDetailPanel({
                                   <span>{itemMeta(item)}</span>
                                 </div>
                               </div>
-                              <span
-                                className={[
-                                  styles.itemAmount,
-                                  styles[`amount-${amountTone(item)}`],
-                                ].join(" ")}
-                              >
-                                {item.type === "income"
-                                  ? "+ "
-                                  : item.type === "expense"
-                                    ? "− "
-                                    : ""}
-                                {formatMoney(item.amountCents)}
-                              </span>
+                              {onUpdateAmount && amountRequest ? (
+                                <InlineEditableAmount
+                                  cents={item.amountCents}
+                                  tone={amountTone(item)}
+                                  sign={amountSign(item)}
+                                  className={styles.itemAmount}
+                                  ariaLabel={fmt(m.dayDetail.editAmount, {
+                                    description: item.description,
+                                  })}
+                                  disabled={isUpdatingItem || isSettlingItem}
+                                  editKey={`${itemKey}-amount`}
+                                  activeEditKey={activeEditKey}
+                                  onActiveEditKeyChange={setActiveEditKey}
+                                  onSave={(amountCents) => {
+                                    const request = buildAmountUpdateRequest(
+                                      item,
+                                      day.date,
+                                      amountCents,
+                                    );
+                                    if (request) onUpdateAmount(request);
+                                  }}
+                                />
+                              ) : (
+                                <span
+                                  className={[
+                                    styles.itemAmount,
+                                    styles[`amount-${amountTone(item)}`],
+                                  ].join(" ")}
+                                >
+                                  {amountSign(item) ? `${amountSign(item)} ` : ""}
+                                  {formatMoney(item.amountCents)}
+                                </span>
+                              )}
                               {settleRequest && onSettle && (
                                 <Button
                                   variant="primary"
                                   className={styles.confirmButton}
-                                  disabled={isSettlingItem}
+                                  disabled={isSettlingItem || isUpdatingItem}
                                   onClick={() => onSettle(settleRequest)}
                                 >
                                   {isSettlingItem

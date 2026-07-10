@@ -95,8 +95,11 @@ export {
 } from "./molecules/QuickAddCard/QuickAddCard.js";
 export {
   DayDetailPanel,
+  dayDetailItemKey,
   dayDetailSettleKey,
   dayDetailSettleKeyFromRequest,
+  type DayDetailAmountUpdateRequest,
+  type DayDetailDescriptionUpdateRequest,
   type DayDetailItem,
   type DayDetailSettleRequest,
 } from "./organisms/DayDetailPanel/DayDetailPanel.js";

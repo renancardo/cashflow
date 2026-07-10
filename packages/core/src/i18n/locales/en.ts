@@ -527,6 +527,7 @@ export const en = {
     empty: "No items affecting this day.",
     confirmPayment: "Confirm payment",
     settling: "Saving…",
+    editAmount: "Edit amount for {description}",
   },
   recurrence: {
     title: "Apply changes to…",

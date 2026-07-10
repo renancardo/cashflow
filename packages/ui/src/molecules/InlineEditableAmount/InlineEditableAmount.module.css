@@ -1,0 +1,92 @@
+.editable {
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 2px 4px;
+  margin: -2px -4px;
+  transition: background 0.15s, box-shadow 0.15s;
+  border: none;
+  background: transparent;
+  text-align: right;
+}
+
+.editable:hover,
+.editable:focus-visible {
+  background: rgba(139, 92, 246, 0.08);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.15);
+}
+
+.editable::after {
+  content: "✎";
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.editable:hover::after,
+.editable:focus-visible::after {
+  opacity: 1;
+}
+
+.editable:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.editable:disabled::after {
+  display: none;
+}
+
+.editing {
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  box-shadow: none;
+  cursor: text;
+}
+
+.editing::after {
+  display: none;
+}
+
+.input {
+  width: 7.5rem;
+  padding: 2px 6px;
+  border: 1px solid var(--color-secondary);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-align: right;
+  color: inherit;
+  background: var(--color-surface);
+}
+
+.input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.15);
+}
+
+.invalid .input {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.15);
+}
+
+.income {
+  color: var(--color-success);
+}
+
+.danger {
+  color: var(--color-text);
+}
+
+.default {
+  color: var(--color-text);
+}

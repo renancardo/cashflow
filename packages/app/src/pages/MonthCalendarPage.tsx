@@ -4,6 +4,7 @@ import { DayDetailPanel, MonthCalendarScreen, type QuickAddValues } from "@cashf
 import { validateCalendarQuickAdd } from "../data/mutations/calendarQuickAdd";
 import { useCalendarQuickAdd } from "../data/mutations/useCalendarQuickAdd";
 import { useDayDetailSettle } from "../data/mutations/useDayDetailSettle";
+import { useDayDetailUpdate } from "../data/mutations/useDayDetailUpdate";
 import { createEmptyTransactionInput } from "../data/mutations/useTransactionMutations";
 import { useAccounts } from "../data/queries/useAccounts";
 import { useCalendarScreen } from "../data/queries/useCalendarScreen";
@@ -28,6 +29,7 @@ export function MonthCalendarPage({
   const { data: accountsData } = useAccounts();
   const quickAdd = useCalendarQuickAdd(selectedDay ?? undefined);
   const dayDetailSettle = useDayDetailSettle();
+  const dayDetailUpdate = useDayDetailUpdate();
   const [quickAddValues, setQuickAddValues] = useState<QuickAddValues>(() => ({
     ...createEmptyTransactionInput(today),
     description: "",
@@ -122,9 +124,12 @@ export function MonthCalendarPage({
           categoryOptions={data?.categoryOptions ?? []}
           saving={quickAdd.isPending}
           settlingKey={dayDetailSettle.settlingKey}
+          updatingKey={dayDetailUpdate.updatingKey}
           onQuickAddChange={(patch) => setQuickAddValues((current) => ({ ...current, ...patch }))}
           onQuickAddSubmit={handleQuickAddSubmit}
           onSettle={(request) => dayDetailSettle.settle(request)}
+          onUpdateAmount={(request) => dayDetailUpdate.updateAmount(request)}
+          onUpdateDescription={(request) => dayDetailUpdate.updateDescription(request)}
           onClose={closeDay}
         />
       }
