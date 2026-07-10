@@ -212,4 +212,61 @@ describe("projectCashFlow", () => {
       expect(projectedItemsOnDate(result, "2026-07-12", { refId: "plan-hoa" })).toHaveLength(1);
     });
   });
+
+  describe("historical days before asOfDate", () => {
+    const fixture = getFixture("household-june-2026");
+
+    it("includes ledger history for days before the simulated date", () => {
+      const result = projectCashFlow(fixture, "2026-07-12");
+
+      const jul1 = dayOf(result, "2026-07-01");
+      expect(jul1).toBeDefined();
+      expect(jul1?.outflowsCents).toBeGreaterThan(0);
+      expect(itemsOnDate(result, "2026-07-01", { source: "transaction" })).toHaveLength(2);
+
+      const jul5 = dayOf(result, "2026-07-05");
+      expect(jul5).toBeDefined();
+      expect(jul5?.closingBalanceCents).toBe(jul1?.closingBalanceCents);
+
+      const jul11 = dayOf(result, "2026-07-11");
+      expect(jul11).toBeDefined();
+      expect(jul11?.closingBalanceCents).toBe(jul1?.closingBalanceCents);
+    });
+
+    it("does not project forecast items before asOfDate", () => {
+      const result = projectCashFlow(fixture, "2026-07-12");
+
+      expect(projectedItemsOnDate(result, "2026-07-08", { refId: "plan-salary-a" })).toHaveLength(
+        0,
+      );
+      expect(
+        projectedItemsOnDate(result, "2026-07-10", { refId: "inst-loan-alpha-07" }),
+      ).toHaveLength(0);
+      expect(projectedItemsOnDate(result, "2026-07-12", { refId: "plan-hoa" })).toHaveLength(1);
+    });
+
+    it("keeps workingBalanceTodayCents on asOfDate", () => {
+      const atJul12 = projectCashFlow(fixture, "2026-07-12");
+
+      expect(atJul12.workingBalanceTodayCents).toBe(
+        dayOf(atJul12, "2026-07-12")?.closingBalanceCents,
+      );
+    });
+
+    it("only reports nextNegativeDate from asOfDate forward", () => {
+      const fixture = getFixture("basic-salary-rent");
+      const input: EngineInput = {
+        ...fixture,
+        settings: {
+          ...fixture.settings,
+          negativeBufferCents: 600_000,
+        },
+      };
+
+      const result = projectCashFlow(input, "2026-06-10");
+
+      expect(dayOf(result, "2026-06-01")?.belowBuffer).toBe(true);
+      expect(result.nextNegativeDate).toBe("2026-06-10");
+    });
+  });
 });

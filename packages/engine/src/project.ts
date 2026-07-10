@@ -1,6 +1,10 @@
 import type { EngineInput, ProjectionDay, ProjectionResult } from "@cashflow/core";
 import { todayIso } from "@cashflow/core";
-import { aggregateWorkingBalanceAt, buildAccountMap } from "./accounts.js";
+import {
+  aggregateWorkingBalanceAt,
+  buildAccountMap,
+  computeHistoryStart,
+} from "./accounts.js";
 import { eachDay, horizonEndDate } from "./dates.js";
 import {
   collectTransactionEventsByDate,
@@ -21,14 +25,15 @@ export function projectCashFlow(
 ): ProjectionResult {
   const accountMap = buildAccountMap(input.accounts);
   const settlements = buildSettlementIndex(input);
+  const historyStart = computeHistoryStart(input.accounts, asOfDate);
   const horizonEnd = horizonEndDate(asOfDate, input.settings.horizonMonths);
-  const dayDates = eachDay(asOfDate, horizonEnd);
+  const dayDates = eachDay(historyStart, horizonEnd);
 
   const txEvents = collectTransactionEventsByDate(
     input.transactions,
     accountMap,
     asOfDate,
-    asOfDate,
+    historyStart,
     horizonEnd,
   );
   const plannedEvents = plannedDayEvents(
@@ -61,7 +66,7 @@ export function projectCashFlow(
   const buffer = input.settings.negativeBufferCents;
   const largeThreshold = input.settings.largeOutflowThresholdCents;
 
-  let balance = aggregateWorkingBalanceAt(input.accounts, input.transactions, asOfDate);
+  let balance = aggregateWorkingBalanceAt(input.accounts, input.transactions, historyStart);
   const days: ProjectionDay[] = [];
 
   for (const date of dayDates) {
@@ -91,7 +96,8 @@ export function projectCashFlow(
     });
   }
 
-  const nextNegativeDate = days.find((d) => d.belowBuffer)?.date ?? null;
+  const nextNegativeDate =
+    days.find((day) => day.date >= asOfDate && day.belowBuffer)?.date ?? null;
   const todayDay = days.find((d) => d.date === asOfDate);
 
   return {

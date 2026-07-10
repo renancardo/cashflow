@@ -16,6 +16,10 @@ export function compareIso(a: string, b: string): number {
   return a.localeCompare(b);
 }
 
+export function minIso(...dates: string[]): string {
+  return dates.reduce((min, date) => (compareIso(date, min) < 0 ? date : min));
+}
+
 export function daysInMonth(year: number, month: number): number {
   return new Date(year, month, 0).getDate();
 }
