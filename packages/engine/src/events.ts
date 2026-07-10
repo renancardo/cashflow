@@ -330,6 +330,7 @@ export function plannedDayEvents(
           accountId: item.accountId,
           categoryId: item.categoryId,
           description: item.description,
+          occurrenceDate,
           ...timing,
         },
         effect: applyForecastEffect(effect, timing.isOverdue),

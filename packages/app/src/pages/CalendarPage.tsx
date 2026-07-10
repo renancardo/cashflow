@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { DayDetailPanel, YearCalendarScreen, type QuickAddValues } from "@cashflow/ui";
 import { validateCalendarQuickAdd } from "../data/mutations/calendarQuickAdd";
 import { useCalendarQuickAdd } from "../data/mutations/useCalendarQuickAdd";
+import { useDayDetailSettle } from "../data/mutations/useDayDetailSettle";
 import { createEmptyTransactionInput } from "../data/mutations/useTransactionMutations";
 import { useAccounts } from "../data/queries/useAccounts";
 import { useCalendarScreen } from "../data/queries/useCalendarScreen";
@@ -19,6 +20,7 @@ export function CalendarPage({ selectedDay = null, onSelectedDayChange }: Props)
   const { data, isPending, isError, error } = useCalendarScreen();
   const { data: accountsData } = useAccounts();
   const quickAdd = useCalendarQuickAdd(selectedDay ?? undefined);
+  const dayDetailSettle = useDayDetailSettle();
   const [year, setYear] = useState(() => Number(today.slice(0, 4)));
   const [quickAddValues, setQuickAddValues] = useState<QuickAddValues>(() => ({
     ...createEmptyTransactionInput(today),
@@ -118,8 +120,10 @@ export function CalendarPage({ selectedDay = null, onSelectedDayChange }: Props)
           accountOptions={data?.accountOptions ?? []}
           categoryOptions={data?.categoryOptions ?? []}
           saving={quickAdd.isPending}
+          settlingKey={dayDetailSettle.settlingKey}
           onQuickAddChange={(patch) => setQuickAddValues((current) => ({ ...current, ...patch }))}
           onQuickAddSubmit={handleQuickAddSubmit}
+          onSettle={(request) => dayDetailSettle.settle(request)}
           onClose={closeDay}
         />
       }

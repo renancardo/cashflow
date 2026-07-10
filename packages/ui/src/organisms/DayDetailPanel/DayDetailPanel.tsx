@@ -1,5 +1,6 @@
 import type { ProjectionDay, ProjectionItem } from "@cashflow/core";
 import { formatMoney } from "@cashflow/core";
+import { Button } from "../../atoms/Button/Button.js";
 import { Chip, type ChipVariant } from "../../atoms/Chip/Chip.js";
 import { FormattedDate } from "../../atoms/FormattedDate/FormattedDate.js";
 import { MoneyAmount } from "../../atoms/MoneyAmount/MoneyAmount.js";
@@ -18,6 +19,11 @@ export type DayDetailItem = ProjectionItem & {
   toAccountName?: string;
 };
 
+export type DayDetailSettleRequest =
+  | { source: "planned"; plannedItemId: string; occurrenceDate: string }
+  | { source: "installment"; installmentId: string }
+  | { source: "statement_payment"; statementId: string };
+
 type AccountOption = { id: string; name: string; type: import("@cashflow/core").AccountType };
 type CategoryOption = { id: string; name: string; kind: "income" | "expense" };
 
@@ -29,8 +35,10 @@ type Props = {
   categoryOptions: CategoryOption[];
   currency?: string;
   saving?: boolean;
+  settlingKey?: string | null;
   onQuickAddChange: (patch: Partial<QuickAddValues>) => void;
   onQuickAddSubmit: () => void;
+  onSettle?: (request: DayDetailSettleRequest) => void;
   onClose: () => void;
 };
 
@@ -68,6 +76,53 @@ function amountTone(item: ProjectionItem): "income" | "danger" | "default" {
   return "default";
 }
 
+function buildSettleRequest(
+  item: ProjectionItem,
+  dayDate: string,
+): DayDetailSettleRequest | null {
+  if (!item.isProjected) return null;
+
+  switch (item.source) {
+    case "planned":
+      return {
+        source: "planned",
+        plannedItemId: item.refId,
+        occurrenceDate: item.occurrenceDate ?? dayDate,
+      };
+    case "installment":
+      return { source: "installment", installmentId: item.refId };
+    case "statement_payment":
+      return { source: "statement_payment", statementId: item.refId };
+    default:
+      return null;
+  }
+}
+
+export function dayDetailSettleKeyFromRequest(request: DayDetailSettleRequest): string {
+  if (request.source === "planned") {
+    return `planned-${request.plannedItemId}-${request.occurrenceDate}`;
+  }
+  if (request.source === "installment") {
+    return `installment-${request.installmentId}`;
+  }
+  return `statement_payment-${request.statementId}`;
+}
+
+export function dayDetailSettleKey(item: ProjectionItem, dayDate: string): string {
+  const request = buildSettleRequest(item, dayDate);
+  if (!request) return `${item.source}-${item.refId}`;
+  return dayDetailSettleKeyFromRequest(request);
+}
+
+function settleLabel(
+  item: ProjectionItem,
+  labels: { markPaid: string; markAsReceived: string; confirmPayment: string },
+): string {
+  if (item.source === "statement_payment") return labels.confirmPayment;
+  if (item.type === "income") return labels.markAsReceived;
+  return labels.markPaid;
+}
+
 export function DayDetailPanel({
   open,
   day,
@@ -76,8 +131,10 @@ export function DayDetailPanel({
   categoryOptions,
   currency = "BRL",
   saving = false,
+  settlingKey = null,
   onQuickAddChange,
   onQuickAddSubmit,
+  onSettle,
   onClose,
 }: Props) {
   const m = useMessages();
@@ -163,8 +220,13 @@ export function DayDetailPanel({
                   <section key={group.title} className={styles.group}>
                     <h3 className={styles.groupTitle}>{group.title}</h3>
                     <ul className={styles.list}>
-                      {items.map((item) => (
-                        <li key={`${item.source}-${item.refId}`}>
+                      {items.map((item) => {
+                        const settleRequest = buildSettleRequest(item, day.date);
+                        const itemSettleKey = dayDetailSettleKey(item, day.date);
+                        const isSettlingItem = settlingKey === itemSettleKey;
+
+                        return (
+                        <li key={`${item.source}-${item.refId}-${item.occurrenceDate ?? day.date}`}>
                           <article
                             className={[styles.item, item.isProjected && styles.itemProjected]
                               .filter(Boolean)
@@ -188,9 +250,26 @@ export function DayDetailPanel({
                               {item.type === "income" ? "+ " : item.type === "expense" ? "− " : ""}
                               {formatMoney(item.amountCents)}
                             </span>
+                            {settleRequest && onSettle && (
+                              <Button
+                                variant="primary"
+                                className={styles.confirmButton}
+                                disabled={isSettlingItem}
+                                onClick={() => onSettle(settleRequest)}
+                              >
+                                {isSettlingItem
+                                  ? m.dayDetail.settling
+                                  : settleLabel(item, {
+                                      markPaid: m.common.markPaid,
+                                      markAsReceived: m.common.markAsReceived,
+                                      confirmPayment: m.dayDetail.confirmPayment,
+                                    })}
+                              </Button>
+                            )}
                           </article>
                         </li>
-                      ))}
+                        );
+                      })}
                     </ul>
                   </section>
                 );

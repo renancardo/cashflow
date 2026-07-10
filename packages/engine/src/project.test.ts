@@ -157,7 +157,7 @@ describe("projectCashFlow", () => {
       expect(dayOf(result, "2026-06-15")?.outflowsCents).toBe(0);
 
       expect(projectedItemsOnDate(result, "2026-06-18", { refId: "plan-streaming" })).toEqual([
-        expect.objectContaining({ amountCents: 5_590 }),
+        expect.objectContaining({ amountCents: 5_590, occurrenceDate: "2026-06-15" }),
       ]);
       expect(dayOf(result, "2026-06-18")?.outflowsCents).toBe(5_590);
     });
