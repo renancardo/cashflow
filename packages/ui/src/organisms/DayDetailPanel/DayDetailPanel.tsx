@@ -76,10 +76,7 @@ function amountTone(item: ProjectionItem): "income" | "danger" | "default" {
   return "default";
 }
 
-function buildSettleRequest(
-  item: ProjectionItem,
-  dayDate: string,
-): DayDetailSettleRequest | null {
+function buildSettleRequest(item: ProjectionItem, dayDate: string): DayDetailSettleRequest | null {
   if (!item.isProjected) return null;
 
   switch (item.source) {
@@ -226,48 +223,54 @@ export function DayDetailPanel({
                         const isSettlingItem = settlingKey === itemSettleKey;
 
                         return (
-                        <li key={`${item.source}-${item.refId}-${item.occurrenceDate ?? day.date}`}>
-                          <article
-                            className={[styles.item, item.isProjected && styles.itemProjected]
-                              .filter(Boolean)
-                              .join(" ")}
+                          <li
+                            key={`${item.source}-${item.refId}-${item.occurrenceDate ?? day.date}`}
                           >
-                            <div className={styles.itemMain}>
-                              <div className={styles.itemDesc}>{item.description}</div>
-                              <div className={styles.itemMeta}>
-                                <Chip variant={chipVariant(item)}>
-                                  {chipLabel(item, m.common.chips)}
-                                </Chip>
-                                <span>{itemMeta(item)}</span>
-                              </div>
-                            </div>
-                            <span
-                              className={[
-                                styles.itemAmount,
-                                styles[`amount-${amountTone(item)}`],
-                              ].join(" ")}
+                            <article
+                              className={[styles.item, item.isProjected && styles.itemProjected]
+                                .filter(Boolean)
+                                .join(" ")}
                             >
-                              {item.type === "income" ? "+ " : item.type === "expense" ? "− " : ""}
-                              {formatMoney(item.amountCents)}
-                            </span>
-                            {settleRequest && onSettle && (
-                              <Button
-                                variant="primary"
-                                className={styles.confirmButton}
-                                disabled={isSettlingItem}
-                                onClick={() => onSettle(settleRequest)}
+                              <div className={styles.itemMain}>
+                                <div className={styles.itemDesc}>{item.description}</div>
+                                <div className={styles.itemMeta}>
+                                  <Chip variant={chipVariant(item)}>
+                                    {chipLabel(item, m.common.chips)}
+                                  </Chip>
+                                  <span>{itemMeta(item)}</span>
+                                </div>
+                              </div>
+                              <span
+                                className={[
+                                  styles.itemAmount,
+                                  styles[`amount-${amountTone(item)}`],
+                                ].join(" ")}
                               >
-                                {isSettlingItem
-                                  ? m.dayDetail.settling
-                                  : settleLabel(item, {
-                                      markPaid: m.common.markPaid,
-                                      markAsReceived: m.common.markAsReceived,
-                                      confirmPayment: m.dayDetail.confirmPayment,
-                                    })}
-                              </Button>
-                            )}
-                          </article>
-                        </li>
+                                {item.type === "income"
+                                  ? "+ "
+                                  : item.type === "expense"
+                                    ? "− "
+                                    : ""}
+                                {formatMoney(item.amountCents)}
+                              </span>
+                              {settleRequest && onSettle && (
+                                <Button
+                                  variant="primary"
+                                  className={styles.confirmButton}
+                                  disabled={isSettlingItem}
+                                  onClick={() => onSettle(settleRequest)}
+                                >
+                                  {isSettlingItem
+                                    ? m.dayDetail.settling
+                                    : settleLabel(item, {
+                                        markPaid: m.common.markPaid,
+                                        markAsReceived: m.common.markAsReceived,
+                                        confirmPayment: m.dayDetail.confirmPayment,
+                                      })}
+                                </Button>
+                              )}
+                            </article>
+                          </li>
                         );
                       })}
                     </ul>

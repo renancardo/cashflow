@@ -1,10 +1,6 @@
 import type { EngineInput, ProjectionDay, ProjectionResult } from "@cashflow/core";
 import { todayIso } from "@cashflow/core";
-import {
-  aggregateWorkingBalanceAt,
-  buildAccountMap,
-  computeHistoryStart,
-} from "./accounts.js";
+import { aggregateWorkingBalanceAt, buildAccountMap, computeHistoryStart } from "./accounts.js";
 import { eachDay, horizonEndDate } from "./dates.js";
 import {
   collectTransactionEventsByDate,

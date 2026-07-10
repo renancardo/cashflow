@@ -34,7 +34,8 @@ export function useDayDetailSettle() {
 
   return {
     settle: settle.mutateAsync,
-    settlingKey: settle.isPending && settle.variables ? dayDetailSettleKeyFromRequest(settle.variables) : null,
+    settlingKey:
+      settle.isPending && settle.variables ? dayDetailSettleKeyFromRequest(settle.variables) : null,
     isSettling: settle.isPending,
   };
 }
