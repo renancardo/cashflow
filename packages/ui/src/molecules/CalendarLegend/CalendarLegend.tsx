@@ -12,6 +12,7 @@ export function CalendarLegend({ variant = "year" }: Props) {
 
   const indicatorItems = [
     { kind: "danger", label: legend.belowBuffer },
+    { kind: "overdue", label: legend.overdue },
     { kind: "success", label: legend.incomeDay },
     { kind: "warning", label: legend.largeOutflow },
     { kind: "card", label: legend.cardDue },

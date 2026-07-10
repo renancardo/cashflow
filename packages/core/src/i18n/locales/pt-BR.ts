@@ -705,6 +705,7 @@ export const ptBR: DeepStringRecord<MessageTree> = {
       trigger: "Legenda",
       dayIndicators: "Indicadores do dia",
       belowBuffer: "Abaixo do buffer — saldo projetado abaixo do limite",
+      overdue: "Em atraso — item não liquidado após o vencimento",
       incomeDay: "Dia de receita — entrada líquida nesta data",
       largeOutflow: "Saída grande — saída líquida acima do limite",
       cardDue: "Fatura do cartão vence",

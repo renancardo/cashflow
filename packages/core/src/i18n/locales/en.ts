@@ -698,6 +698,7 @@ export const en = {
       trigger: "Legend",
       dayIndicators: "Day indicators",
       belowBuffer: "Below buffer — projected balance under your threshold",
+      overdue: "Overdue — unsettled item past its due date",
       incomeDay: "Income day — net inflow on this date",
       largeOutflow: "Large outflow — net outflow above your limit",
       cardDue: "Card statement due",

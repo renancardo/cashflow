@@ -161,11 +161,12 @@ else:
 **Layout regions**
 - **Header strip:** current working balance (`ProjectionResult.workingBalanceTodayCents`), next negative date (`nextNegativeDate`), alert badge when `nextNegativeDate` is set.
 - **Linear grid:** months as rows, weekdays as columns; weekend columns subtly banded. Horizontally scrollable across the horizon; "jump to today" control.
-- **Legend:** red dot (below buffer), green (income day), amber (large outflow — net outflow ≥ `Settings.largeOutflowThresholdCents`), card-due marker.
+- **Legend:** red dot (below buffer), **red vertical bar (overdue unsettled item)**, green (income day), amber (large outflow — net outflow ≥ `Settings.largeOutflowThresholdCents`), card-due marker.
 
 **Day cell contents**
 - Day number.
 - **Red dot** if `belowBuffer`.
+- **Red left vertical bar** if any `ProjectionDay.items[]` entry has `isOverdue === true`.
 - Subtle indicators: net income day (green), large outflow (amber, `ProjectionDay.largeOutflow`), credit-card statement due (icon).
 
 | Concern | Spec |
@@ -187,12 +188,13 @@ else:
 - Month grid (same weekday columns as year, one month) **or** list-by-day (open item, default month grid per scope §8).
 - Month total strip: inflows, outflows, net, end-of-month projected balance.
 - Prev/next month navigation; link back to Year view.
-- **Legend:** year-style day indicators (§2.4, §2.5), **day-entry text colors** (§2.6), and month-total projection note.
+- **Legend:** year-style day indicators (§2.4, §2.5, overdue bar), **day-entry text colors** (§2.6), and month-total projection note.
 
 **Day cell contents**
 - Day number; optional today highlight.
 - Closing balance (neutral text).
 - Dot indicators (below buffer, income day, large outflow, card due) — same semantics as year view.
+- **Red left vertical bar** when any item on the day is overdue (`isOverdue`); same left-edge bar when `belowBuffer` (overdue takes `#dc2626` when both apply).
 
 | Concern | Spec |
 |---|---|

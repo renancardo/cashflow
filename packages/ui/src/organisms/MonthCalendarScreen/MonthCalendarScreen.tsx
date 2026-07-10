@@ -12,6 +12,7 @@ import {
   getDayEntryLines,
   getDayIndicators,
   getDayTemporalState,
+  hasOverdueItems,
   indexProjectionDays,
   isWeekend,
   shiftMonth,
@@ -200,6 +201,7 @@ export function MonthCalendarScreen({
                     temporal !== "future" && styles[temporal],
                     weekend && styles.weekend,
                     day?.belowBuffer && styles.belowBuffer,
+                    day && hasOverdueItems(day) && styles.overdue,
                     selectedDate === cell.date && styles.selected,
                   ]
                     .filter(Boolean)

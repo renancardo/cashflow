@@ -218,6 +218,45 @@
     inset 0 0 0 2px var(--color-primary);
 }
 
+.overdue {
+  box-shadow: inset 3px 0 0 var(--flow-past-due);
+}
+
+.belowBuffer.overdue {
+  box-shadow: inset 3px 0 0 var(--flow-past-due);
+}
+
+.overdue.selected {
+  box-shadow:
+    inset 3px 0 0 var(--flow-past-due),
+    inset 0 0 0 1px var(--color-primary);
+}
+
+.belowBuffer.overdue.selected {
+  box-shadow:
+    inset 3px 0 0 var(--flow-past-due),
+    inset 0 0 0 1px var(--color-primary);
+}
+
+.overdue.today {
+  box-shadow:
+    inset 3px 0 0 var(--flow-past-due),
+    inset 0 0 0 2px var(--color-primary);
+}
+
+.belowBuffer.overdue.today,
+.belowBuffer.overdue.today.selected {
+  box-shadow:
+    inset 3px 0 0 var(--flow-past-due),
+    inset 0 0 0 2px var(--color-primary);
+}
+
+.overdue.today.selected {
+  box-shadow:
+    inset 3px 0 0 var(--flow-past-due),
+    inset 0 0 0 2px var(--color-primary);
+}
+
 .dayNumber {
   font-family: var(--font-mono);
   font-size: 0.75rem;

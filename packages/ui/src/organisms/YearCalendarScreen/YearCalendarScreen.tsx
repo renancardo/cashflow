@@ -9,6 +9,7 @@ import {
   buildYearMonthRow,
   getDayIndicators,
   getDayTemporalState,
+  hasOverdueItems,
   indexProjectionDays,
   isWeekend,
   monthShortLabels,
@@ -189,6 +190,7 @@ export function YearCalendarScreen({
                             day={cell.day!}
                             state={temporal}
                             indicators={indicators}
+                            overdue={day ? hasOverdueItems(day) : false}
                             selected={selectedDate === cell.date}
                             weekend={isWeekend(cell.date)}
                           />

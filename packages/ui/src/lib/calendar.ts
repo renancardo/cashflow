@@ -109,6 +109,10 @@ export function getDayIndicators(day: ProjectionDay): IndicatorKind[] {
   return indicators;
 }
 
+export function hasOverdueItems(day: ProjectionDay): boolean {
+  return day.items.some((item) => item.isOverdue);
+}
+
 export function getEntryLineTone(item: ProjectionItem): EntryLineTone {
   const isIncome = item.type === "income";
 

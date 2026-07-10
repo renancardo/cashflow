@@ -1,6 +1,6 @@
 # Idea: Unsettled planned occurrences (missed income & overdue bills)
 
-**Status:** backlog — product design open  
+**Status:** implemented (2026-07-10) — engine `isOverdue`, month entry colors, year/month overdue bars, day-panel settle  
 **Captured:** 2026-07-07 (from time-travel QA)  
 **Related:** [003-screen-specs.md §2.6](../specs/003-screen-specs.md), [05-forecast.md](../user-stories/05-forecast.md) (US-5.6), [03-calendar.md](../user-stories/03-calendar.md) (US-3.12), [04-transactions.md](../user-stories/04-transactions.md), [US-3.9](../user-stories/03-calendar.md#us-39--mark-paid--received-from-day-panel)
 
@@ -53,9 +53,9 @@ Today the engine still emits the occurrence on its **original** date, but once `
 | **A — Past-due indicator only** | Keep on original date; red styling + badge when `unsettled && effectiveDate < today` | Matches user intuition (“bill is late”) | Needs engine `isSettled` / `isProjected` fix |
 | **B — Overdue roll-up** | Aggregate overdue outflows in header (“2 bills overdue”) | High visibility | New summary UI |
 | **C — Reschedule / skip** | Override date or `skipped` status per occurrence | Handles “paid next week” / “skipped this month” | Depends on US-5.2 skip UI |
-| **D — Late payment settle** | Same as income: pay on actual date, link to occurrence | Already aligned with §2.2 settlement | Needs day-panel settle (US-3.9) |
+| **D — Late payment settle** | Same as income: pay on actual date, link to occurrence | Already aligned with §2.2 settlement | Day-panel settle wired (US-3.9) |
 
-**Recommendation:** **A + D + C** — implement [003-screen-specs.md §2.6](../specs/003-screen-specs.md) past-due red on month calendar entry lines; add year-view **overdue** dot; wire settle from day panel. User’s red-indicator idea fits **A** (already spec’d, not fully wired).
+**Recommendation:** **A + D + C** — implement [003-screen-specs.md §2.6](../specs/003-screen-specs.md) past-due red on month calendar entry lines; add year-view **overdue** dot. Day-panel settle is wired (US-3.9); remaining work is engine `isProjected` / overdue styling. User’s red-indicator idea fits **A** (already spec’d, not fully wired).
 
 **Open questions**
 
@@ -90,11 +90,12 @@ awaiting UI = overdue && type === "income"
 
 ## Suggested backlog
 
-| ID | Title | Epic |
-|---|---|---|
-| US-5.6 | Missed income & late receipt | Forecast |
-| US-3.12 | Overdue bill indicators | Calendar |
-| US-3.9 | Mark paid / received from day panel | Calendar (existing; dependency) |
+| ID | Title | Epic | Status |
+|---|---|---|---|
+| US-5.6 | Missed income & late receipt | Forecast | **Done** (core; optional “received on” display deferred) |
+| US-3.12 | Overdue bill indicators | Calendar | **Done** (core; optional Forecast badge deferred) |
+
+US-3.9 (day-panel settle) is **done** — see [03-calendar.md](../user-stories/03-calendar.md#us-39--mark-paid--received-from-day-panel).
 
 ---
 

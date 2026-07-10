@@ -108,12 +108,12 @@ If today passes an expected income date without settlement, the occurrence shoul
 
 ### Acceptance criteria
 
-- [ ] Unsettled income on `effectiveDate < today` shows **awaiting** state (distinct from projected and actual) on month calendar entry lines
-- [ ] `workingBalanceTodayCents` does **not** treat unsettled past income as received
-- [ ] **Confirm receipt** (day panel or Forecast) creates `Transaction` with `effectiveDate` = receipt day and `settlesPlannedOccurrenceDate` = original occurrence
-- [ ] Original scheduled day shows settled link or “received on {date}” after late settlement
-- [ ] Optional: **Reschedule** occurrence via `PlannedItemOverride.dateOverride` from day panel
-- [ ] Engine exposes `isSettled` on projection items; unsettled past items keep `isProjected: true` (or explicit `status: overdue | awaiting`)
+- [x] Unsettled income on `effectiveDate < today` shows **awaiting** state (distinct from projected and actual) on month calendar entry lines — `getEntryLineTone()` → `awaiting-income`
+- [x] `workingBalanceTodayCents` does **not** treat unsettled past income as received — engine `isOverdue` + `applyForecastEffect`
+- [x] **Confirm receipt** (day panel or Forecast) creates `Transaction` with `effectiveDate` = receipt day and `settlesPlannedOccurrenceDate` = original occurrence — day-panel via US-3.9; Forecast via `usePlannedItemMutations.markPaid`
+- [ ] Original scheduled day shows settled link or “received on {date}” after late settlement — deferred
+- [ ] Optional: **Reschedule** occurrence via `PlannedItemOverride.dateOverride` from day panel — deferred
+- [x] Engine exposes `isOverdue` on projection items; unsettled past items keep `isProjected: true`
 
 ### Open questions
 

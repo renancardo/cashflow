@@ -7,6 +7,7 @@ type Props = {
   day: number;
   state?: DayTemporalState;
   indicators?: IndicatorKind[];
+  overdue?: boolean;
   selected?: boolean;
   weekend?: boolean;
   className?: string;
@@ -16,6 +17,7 @@ export function CalendarDayCell({
   day,
   state = "future",
   indicators = [],
+  overdue = false,
   selected = false,
   weekend = false,
   className,
@@ -28,6 +30,7 @@ export function CalendarDayCell({
         styles.cell,
         styles[state],
         weekend && styles.weekend,
+        overdue && styles.overdue,
         selected && styles.selected,
         className,
       ]
