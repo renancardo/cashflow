@@ -38,7 +38,7 @@ export function useStatementMutations() {
 
   const markPaid = useMutation({
     mutationFn: ({ id, effectiveDate }: { id: string; effectiveDate?: string }) =>
-      settleStatement(id, effectiveDate ?? today),
+      settleStatement(id, effectiveDate ?? today, { payRemaining: true }),
     onSuccess: invalidate,
   });
 
@@ -56,7 +56,9 @@ export function useStatementMutations() {
         plannedPaymentCents: input.plannedPaymentCents,
         payFromAccountId: input.payFromAccountId,
       });
-      return settleStatement(id, effectiveDate ?? today);
+      return settleStatement(id, effectiveDate ?? today, {
+        amountCents: input.plannedPaymentCents,
+      });
     },
     onSuccess: invalidate,
   });

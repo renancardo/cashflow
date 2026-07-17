@@ -6,14 +6,22 @@ import {
   AccountEditorPanel,
   AccountsScreen,
   StatementDetailPanel,
+  StatementEditorPanel,
   StatementListPanel,
   type AccountEditorValues,
+  type StatementChargeRow,
+  type StatementEditorValues,
 } from "@cashflow/ui";
 import {
   createEmptyAccountInput,
   useAccountMutations,
   type AccountInput,
 } from "../data/mutations/useAccountMutations";
+import { useInstallmentMutations } from "../data/mutations/useInstallmentMutations";
+import { usePlannedItemMutations } from "../data/mutations/usePlannedItemMutations";
+import { usePlannedItemOverrideMutations } from "../data/mutations/usePlannedItemOverrideMutations";
+import { useStatementMutations } from "../data/mutations/useStatementMutations";
+import { useTransactionMutations } from "../data/mutations/useTransactionMutations";
 import { useSettings } from "../data/queries/useSettings";
 import { useAccounts } from "../data/queries/useAccounts";
 import { useStatements } from "../data/queries/useStatements";
@@ -69,36 +77,49 @@ export function AccountsPage({ editorSearch = {}, onEditorSearchChange }: Props)
   const { today } = useAppClock();
   const { data, isPending, isError, error } = useAccounts();
   const { data: settingsData } = useSettings();
-  const { create, update, setWorking, archive } = useAccountMutations();
-  const editorOpen = Boolean(editorSearch.new || editorSearch.edit);
-  const editorMode = editorSearch.edit ? "edit" : "create";
-  const editingId = editorSearch.edit ?? null;
   const [statementsCardId, setStatementsCardId] = useState<string | null>(null);
   const [detailStatementId, setDetailStatementId] = useState<string | null>(null);
-  const [editorValues, setEditorValues] = useState<AccountEditorValues>(() =>
-    createEmptyAccountInput(today),
-  );
+  const [editingStatementId, setEditingStatementId] = useState<string | null>(null);
+  const [statementValues, setStatementValues] = useState<StatementEditorValues>({});
+
   const { data: statements = [] } = useStatements(statementsCardId);
   const { data: statementDetail, isPending: isDetailPending } =
     useStatementDetail(detailStatementId);
+  const { create, update, archive, setWorking } = useAccountMutations();
+  const statementMutations = useStatementMutations();
+  const transactionMutations = useTransactionMutations();
+  const plannedMutations = usePlannedItemMutations();
+  const plannedOverrideMutations = usePlannedItemOverrideMutations();
+  const installmentMutations = useInstallmentMutations();
+
+  const editorOpen = Boolean(editorSearch.new || editorSearch.edit);
+  const editorMode = editorSearch.edit ? "edit" : "create";
+  const editingId = editorSearch.edit ?? null;
+  const [editorValues, setEditorValues] = useState<AccountEditorValues>(() =>
+    createEmptyAccountInput(today, "BRL", settingsData),
+  );
 
   const payFromOptions = useMemo(
     () =>
       (data?.rawAccounts ?? [])
-        .filter((account) => account.isWorking && account.type !== "credit_card")
+        .filter((account) => account.isWorking && !account.archivedAt)
         .map((account) => ({ id: account.id, name: account.name })),
     [data?.rawAccounts],
   );
 
   const editingBalanceCents = useMemo(() => {
-    if (!editingId) return 0;
-    return data?.accounts.find((account) => account.id === editingId)?.balanceCents ?? 0;
-  }, [data?.accounts, editingId]);
+    if (!editingId || !data) return undefined;
+    return data.accounts.find((row) => row.id === editingId)?.balanceCents;
+  }, [data, editingId]);
 
   const statementsCardName = useMemo(() => {
-    if (!statementsCardId) return "";
     return data?.rawAccounts.find((account) => account.id === statementsCardId)?.name ?? "";
   }, [data?.rawAccounts, statementsCardId]);
+
+  const editingStatement = useMemo(
+    () => statements.find((row) => row.id === editingStatementId),
+    [statements, editingStatementId],
+  );
 
   useEffect(() => {
     if (editorSearch.edit) {
@@ -110,7 +131,22 @@ export function AccountsPage({ editorSearch = {}, onEditorSearchChange }: Props)
     if (editorSearch.new) {
       setEditorValues(createEmptyAccountInput(today, "BRL", settingsData));
     }
-  }, [editorSearch.edit, editorSearch.new, data?.rawAccounts, settingsData]);
+  }, [editorSearch.edit, editorSearch.new, data?.rawAccounts, settingsData, today]);
+
+  useEffect(() => {
+    if (!editingStatement) return;
+    const remainingCents = Math.max(
+      0,
+      editingStatement.computedTotalCents - (editingStatement.paidAmountCents ?? 0),
+    );
+    setStatementValues({
+      plannedPaymentCents:
+        editingStatement.status === "partially_paid"
+          ? remainingCents
+          : editingStatement.plannedPaymentCents,
+      payFromAccountId: editingStatement.payFromAccountId,
+    });
+  }, [editingStatement]);
 
   const openCreate = () => {
     setEditorValues(createEmptyAccountInput(today, "BRL", settingsData));
@@ -157,6 +193,87 @@ export function AccountsPage({ editorSearch = {}, onEditorSearchChange }: Props)
     });
   };
 
+  const openStatementEditor = (statementId: string) => {
+    setDetailStatementId(null);
+    setEditingStatementId(statementId);
+  };
+
+  const handleStatementSave = async () => {
+    if (!editingStatementId) return;
+    await statementMutations.update.mutateAsync({
+      id: editingStatementId,
+      input: statementValues,
+    });
+    setEditingStatementId(null);
+  };
+
+  const handleStatementReset = async () => {
+    if (!editingStatementId) return;
+    await statementMutations.resetOverride.mutateAsync(editingStatementId);
+    setStatementValues((current) => ({ ...current, plannedPaymentCents: undefined }));
+  };
+
+  const handleStatementRecordPayment = async () => {
+    if (!editingStatementId) return;
+    await statementMutations.recordPayment.mutateAsync({
+      id: editingStatementId,
+      input: statementValues,
+    });
+    setEditingStatementId(null);
+  };
+
+  const handleEditCharge = (charge: StatementChargeRow) => {
+    setDetailStatementId(null);
+    setStatementsCardId(null);
+    if (charge.source === "transaction" || charge.source === "payment") {
+      navigate({ to: "/transactions", search: { edit: charge.refId } });
+      return;
+    }
+    if (charge.source === "planned") {
+      navigate({ to: "/forecast", search: { planned: charge.refId } });
+      return;
+    }
+    if (charge.source === "installment" && charge.planId) {
+      navigate({ to: "/forecast", search: { installment: charge.planId } });
+    }
+  };
+
+  const handleDeleteCharge = async (charge: StatementChargeRow) => {
+    if (!window.confirm("Remove this charge from the statement?")) return;
+
+    if (charge.source === "transaction" || charge.source === "payment") {
+      await transactionMutations.remove.mutateAsync(charge.refId);
+      return;
+    }
+    if (charge.source === "planned") {
+      await plannedOverrideMutations.skipOccurrence.mutateAsync({
+        plannedItemId: charge.refId,
+        occurrenceDate: charge.effectiveDate,
+      });
+      return;
+    }
+    if (charge.source === "installment") {
+      await installmentMutations.removeCharge.mutateAsync(charge.refId);
+    }
+  };
+
+  const handleMarkChargePaid = async (charge: StatementChargeRow) => {
+    if (charge.source === "planned") {
+      await plannedMutations.markPaid.mutateAsync({
+        plannedItemId: charge.refId,
+        occurrenceDate: charge.effectiveDate,
+        effectiveDate: charge.effectiveDate,
+      });
+      return;
+    }
+    if (charge.source === "installment") {
+      await installmentMutations.markPaid.mutateAsync({
+        installmentId: charge.refId,
+        effectiveDate: charge.effectiveDate,
+      });
+    }
+  };
+
   return (
     <AccountsScreen
       accounts={data?.accounts ?? []}
@@ -186,9 +303,11 @@ export function AccountsPage({ editorSearch = {}, onEditorSearchChange }: Props)
             statements={statements}
             onClose={() => setStatementsCardId(null)}
             onViewItems={(statementId) => setDetailStatementId(statementId)}
-            onNavigateToTransaction={() => {
+            onEdit={openStatementEditor}
+            onNavigateToTransaction={(transactionId) => {
               setStatementsCardId(null);
-              navigate({ to: "/transactions" });
+              setDetailStatementId(null);
+              navigate({ to: "/transactions", search: { edit: transactionId } });
             }}
           />
           <StatementDetailPanel
@@ -199,10 +318,40 @@ export function AccountsPage({ editorSearch = {}, onEditorSearchChange }: Props)
             dueDate={statementDetail?.statement.dueDate ?? ""}
             computedTotalCents={statementDetail?.statement.computedTotalCents ?? 0}
             plannedPaymentCents={statementDetail?.statement.plannedPaymentCents}
+            paidAmountCents={statementDetail?.statement.paidAmountCents}
             status={statementDetail?.statement.status ?? "open"}
             charges={statementDetail?.charges ?? []}
             loading={isDetailPending}
             onClose={() => setDetailStatementId(null)}
+            onEdit={() => {
+              if (!detailStatementId) return;
+              openStatementEditor(detailStatementId);
+            }}
+            onEditCharge={handleEditCharge}
+            onDeleteCharge={handleDeleteCharge}
+            onMarkChargePaid={handleMarkChargePaid}
+          />
+          <StatementEditorPanel
+            open={Boolean(editingStatementId && editingStatement)}
+            cardName={statementsCardName || "Credit card"}
+            periodStart={editingStatement?.periodStart ?? ""}
+            closingDate={editingStatement?.closingDate ?? ""}
+            dueDate={editingStatement?.dueDate ?? ""}
+            computedTotalCents={editingStatement?.computedTotalCents ?? 0}
+            paidAmountCents={editingStatement?.paidAmountCents}
+            values={statementValues}
+            status={editingStatement?.status ?? "open"}
+            payFromOptions={payFromOptions}
+            saving={
+              statementMutations.update.isPending ||
+              statementMutations.recordPayment.isPending ||
+              statementMutations.resetOverride.isPending
+            }
+            onChange={(patch) => setStatementValues((current) => ({ ...current, ...patch }))}
+            onClose={() => setEditingStatementId(null)}
+            onResetToFull={handleStatementReset}
+            onSave={handleStatementSave}
+            onRecordPayment={handleStatementRecordPayment}
           />
         </>
       }

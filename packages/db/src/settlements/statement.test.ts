@@ -48,7 +48,7 @@ describe("settleStatement", () => {
     expect(result.transaction.paysStatementId).toBe(statement!.id);
   });
 
-  it("uses plannedPaymentCents when set", async () => {
+  it("uses plannedPaymentCents when set and marks partially_paid with carryover", async () => {
     resetDatabase(createEmptyState());
 
     const checking = await accountsRepo.create({
@@ -81,6 +81,95 @@ describe("settleStatement", () => {
 
     const result = await settleStatement(statement!.id, "2026-06-30");
     expect(result.transaction.amountCents).toBe(100_000);
+    expect(result.statement.status).toBe("partially_paid");
+    expect(result.statement.paidAmountCents).toBe(100_000);
+    expect(result.transaction.paysStatementId).toBe(statement!.id);
+
+    const next = (await creditCardStatementsRepo.getByCardId(card.id)).find(
+      (row) => row.dueDate === "2026-08-01",
+    );
+    expect(next?.computedTotalCents).toBe(50_000);
+  });
+
+  it("accepts an additional payment that finishes a partially_paid statement", async () => {
+    resetDatabase(createEmptyState());
+
+    const checking = await accountsRepo.create({
+      name: "Checking",
+      type: "checking",
+      currency: "BRL",
+      isWorking: true,
+      anchorBalanceCents: 1_000_000,
+      anchorDate: "2026-06-01",
+    });
+
+    const card = await accountsRepo.create({
+      name: "Main Credit Card",
+      type: "credit_card",
+      currency: "BRL",
+      isWorking: false,
+      anchorBalanceCents: 150_000,
+      anchorDate: "2026-06-01",
+      closingDay: 26,
+      dueDay: 1,
+      defaultPayFromAccountId: checking.id,
+    });
+
+    materializeStatementsForCard(card.id, "2026-06-28");
+    const statement = (await creditCardStatementsRepo.getByCardId(card.id)).find(
+      (row) => row.dueDate === "2026-07-01",
+    );
+
+    await creditCardStatementsRepo.update(statement!.id, { plannedPaymentCents: 100_000 });
+    await settleStatement(statement!.id, "2026-06-30");
+
+    const second = await settleStatement(statement!.id, "2026-07-01", { amountCents: 50_000 });
+    expect(second.transaction.amountCents).toBe(50_000);
+    expect(second.statement.status).toBe("paid");
+    expect(second.statement.paidAmountCents).toBe(150_000);
+
+    const next = (await creditCardStatementsRepo.getByCardId(card.id)).find(
+      (row) => row.dueDate === "2026-08-01",
+    );
+    expect(next?.computedTotalCents).toBe(0);
+  });
+
+  it("payRemaining settles the leftover balance on a partial statement", async () => {
+    resetDatabase(createEmptyState());
+
+    const checking = await accountsRepo.create({
+      name: "Checking",
+      type: "checking",
+      currency: "BRL",
+      isWorking: true,
+      anchorBalanceCents: 1_000_000,
+      anchorDate: "2026-06-01",
+    });
+
+    const card = await accountsRepo.create({
+      name: "Main Credit Card",
+      type: "credit_card",
+      currency: "BRL",
+      isWorking: false,
+      anchorBalanceCents: 150_000,
+      anchorDate: "2026-06-01",
+      closingDay: 26,
+      dueDay: 1,
+      defaultPayFromAccountId: checking.id,
+    });
+
+    materializeStatementsForCard(card.id, "2026-06-28");
+    const statement = (await creditCardStatementsRepo.getByCardId(card.id)).find(
+      (row) => row.dueDate === "2026-07-01",
+    );
+
+    await creditCardStatementsRepo.update(statement!.id, { plannedPaymentCents: 40_000 });
+    await settleStatement(statement!.id, "2026-06-30");
+
+    const result = await settleStatement(statement!.id, "2026-07-01", { payRemaining: true });
+    expect(result.transaction.amountCents).toBe(110_000);
+    expect(result.statement.status).toBe("paid");
+    expect(result.statement.paidAmountCents).toBe(150_000);
   });
 
   it("reverts statement to unpaid when the payment transaction is deleted", async () => {

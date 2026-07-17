@@ -25,6 +25,7 @@ type Props = {
   closingDate: string;
   dueDate: string;
   computedTotalCents: number;
+  paidAmountCents?: number;
   includesOpeningDebt?: boolean;
   values: StatementEditorValues;
   status: StatementStatus;
@@ -34,6 +35,7 @@ type Props = {
   onChange: (patch: Partial<StatementEditorValues>) => void;
   onClose: () => void;
   onResetToFull: () => void;
+  onSave?: () => void;
   onRecordPayment?: () => void;
 };
 
@@ -85,6 +87,7 @@ export function StatementEditorPanel({
   closingDate,
   dueDate,
   computedTotalCents,
+  paidAmountCents = 0,
   includesOpeningDebt = false,
   values,
   status,
@@ -94,14 +97,20 @@ export function StatementEditorPanel({
   onChange,
   onClose,
   onResetToFull,
+  onSave,
   onRecordPayment,
 }: Props) {
   const m = useMessages();
   const isPaid = status === "paid";
-  const plannedCents = values.plannedPaymentCents ?? computedTotalCents;
+  const isPartial = status === "partially_paid" || paidAmountCents > 0;
+  const remainingCents = Math.max(0, computedTotalCents - paidAmountCents);
+  const plannedCents = values.plannedPaymentCents ?? remainingCents;
   const hasOverride = values.plannedPaymentCents != null;
+  const unpaidAfterThisPayment = Math.max(0, remainingCents - plannedCents);
   const periodLabel = formatStatementPeriod(periodStart, closingDate);
-  const canRecord = !isPaid && plannedCents > 0 && Boolean(onRecordPayment);
+  const canRecord = !isPaid && plannedCents > 0 && remainingCents > 0 && Boolean(onRecordPayment);
+  const canSave = !isPaid && Boolean(onSave);
+  const paymentLabel = isPartial ? m.statements.thisPayment : m.common.form.plannedPayment;
 
   return (
     <EditorPanel
@@ -115,6 +124,11 @@ export function StatementEditorPanel({
           <Button variant="ghost" type="button" onClick={onClose}>
             {m.common.cancel}
           </Button>
+          {canSave && (
+            <Button variant="ghost" type="button" disabled={saving} onClick={onSave}>
+              {m.common.saveChanges}
+            </Button>
+          )}
           {onRecordPayment && (
             <Button
               variant="primary"
@@ -138,10 +152,24 @@ export function StatementEditorPanel({
           )}
         </div>
 
+        {isPartial && !isPaid && (
+          <>
+            <div className={styles.readOnlyRow}>
+              <span className={styles.readOnlyLabel}>{m.statements.alreadyPaid}</span>
+              <MoneyAmount cents={paidAmountCents} />
+            </div>
+            <div className={styles.readOnlyRow}>
+              <span className={styles.readOnlyLabel}>{m.statements.remaining}</span>
+              <MoneyAmount cents={remainingCents} />
+            </div>
+          </>
+        )}
+
         <div className={styles.readOnlyRow}>
           <span className={styles.readOnlyLabel}>{m.common.form.dueDate}</span>
           <FormattedDate isoDate={dueDate} />
           {isPaid && <Chip variant="actual">{m.common.paidCheck}</Chip>}
+          {status === "partially_paid" && <Chip variant="statement">{m.common.partial}</Chip>}
         </div>
 
         {!isPaid && (
@@ -149,7 +177,7 @@ export function StatementEditorPanel({
             <div className={styles.fieldRow}>
               <MoneyField
                 id="statement-planned-payment"
-                label={m.common.form.plannedPayment}
+                label={paymentLabel}
                 placeholder={m.common.form.placeholderAmount}
                 currency={currency}
                 cents={plannedCents}
@@ -166,6 +194,14 @@ export function StatementEditorPanel({
                 </Button>
               )}
             </div>
+
+            {unpaidAfterThisPayment > 0 && (
+              <p className={styles.readOnlyHint}>
+                {fmt(m.statements.remainderHint, {
+                  amount: formatCents(unpaidAfterThisPayment),
+                })}
+              </p>
+            )}
 
             <FormField
               id="statement-pay-from"

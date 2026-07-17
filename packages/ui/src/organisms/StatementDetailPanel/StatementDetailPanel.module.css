@@ -148,6 +148,10 @@
   color: var(--color-text-muted);
 }
 
+.listHeaderWithActions {
+  grid-template-columns: 5.5rem 1fr 5.5rem auto;
+}
+
 .row {
   display: grid;
   grid-template-columns: 5.5rem 1fr 5.5rem;
@@ -157,6 +161,10 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
+}
+
+.rowWithActions {
+  grid-template-columns: 5.5rem 1fr 5.5rem auto;
 }
 
 .rowProjected {
@@ -193,6 +201,18 @@
   font-variant-numeric: tabular-nums;
 }
 
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  justify-content: flex-end;
+}
+
+.actionButton {
+  padding: var(--space-1) var(--space-2);
+  font-size: 0.75rem;
+}
+
 .footer {
   display: flex;
   justify-content: space-between;
@@ -218,5 +238,15 @@
   .row {
     grid-template-columns: 4.5rem 1fr 4.75rem;
     gap: var(--space-2);
+  }
+
+  .listHeaderWithActions,
+  .rowWithActions {
+    grid-template-columns: 4.5rem 1fr 4.75rem;
+  }
+
+  .actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
   }
 }

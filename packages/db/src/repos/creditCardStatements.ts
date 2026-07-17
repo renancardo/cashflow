@@ -1,6 +1,7 @@
 import { compareIso, todayIso } from "@cashflow/core";
 import type { CreditCardStatement } from "@cashflow/core";
 import { getDatabase } from "../in-memory/database.js";
+import { recomputeStatementTotalsForCard } from "../materialize/statements.js";
 
 export const creditCardStatementsRepo = {
   async getAll(): Promise<CreditCardStatement[]> {
@@ -26,13 +27,37 @@ export const creditCardStatementsRepo = {
     }
 
     db.creditCardStatements[index] = { ...db.creditCardStatements[index], ...patch };
-    return db.creditCardStatements[index];
+    const updated = db.creditCardStatements[index];
+    recomputeStatementTotalsForCard(updated.cardAccountId);
+    return db.creditCardStatements.find((row) => row.id === id) ?? updated;
   },
 
-  async markPaid(id: string, paymentTransactionId: string): Promise<CreditCardStatement> {
+  async markPaid(
+    id: string,
+    paymentTransactionId: string,
+    paidAmountCents?: number,
+  ): Promise<CreditCardStatement> {
+    const statement = await this.getById(id);
+    if (!statement) {
+      throw new Error(`CreditCardStatement not found: ${id}`);
+    }
+
     return this.update(id, {
       status: "paid",
       paymentTransactionId,
+      paidAmountCents: paidAmountCents ?? statement.computedTotalCents,
+    });
+  },
+
+  async markPartiallyPaid(
+    id: string,
+    paymentTransactionId: string,
+    paidAmountCents: number,
+  ): Promise<CreditCardStatement> {
+    return this.update(id, {
+      status: "partially_paid",
+      paymentTransactionId,
+      paidAmountCents,
     });
   },
 
@@ -47,6 +72,7 @@ export const creditCardStatementsRepo = {
     return this.update(id, {
       status: compareIso(statement.closingDate, effectiveDate) < 0 ? "closed" : "open",
       paymentTransactionId: undefined,
+      paidAmountCents: undefined,
     });
   },
 };

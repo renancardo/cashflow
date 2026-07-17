@@ -3,7 +3,7 @@ export type CategoryKind = "income" | "expense";
 export type TxType = "income" | "expense" | "transfer";
 export type Recurrence = "once" | "weekly" | "monthly" | "yearly";
 export type OverrideStatus = "modified" | "skipped";
-export type StatementStatus = "open" | "closed" | "paid";
+export type StatementStatus = "open" | "closed" | "paid" | "partially_paid";
 export type InstallmentStatus = "scheduled" | "paid";
 export type Language = "pt-BR" | "en";
 
@@ -100,6 +100,8 @@ export interface CreditCardStatement {
   dueDate: string;
   computedTotalCents: number;
   plannedPaymentCents?: number;
+  /** Actual amount paid toward this statement (partial or full). */
+  paidAmountCents?: number;
   payFromAccountId?: string;
   status: StatementStatus;
   paymentTransactionId?: string;

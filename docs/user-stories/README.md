@@ -79,8 +79,8 @@ flowchart LR
 # Current priority list:
 
 - Persistent storage (data survives reload)
-- Credit card partial payments + carryover (US-6.5)
 - Accounts polish (validation, re-anchor, archived list)
+- Categories improvements (add parent name in front of category name)
 - Skip single forecast occurrence
 - Design system cards + mobile calendar polish
 - App design improvement

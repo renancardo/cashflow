@@ -18,6 +18,7 @@ export type StatementListRow = {
   dueDate: string;
   computedTotalCents: number;
   plannedPaymentCents?: number;
+  paidAmountCents?: number;
   status: StatementStatus;
   paymentTransactionId?: string;
 };
@@ -33,11 +34,15 @@ type Props = {
 };
 
 function isPaid(row: StatementListRow): boolean {
-  return row.status === "paid" || Boolean(row.paymentTransactionId);
+  return row.status === "paid";
 }
 
-function payAmountCents(row: StatementListRow): number {
-  return row.plannedPaymentCents ?? row.computedTotalCents;
+function isPartiallyPaid(row: StatementListRow): boolean {
+  return row.status === "partially_paid";
+}
+
+function remainingCents(row: StatementListRow): number {
+  return Math.max(0, row.computedTotalCents - (row.paidAmountCents ?? 0));
 }
 
 function hasPaymentOverride(row: StatementListRow): boolean {
@@ -46,6 +51,7 @@ function hasPaymentOverride(row: StatementListRow): boolean {
 
 function isPartialPayment(row: StatementListRow): boolean {
   if (isPaid(row)) return false;
+  if (isPartiallyPaid(row)) return true;
   return row.plannedPaymentCents != null && row.plannedPaymentCents < row.computedTotalCents;
 }
 
@@ -137,14 +143,14 @@ export function StatementListPanel({
                 <span role="columnheader">{h.period}</span>
                 <span role="columnheader">{h.close}</span>
                 <span role="columnheader">{h.due}</span>
-                <span role="columnheader">{h.total}</span>
-                <span role="columnheader">{h.pay}</span>
+                <span role="columnheader">{h.remaining}</span>
                 <span role="columnheader">{h.status}</span>
                 <span role="columnheader" aria-hidden />
               </div>
 
               {statements.map((row) => {
                 const paid = isPaid(row);
+                const partial = isPartiallyPaid(row);
 
                 return (
                   <div key={row.id} className={styles.tableRow} role="row">
@@ -157,22 +163,21 @@ export function StatementListPanel({
                     <span className={styles.colDue} role="cell">
                       <time dateTime={row.dueDate}>{formatShortDate(row.dueDate)}</time>
                     </span>
-                    <span className={styles.colTotal} role="cell">
-                      <MoneyAmount cents={row.computedTotalCents} />
-                    </span>
-                    <span className={styles.colPay} role="cell">
-                      <span className={styles.payCell}>
-                        <MoneyAmount cents={payAmountCents(row)} />
-                        {hasPaymentOverride(row) && !paid && (
+                    <span className={styles.colRemaining} role="cell">
+                      <span className={styles.remainingCell}>
+                        <MoneyAmount cents={remainingCents(row)} />
+                        {hasPaymentOverride(row) && !paid && !partial && (
                           <Chip variant="statement">{m.common.override}</Chip>
                         )}
                       </span>
                     </span>
                     <span className={styles.colStatus} role="cell">
                       <span className={styles.statusCell}>
-                        {paid ? (
+                        {paid || partial ? (
                           <>
-                            <Chip variant="actual">{m.common.paidCheck}</Chip>
+                            <Chip variant={paid ? "actual" : "statement"}>
+                              {paid ? m.common.paidCheck : m.common.partial}
+                            </Chip>
                             {row.paymentTransactionId && onNavigateToTransaction && (
                               <button
                                 type="button"

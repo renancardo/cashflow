@@ -67,6 +67,8 @@ export function usePlannedItemMutations() {
     queryClient.invalidateQueries({ queryKey: queryKeys.accounts });
     queryClient.invalidateQueries({ queryKey: ["transactions"] });
     queryClient.invalidateQueries({ queryKey: ["projection"] });
+    queryClient.invalidateQueries({ queryKey: ["creditCardStatements"] });
+    queryClient.invalidateQueries({ queryKey: ["statementDetail"] });
   };
 
   const create = useMutation({
@@ -140,10 +142,13 @@ export function usePlannedItemMutations() {
     mutationFn: ({
       plannedItemId,
       occurrenceDate,
+      effectiveDate,
     }: {
       plannedItemId: string;
       occurrenceDate: string;
-    }) => settlePlannedItem(plannedItemId, occurrenceDate, today),
+      /** Defaults to app clock today; statement charges should pass the charge date. */
+      effectiveDate?: string;
+    }) => settlePlannedItem(plannedItemId, occurrenceDate, effectiveDate ?? today),
     onSuccess: invalidate,
   });
 

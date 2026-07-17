@@ -162,11 +162,31 @@ export const transactionsRepo = {
       await installmentsRepo.markScheduled(installmentId);
     }
 
+    db.transactions.splice(index, 1);
+
     if (statementId) {
-      await creditCardStatementsRepo.markUnpaid(statementId);
+      const remainingPayments = db.transactions.filter(
+        (row) => row.paysStatementId === statementId,
+      );
+      const paidAmountCents = remainingPayments.reduce((sum, row) => sum + row.amountCents, 0);
+      const latestPayment = remainingPayments.sort((a, b) =>
+        b.effectiveDate.localeCompare(a.effectiveDate),
+      )[0];
+      const statement = db.creditCardStatements.find((row) => row.id === statementId);
+
+      if (!latestPayment || paidAmountCents <= 0) {
+        await creditCardStatementsRepo.markUnpaid(statementId);
+      } else if (statement && paidAmountCents >= statement.computedTotalCents) {
+        await creditCardStatementsRepo.markPaid(statementId, latestPayment.id, paidAmountCents);
+      } else {
+        await creditCardStatementsRepo.markPartiallyPaid(
+          statementId,
+          latestPayment.id,
+          paidAmountCents,
+        );
+      }
     }
 
-    db.transactions.splice(index, 1);
     recomputeAllStatementTotals();
   },
 };

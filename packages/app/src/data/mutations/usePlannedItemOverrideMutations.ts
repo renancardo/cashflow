@@ -9,6 +9,8 @@ export function usePlannedItemOverrideMutations() {
     queryClient.invalidateQueries({ queryKey: queryKeys.plannedItems });
     queryClient.invalidateQueries({ queryKey: queryKeys.forecast });
     queryClient.invalidateQueries({ queryKey: ["projection"] });
+    queryClient.invalidateQueries({ queryKey: ["creditCardStatements"] });
+    queryClient.invalidateQueries({ queryKey: ["statementDetail"] });
   };
 
   const skipOccurrence = useMutation({

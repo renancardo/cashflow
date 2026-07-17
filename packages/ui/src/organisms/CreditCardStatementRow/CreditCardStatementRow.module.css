@@ -79,7 +79,7 @@
 .scheduleHeader,
 .scheduleRow {
   display: grid;
-  grid-template-columns: 7rem 5rem 5rem 5rem 6rem 1fr;
+  grid-template-columns: 7rem 5rem 5rem 5.5rem 6rem 1fr;
   gap: var(--space-2);
   align-items: center;
   padding: var(--space-2) 0;
@@ -111,6 +111,13 @@
 
 .scheduleRowPaid {
   opacity: 0.7;
+}
+
+.scheduleRemaining {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-wrap: wrap;
 }
 
 .actionButton {
@@ -170,7 +177,8 @@
     grid-template-columns: 1fr auto;
     grid-template-areas:
       "period status"
-      "due pay"
+      "close due"
+      "remaining remaining"
       "actions actions";
   }
 
@@ -182,18 +190,22 @@
     grid-area: period;
   }
 
-  .scheduleDue {
-    grid-area: due;
+  .scheduleClose {
+    grid-area: close;
     color: var(--color-text-muted);
   }
 
-  .scheduleTotal {
-    display: none;
+  .scheduleDue {
+    grid-area: due;
+    color: var(--color-text-muted);
+    justify-self: end;
   }
 
-  .schedulePay {
-    grid-area: pay;
-    justify-self: end;
+  .scheduleRemaining {
+    grid-area: remaining;
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
   }
 
   .scheduleStatus {

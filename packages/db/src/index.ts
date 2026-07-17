@@ -25,10 +25,13 @@ export { settlePlannedItem } from "./settlements/planned.js";
 export { settleStatement, type SettleStatementResult } from "./settlements/statement.js";
 export { assertValidTransaction, TRANSFER_TO_CREDIT_CARD_ERROR } from "./validate/transaction.js";
 export {
+  appliedPaymentCents,
   computeDueDate,
   generateStatementCycles,
+  isSettledStatement,
   listStatementCharges,
   materializeStatementsForCard,
+  unpaidRemainderCents,
   type StatementCharge,
   type StatementChargeSource,
 } from "./materialize/statements.js";

@@ -35,7 +35,7 @@ export function buildSettlementIndex(input: EngineInput): SettlementIndex {
   }
 
   for (const stmt of input.creditCardStatements) {
-    if (stmt.status === "paid" || stmt.paymentTransactionId) {
+    if (stmt.status === "paid" || stmt.status === "partially_paid" || stmt.paymentTransactionId) {
       statements.add(stmt.id);
     }
   }
