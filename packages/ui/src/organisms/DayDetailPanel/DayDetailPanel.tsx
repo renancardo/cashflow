@@ -191,7 +191,9 @@ function buildDescriptionUpdateRequest(
 }
 
 function isDescriptionEditable(item: ProjectionItem): boolean {
-  return item.source === "transaction" || item.source === "planned" || item.source === "installment";
+  return (
+    item.source === "transaction" || item.source === "planned" || item.source === "installment"
+  );
 }
 
 function settleLabel(

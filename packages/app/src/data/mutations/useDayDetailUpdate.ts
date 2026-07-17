@@ -7,14 +7,13 @@ import {
   plannedItemsRepo,
   transactionsRepo,
 } from "@cashflow/db";
-import type {
-  DayDetailAmountUpdateRequest,
-  DayDetailDescriptionUpdateRequest,
-} from "@cashflow/ui";
+import type { DayDetailAmountUpdateRequest, DayDetailDescriptionUpdateRequest } from "@cashflow/ui";
 import { queryKeys } from "../keys";
 import { type TransactionInput, useTransactionMutations } from "./useTransactionMutations";
 
-function toTransactionInput(tx: Awaited<ReturnType<typeof transactionsRepo.getById>>): TransactionInput {
+function toTransactionInput(
+  tx: Awaited<ReturnType<typeof transactionsRepo.getById>>,
+): TransactionInput {
   if (!tx) {
     throw new Error("Transaction not found");
   }
