@@ -158,6 +158,11 @@
   gap: var(--space-5);
 }
 
+.group {
+  display: flex;
+  flex-direction: column;
+}
+
 .groupTitle {
   margin: 0 0 var(--space-3);
   font-family: var(--font-mono);
@@ -179,12 +184,31 @@
 .item {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: var(--space-1) var(--space-3);
+  gap: var(--space-2) var(--space-3);
   align-items: center;
   padding: var(--space-3);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+}
+
+.confirmButton {
+  grid-column: 1 / -1;
+  justify-self: stretch;
+  min-height: 2rem;
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.8125rem;
+  background: #15803d;
+  border-color: #15803d;
+}
+
+.confirmButton:hover:not(:disabled) {
+  background: #166534;
+  border-color: #166534;
+}
+
+.confirmButton:disabled {
+  opacity: 0.7;
 }
 
 .itemProjected {
@@ -197,9 +221,7 @@
 }
 
 .itemDesc {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-primary);
+  display: block;
   margin-bottom: var(--space-1);
 }
 
@@ -213,10 +235,7 @@
 }
 
 .itemAmount {
-  font-family: var(--font-display);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  white-space: nowrap;
+  justify-self: end;
 }
 
 .amount-income {

@@ -2,7 +2,7 @@
 
 Year and month calendar views driven by real engine output.
 
-**Status (2026-07-03):** Year and month calendars are wired to live projection data via `useCalendarScreen` → `YearCalendarScreen` / `MonthCalendarScreen` (`/year`, `/month/$yearMonth`). Header metrics, indicators, day panel, and quick-add are implemented. Month view styling aligns with `docs/prototype/004/month.css` (weekend columns, entry label colors, below-buffer accent, balance line). Settlement actions and inline amount edit in the day panel are **not** implemented yet — mark-paid exists on Forecast only. Year view mobile layout is functional but not polished (small cells, horizontal scroll only). Data lives in an in-memory repo until persistent storage (ADR-006).
+**Status (2026-07-10):** Year and month calendars are wired to live projection data via `useCalendarScreen` → `YearCalendarScreen` / `MonthCalendarScreen` (`/year`, `/month/$yearMonth`). Header metrics, indicators, day panel, quick-add, settlement actions (US-3.9), inline amount/description edit (US-3.8), and **unsettled overdue/awaiting indicators** (US-3.12 / US-5.6) are implemented. Month view styling aligns with `docs/prototype/004/month.css` (weekend columns, entry label colors, below-buffer accent, balance line). Year view mobile layout is functional but not polished (small cells, horizontal scroll only). Data lives in an in-memory repo until persistent storage (ADR-006).
 
 ---
 
@@ -96,8 +96,8 @@ Year and month calendar views driven by real engine output.
 - [x] Shows opening/closing balance, inflows, outflows, item list from `ProjectionDay`
 - [x] Distinguishes actual vs projected items — `Chip` variants + grouped sections (Transactions / Planned / Installments / Statement payments)
 - [x] Quick-add entry points (income / expense / transfer) with day pre-filled — `QuickAddCard` in panel footer
-- [ ] Inline amount edit on projected items (see US-3.8)
-- [ ] Confirm payment / mark received on projected items (see US-3.9)
+- [x] Inline amount edit on projected items (see US-3.8)
+- [x] Confirm payment / mark received on projected items (see US-3.9)
 
 ---
 
@@ -148,15 +148,15 @@ Year and month calendar views driven by real engine output.
 
 ### Acceptance criteria
 
-- [ ] Projected items (`isProjected === true`) and transaction items show amount with editable affordance (pencil hint on hover/focus) per `docs/prototype/004/css/day-panel.css`
-- [ ] Click / Enter / Space opens inline currency input; Enter or blur saves; Escape cancels
-- [ ] Invalid input shows inline error state (red border) and does not persist
-- [ ] Save creates a **this-occurrence-only** `PlannedItemOverride` (amount) or updates `Installment.amountCentsOverride` / statement amount per source type — same semantics as [003-screen-specs.md §2.1](../specs/003-screen-specs.md)
-- [ ] Actual (`isProjected === false`) ledger rows are editable also
-- [ ] Successful save invalidates projection; panel and calendar cells refresh
+- [x] Projected items (`isProjected === true`) and transaction items show amount with editable affordance (pencil hint on hover/focus) per `docs/prototype/004/css/day-panel.css`
+- [x] Click / Enter / Space opens inline currency input; Enter or blur saves; Escape cancels
+- [x] Invalid input shows inline error state (red border) and does not persist
+- [x] Save creates a **this-occurrence-only** `PlannedItemOverride` (amount) or updates `Installment.amountCentsOverride` / statement amount per source type — same semantics as [003-screen-specs.md §2.1](../specs/003-screen-specs.md)
+- [x] Actual (`isProjected === false`) ledger rows are editable also
+- [x] Successful save invalidates projection; panel and calendar cells refresh
 - [ ] Storybook story covers idle, editing, invalid, and saved states
 
-**Notes:** Prototype reference — `docs/prototype/004/js/day-panel.js` (`startAmountEdit` / `finishAmountEdit`). Reuse money parsing from transaction forms where possible.
+**Notes:** Implemented via `InlineEditableAmount`, `InlineEditableText`, and `useDayDetailUpdate` (`DayDetailPanel` + `CalendarPage` / `MonthCalendarPage`). Description inline edit is also wired for transactions, planned items, and installments (not statement payments). Prototype reference — `docs/prototype/004/js/day-panel.js` (`startAmountEdit` / `finishAmountEdit`). Money parsing reuses `parseMoney` / `formatCents` from transaction forms.
 
 ---
 
@@ -171,16 +171,17 @@ Year and month calendar views driven by real engine output.
 
 ### Acceptance criteria
 
-- [ ] Projected **planned** occurrences show a primary action (e.g. “Confirm payment” / “Confirm receipt”) per item type and sign
-- [ ] Projected **installments** and **statement payments** show equivalent settle action (reuse labels from Forecast screen)
-- [ ] Action calls existing settlement paths: `settlePlannedItem`, `settleInstallment`, or statement payment flow — same canonical links as [003-screen-specs.md §2.2](../specs/003-screen-specs.md)
-- [ ] Settlement creates an actual `Transaction` dated **today** (`todayIso()`), with `settlesPlannedItemId` + `settlesPlannedOccurrenceDate` (or installment / statement fields); projected row disappears from that day after recompute
-- [ ] Item moves to **Transactions** group in the panel (actual) and to the transactions ledger for today’s date
+- [x] Projected **planned** occurrences show a primary action (e.g. “Confirm payment” / “Confirm receipt”) per item type and sign
+- [x] Projected **installments** and **statement payments** show equivalent settle action (reuse labels from Forecast screen)
+- [x] Action calls existing settlement paths: `settlePlannedItem`, `settleInstallment`, or statement payment flow — same canonical links as [003-screen-specs.md §2.2](../specs/003-screen-specs.md)
+- [x] Settlement creates an actual `Transaction` dated **today** (`todayIso()`), with `settlesPlannedItemId` + `settlesPlannedOccurrenceDate` (or installment / statement fields); projected row disappears from that day after recompute
+- [x] Item moves to **Transactions** group in the panel (actual) and to the transactions ledger for today’s date
 - [ ] Disabled or hidden for already-settled occurrences and for past-due items that need explicit amount confirmation first (define in UX review)
-- [ ] Optimistic or loading state on the button; error surfaced inline
+- [x] Loading state on the button (`settlingKey` disables confirm while pending)
+- [ ] Error surfaced inline on settlement failure
 - [ ] E2E: open day with projected planned item → confirm → item appears under Transactions and calendar indicators update
 
-**Notes:** `settlePlannedItem` / `settleInstallment` already exist in `packages/db`; Forecast screen exposes mark-paid via `usePlannedItemMutations` / `useInstallmentMutations` — wire the same mutations from `DayDetailPanel`.
+**Notes:** Wired via `useDayDetailSettle` from `DayDetailPanel` on `CalendarPage` and `MonthCalendarPage`. `settlePlannedItem` / `settleInstallment` / `settleStatement` already exist in `packages/db`; Forecast screen still exposes the same paths via `usePlannedItemMutations` / `useInstallmentMutations`.
 
 ---
 
@@ -347,17 +348,17 @@ Non-contiguous days (e.g. Mon + Wed + Fri) are in scope — sum and list include
 
 ### Problem
 
-Month calendar entry styling for **past-due payment** is specified (strong red `#dc2626`) but the engine currently marks past unsettled items as `isProjected: false`, so overdue expenses may render as actual outflows instead of overdue.
+Unsettled expenses and income past their due date must stay visible, distinct from actuals, and excluded from balance until settled. Month entry-line colors and day-level overdue bars communicate lateness at a glance.
 
 ### Acceptance criteria
 
-- [ ] Unsettled expense with `effectiveDate < today` uses **past-due** entry color on month calendar (§2.6)
-- [ ] Year calendar shows an **overdue** dot (or reuse danger variant) on days with at least one past-due unsettled expense
-- [ ] Legend documents overdue semantics alongside below-buffer red dot
-- [ ] `workingBalanceTodayCents` does **not** treat unsettled past expenses as paid (engine fix aligned with US-5.6)
-- [ ] Day panel lists overdue items with primary **Confirm payment** action (see US-3.9)
-- [ ] Late payment: settlement `effectiveDate` = payment day, `settlesPlannedOccurrenceDate` = original due date
-- [ ] Optional: Forecast row badge “Overdue” on `nextDate < today` for active planned expenses
+- [x] Unsettled expense with `effectiveDate < today` uses **past-due** entry color on month calendar (§2.6) — `getEntryLineTone()` → `past-due`
+- [x] Year and month calendars show a **left vertical bar** (`#dc2626`) on days with any overdue unsettled item — `hasOverdueItems()` + `CalendarDayCell.overdue` / `MonthCalendarScreen.overdue`
+- [x] Legend documents overdue bar alongside below-buffer and dot indicators — `CalendarLegend` `legend.overdue`
+- [x] `workingBalanceTodayCents` does **not** treat unsettled past expenses as paid — engine `applyForecastEffect` skips overdue items
+- [x] Day panel lists overdue items with **Awaiting** / **Past due** chips and **Confirm payment** action (US-3.9)
+- [x] Late payment: settlement `effectiveDate` = payment day, `settlesPlannedOccurrenceDate` = original due date — `useDayDetailSettle`
+- [ ] Optional: Forecast row badge “Overdue” on `nextDate < today` for active planned expenses — deferred
 
 ### Open questions
 

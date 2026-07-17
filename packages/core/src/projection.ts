@@ -20,6 +20,10 @@ export interface ProjectionItem {
   categoryId?: string;
   description: string;
   isProjected: boolean;
+  /** Unsettled forecast whose due date is before asOfDate; shown but excluded from balance. */
+  isOverdue: boolean;
+  /** Canonical schedule date for planned occurrences (may differ from the calendar day). */
+  occurrenceDate?: string;
 }
 
 export interface ProjectionDay {

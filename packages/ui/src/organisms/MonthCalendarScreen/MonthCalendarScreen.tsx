@@ -11,13 +11,26 @@ import {
   formatMonthYear,
   getDayEntryLines,
   getDayIndicators,
+  getDayTemporalState,
+  hasOverdueItems,
   indexProjectionDays,
+  isWeekend,
   shiftMonth,
   weekdayLongLabels,
+  type EntryLineTone,
 } from "../../lib/calendar.js";
 import { useLanguage, useMessages } from "../../i18n/LanguageContext.js";
 import { HeaderStrip } from "../HeaderStrip/HeaderStrip.js";
 import styles from "./MonthCalendarScreen.module.css";
+
+const entryToneStyles: Record<EntryLineTone, string> = {
+  "actual-income": styles.actualincome,
+  "projected-income": styles.projectedincome,
+  "actual-outflow": styles.actualoutflow,
+  "projected-outflow": styles.projectedoutflow,
+  "past-due": styles.pastdue,
+  "awaiting-income": styles.awaitingincome,
+};
 
 type Props = {
   month: string;
@@ -174,6 +187,8 @@ export function MonthCalendarScreen({
               }
 
               const day = daysByDate.get(cell.date);
+              const temporal = getDayTemporalState(cell.date, today);
+              const weekend = isWeekend(cell.date);
               const indicators = day ? getDayIndicators(day) : [];
               const entries = day ? getDayEntryLines(day, today) : [];
 
@@ -183,7 +198,10 @@ export function MonthCalendarScreen({
                   type="button"
                   className={[
                     styles.dayCell,
+                    temporal !== "future" && styles[temporal],
+                    weekend && styles.weekend,
                     day?.belowBuffer && styles.belowBuffer,
+                    day && hasOverdueItems(day) && styles.overdue,
                     selectedDate === cell.date && styles.selected,
                   ]
                     .filter(Boolean)
@@ -193,7 +211,7 @@ export function MonthCalendarScreen({
                   })}
                   onClick={() => onDaySelect?.(cell.date!)}
                 >
-                  <span className={styles.dayNumberContainer}>
+                  <span>
                     <span className={styles.dayNumber}>{String(cell.day).padStart(2, "0")} - </span>
                     {day && (
                       <span
@@ -210,7 +228,7 @@ export function MonthCalendarScreen({
                       {entries.map((entry) => (
                         <span
                           key={entry.id}
-                          className={[styles.entry, styles[entry.tone.replace(/-/g, "")]].join(" ")}
+                          className={[styles.entry, entryToneStyles[entry.tone]].join(" ")}
                         >
                           {entry.label}
                         </span>

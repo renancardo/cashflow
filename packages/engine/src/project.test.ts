@@ -157,7 +157,7 @@ describe("projectCashFlow", () => {
       expect(dayOf(result, "2026-06-15")?.outflowsCents).toBe(0);
 
       expect(projectedItemsOnDate(result, "2026-06-18", { refId: "plan-streaming" })).toEqual([
-        expect.objectContaining({ amountCents: 5_590 }),
+        expect.objectContaining({ amountCents: 5_590, occurrenceDate: "2026-06-15" }),
       ]);
       expect(dayOf(result, "2026-06-18")?.outflowsCents).toBe(5_590);
     });
@@ -210,6 +210,85 @@ describe("projectCashFlow", () => {
         projectedItemsOnDate(result, "2026-07-10", { refId: "inst-loan-alpha-jul" }),
       ).toHaveLength(1);
       expect(projectedItemsOnDate(result, "2026-07-12", { refId: "plan-hoa" })).toHaveLength(1);
+    });
+  });
+
+  describe("historical days before asOfDate", () => {
+    const fixture = getFixture("household-june-2026");
+
+    it("includes ledger history for days before the simulated date", () => {
+      const result = projectCashFlow(fixture, "2026-07-12");
+
+      const jul1 = dayOf(result, "2026-07-01");
+      expect(jul1).toBeDefined();
+      expect(jul1?.outflowsCents).toBeGreaterThan(0);
+      expect(itemsOnDate(result, "2026-07-01", { source: "transaction" })).toHaveLength(2);
+
+      const jul5 = dayOf(result, "2026-07-05");
+      expect(jul5).toBeDefined();
+      expect(jul5?.closingBalanceCents).toBe(jul1?.closingBalanceCents);
+
+      const jul11 = dayOf(result, "2026-07-11");
+      expect(jul11).toBeDefined();
+      expect(jul11?.closingBalanceCents).toBe(jul1?.closingBalanceCents);
+    });
+
+    it("shows overdue unsettled forecast items before asOfDate without affecting balance", () => {
+      const result = projectCashFlow(fixture, "2026-07-12");
+
+      const salaryJul8 = projectedItemsOnDate(result, "2026-07-08", { refId: "plan-salary-a" });
+      expect(salaryJul8).toHaveLength(1);
+      expect(salaryJul8[0]?.isOverdue).toBe(true);
+      expect(dayOf(result, "2026-07-08")?.inflowsCents).toBe(0);
+
+      const installmentJul10 = projectedItemsOnDate(result, "2026-07-10", {
+        refId: "inst-loan-alpha-07",
+      });
+      expect(installmentJul10).toHaveLength(1);
+      expect(installmentJul10[0]?.isOverdue).toBe(true);
+      expect(dayOf(result, "2026-07-10")?.outflowsCents).toBe(0);
+
+      expect(projectedItemsOnDate(result, "2026-07-12", { refId: "plan-hoa" })).toEqual([
+        expect.objectContaining({ isOverdue: false }),
+      ]);
+    });
+
+    it("marks overdue income and expenses in basic salary scenario", () => {
+      const salaryFixture = getFixture("basic-salary-rent");
+      const result = projectCashFlow(salaryFixture, "2026-06-10");
+
+      expect(projectedItemsOnDate(result, "2026-06-05", { refId: "plan-salary" })).toEqual([
+        expect.objectContaining({ type: "income", isOverdue: true }),
+      ]);
+      expect(dayOf(result, "2026-06-05")?.inflowsCents).toBe(0);
+
+      expect(projectedItemsOnDate(result, "2026-06-10", { refId: "plan-rent" })).toEqual([
+        expect.objectContaining({ type: "expense", isOverdue: false, isProjected: true }),
+      ]);
+    });
+
+    it("keeps workingBalanceTodayCents on asOfDate", () => {
+      const atJul12 = projectCashFlow(fixture, "2026-07-12");
+
+      expect(atJul12.workingBalanceTodayCents).toBe(
+        dayOf(atJul12, "2026-07-12")?.closingBalanceCents,
+      );
+    });
+
+    it("only reports nextNegativeDate from asOfDate forward", () => {
+      const fixture = getFixture("basic-salary-rent");
+      const input: EngineInput = {
+        ...fixture,
+        settings: {
+          ...fixture.settings,
+          negativeBufferCents: 600_000,
+        },
+      };
+
+      const result = projectCashFlow(input, "2026-06-10");
+
+      expect(dayOf(result, "2026-06-01")?.belowBuffer).toBe(true);
+      expect(result.nextNegativeDate).toBe("2026-06-10");
     });
   });
 });

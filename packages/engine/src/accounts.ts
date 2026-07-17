@@ -1,5 +1,5 @@
 import type { Account, Transaction } from "@cashflow/core";
-import { addDays } from "./dates.js";
+import { addDays, compareIso, minIso } from "./dates.js";
 
 export type AccountMap = Map<string, Account>;
 
@@ -66,6 +66,15 @@ export function workingAccountBalanceAt(
     balance += transactionAccountDelta(tx, account.id);
   }
   return balance;
+}
+
+/** Earliest date to include in projection history (working account anchors, capped at asOfDate). */
+export function computeHistoryStart(accounts: Account[], asOfDate: string): string {
+  const anchorDates = accounts.filter(isWorkingAccount).map((account) => account.anchorDate);
+  if (anchorDates.length === 0) return asOfDate;
+
+  const earliest = minIso(...anchorDates);
+  return compareIso(earliest, asOfDate) <= 0 ? earliest : asOfDate;
 }
 
 /** Aggregate working balance at the start of `beforeDate`. */

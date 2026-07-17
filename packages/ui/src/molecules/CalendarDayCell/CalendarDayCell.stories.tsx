@@ -57,3 +57,13 @@ export const PastMuted: Story = {
     indicators: ["warning"],
   },
 };
+
+export const Overdue: Story = {
+  name: "Overdue bar",
+  args: {
+    day: 10,
+    state: "future",
+    overdue: true,
+    indicators: [],
+  },
+};

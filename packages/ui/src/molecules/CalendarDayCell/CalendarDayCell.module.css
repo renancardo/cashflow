@@ -44,6 +44,28 @@
   box-shadow: inset 0 0 0 2px var(--color-primary);
 }
 
+.overdue {
+  box-shadow: inset 3px 0 0 #dc2626;
+}
+
+.today.overdue {
+  box-shadow:
+    inset 3px 0 0 #dc2626,
+    inset 0 0 0 2px var(--color-primary);
+}
+
+.selected.overdue {
+  box-shadow:
+    inset 3px 0 0 #dc2626,
+    inset 0 0 0 1px var(--color-primary);
+}
+
+.today.selected.overdue {
+  box-shadow:
+    inset 3px 0 0 #dc2626,
+    inset 0 0 0 2px var(--color-primary);
+}
+
 .future {
   color: var(--color-text);
   font-weight: 500;
