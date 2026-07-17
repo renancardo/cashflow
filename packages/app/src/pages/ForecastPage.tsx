@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import type { PlannedItem } from "@cashflow/core";
 import { compareIso, isRecurring } from "@cashflow/core";
 import {
@@ -11,6 +12,7 @@ import {
   type ForecastFilter,
   type PlannedItemEditorValues,
   type RecurrenceScope,
+  type StatementChargeRow,
   type StatementEditorValues,
 } from "@cashflow/ui";
 import {
@@ -23,7 +25,9 @@ import {
   usePlannedItemMutations,
   type PlannedItemEditorInput,
 } from "../data/mutations/usePlannedItemMutations";
+import { usePlannedItemOverrideMutations } from "../data/mutations/usePlannedItemOverrideMutations";
 import { useStatementMutations } from "../data/mutations/useStatementMutations";
+import { useTransactionMutations } from "../data/mutations/useTransactionMutations";
 import { useForecastScreen } from "../data/queries/useForecastScreen";
 import { useStatementDetail } from "../data/queries/useStatementDetail";
 import { useAccounts } from "../data/queries/useAccounts";
@@ -64,6 +68,7 @@ function toPlannedEditorValues(item: PlannedItem): PlannedItemEditorValues {
 }
 
 export function ForecastPage({ editorSearch = {}, onEditorSearchChange }: Props) {
+  const navigate = useNavigate();
   const { today } = useAppClock();
   const [filter, setFilter] = useState<ForecastFilter>("all");
   const [detailStatementId, setDetailStatementId] = useState<string | null>(null);
@@ -73,8 +78,10 @@ export function ForecastPage({ editorSearch = {}, onEditorSearchChange }: Props)
     useStatementDetail(detailStatementId);
 
   const plannedMutations = usePlannedItemMutations();
+  const plannedOverrideMutations = usePlannedItemOverrideMutations();
   const installmentMutations = useInstallmentMutations();
   const statementMutations = useStatementMutations();
+  const transactionMutations = useTransactionMutations();
 
   const editorOpen = Boolean(
     editorSearch.new || editorSearch.planned || editorSearch.installment || editorSearch.statement,
@@ -117,8 +124,15 @@ export function ForecastPage({ editorSearch = {}, onEditorSearchChange }: Props)
     if (editorSearch.statement) {
       const statement = data?.rawStatements.find((row) => row.id === editorSearch.statement);
       if (statement) {
+        const remainingCents = Math.max(
+          0,
+          statement.computedTotalCents - (statement.paidAmountCents ?? 0),
+        );
         setStatementValues({
-          plannedPaymentCents: statement.plannedPaymentCents,
+          plannedPaymentCents:
+            statement.status === "partially_paid"
+              ? remainingCents
+              : statement.plannedPaymentCents,
           payFromAccountId: statement.payFromAccountId,
         });
       }
@@ -205,8 +219,13 @@ export function ForecastPage({ editorSearch = {}, onEditorSearchChange }: Props)
   const openEditStatement = (id: string) => {
     const statement = data?.rawStatements.find((row) => row.id === id);
     if (!statement) return;
+    const remainingCents = Math.max(
+      0,
+      statement.computedTotalCents - (statement.paidAmountCents ?? 0),
+    );
     setStatementValues({
-      plannedPaymentCents: statement.plannedPaymentCents,
+      plannedPaymentCents:
+        statement.status === "partially_paid" ? remainingCents : statement.plannedPaymentCents,
       payFromAccountId: statement.payFromAccountId,
     });
     onEditorSearchChange?.({ statement: id });
@@ -283,6 +302,15 @@ export function ForecastPage({ editorSearch = {}, onEditorSearchChange }: Props)
     setStatementValues((current) => ({ ...current, plannedPaymentCents: undefined }));
   };
 
+  const handleStatementSave = async () => {
+    if (!editingStatementId) return;
+    await statementMutations.update.mutateAsync({
+      id: editingStatementId,
+      input: statementValues,
+    });
+    closeEditor();
+  };
+
   const handleStatementRecordPayment = async () => {
     if (!editingStatementId) return;
     await statementMutations.recordPayment.mutateAsync({
@@ -290,6 +318,57 @@ export function ForecastPage({ editorSearch = {}, onEditorSearchChange }: Props)
       input: statementValues,
     });
     closeEditor();
+  };
+
+  const handleEditCharge = (charge: StatementChargeRow) => {
+    setDetailStatementId(null);
+    if (charge.source === "transaction" || charge.source === "payment") {
+      navigate({ to: "/transactions", search: { edit: charge.refId } });
+      return;
+    }
+    if (charge.source === "planned") {
+      onEditorSearchChange?.({ planned: charge.refId });
+      return;
+    }
+    if (charge.source === "installment" && charge.planId) {
+      onEditorSearchChange?.({ installment: charge.planId });
+    }
+  };
+
+  const handleDeleteCharge = async (charge: StatementChargeRow) => {
+    if (!window.confirm("Remove this charge from the statement?")) return;
+
+    if (charge.source === "transaction" || charge.source === "payment") {
+      await transactionMutations.remove.mutateAsync(charge.refId);
+      return;
+    }
+    if (charge.source === "planned") {
+      await plannedOverrideMutations.skipOccurrence.mutateAsync({
+        plannedItemId: charge.refId,
+        occurrenceDate: charge.effectiveDate,
+      });
+      return;
+    }
+    if (charge.source === "installment") {
+      await installmentMutations.removeCharge.mutateAsync(charge.refId);
+    }
+  };
+
+  const handleMarkChargePaid = async (charge: StatementChargeRow) => {
+    if (charge.source === "planned") {
+      await plannedMutations.markPaid.mutateAsync({
+        plannedItemId: charge.refId,
+        occurrenceDate: charge.effectiveDate,
+        effectiveDate: charge.effectiveDate,
+      });
+      return;
+    }
+    if (charge.source === "installment") {
+      await installmentMutations.markPaid.mutateAsync({
+        installmentId: charge.refId,
+        effectiveDate: charge.effectiveDate,
+      });
+    }
   };
 
   const occurrencePreview = useMemo(() => {
@@ -336,7 +415,7 @@ export function ForecastPage({ editorSearch = {}, onEditorSearchChange }: Props)
         onEditPlanned={openEditPlanned}
         onEditInstallment={openEditInstallment}
         onMarkInstallmentPaid={(installmentId) =>
-          installmentMutations.markPaid.mutate(installmentId)
+          installmentMutations.markPaid.mutate({ installmentId })
         }
         onMarkPlannedPaid={(plannedItemId, occurrenceDate) =>
           plannedMutations.markPaid.mutate({ plannedItemId, occurrenceDate })
@@ -407,6 +486,7 @@ export function ForecastPage({ editorSearch = {}, onEditorSearchChange }: Props)
               closingDate={editingStatement?.closingDate ?? ""}
               dueDate={editingStatement?.dueDate ?? ""}
               computedTotalCents={editingStatement?.computedTotalCents ?? 0}
+              paidAmountCents={editingStatement?.paidAmountCents}
               includesOpeningDebt={includesOpeningDebt}
               values={statementValues}
               status={editingStatement?.status ?? "open"}
@@ -419,6 +499,7 @@ export function ForecastPage({ editorSearch = {}, onEditorSearchChange }: Props)
               onChange={(patch) => setStatementValues((current) => ({ ...current, ...patch }))}
               onClose={closeEditor}
               onResetToFull={handleStatementReset}
+              onSave={handleStatementSave}
               onRecordPayment={handleStatementRecordPayment}
             />
           )
@@ -433,6 +514,7 @@ export function ForecastPage({ editorSearch = {}, onEditorSearchChange }: Props)
         dueDate={statementDetail?.statement.dueDate ?? ""}
         computedTotalCents={statementDetail?.statement.computedTotalCents ?? 0}
         plannedPaymentCents={statementDetail?.statement.plannedPaymentCents}
+        paidAmountCents={statementDetail?.statement.paidAmountCents}
         status={statementDetail?.statement.status ?? "open"}
         charges={statementDetail?.charges ?? []}
         loading={isDetailPending}
@@ -442,6 +524,9 @@ export function ForecastPage({ editorSearch = {}, onEditorSearchChange }: Props)
           setDetailStatementId(null);
           openEditStatement(detailStatementId);
         }}
+        onEditCharge={handleEditCharge}
+        onDeleteCharge={handleDeleteCharge}
+        onMarkChargePaid={handleMarkChargePaid}
       />
 
       <RecurrenceScopeDialog

@@ -215,17 +215,19 @@ One row per card per billing cycle, maintained by the engine from the card's `cl
 | `periodStart` | date | Day after previous closing date |
 | `closingDate` | date | This cycle's closing date |
 | `dueDate` | date | First due day after `closingDate` |
-| `computedTotalCents` | integer | Statement total owed at due date (see engine rules below) |
+| `computedTotalCents` | integer | Statement total owed at due date (period charges + opening debt + **carryover** after prior close) |
 | `plannedPaymentCents` | integer? | Override of payment amount; null ⇒ pay full `computedTotalCents`. → partial payment |
+| `paidAmountCents` | integer? | Actual amount paid when settled (full or partial). Cleared if payment transaction is deleted |
 | `payFromAccountId` | string? | Override of which working account pays; null ⇒ card's `defaultPayFromAccountId` |
-| `status` | enum `StatementStatus` | `open`, `closed`, `paid` |
-| `paymentTransactionId` | string? | The actual transfer (working → card) that paid it |
+| `status` | enum `StatementStatus` | `open`, `closed`, `paid`, `partially_paid` |
+| `paymentTransactionId` | string? | The actual transfer (working → card) that paid it (full or partial) |
 
 **Engine rules**
 - **Materialization:** all statements within the projection horizon (`Settings.horizonMonths`, default 24) are pre-created per card when the card is created or its cycle config changes. → *§8.4*
-- **Opening debt seeding:** when a card is created or re-anchored with `anchorBalanceCents > 0`, the **first statement with `dueDate >= anchorDate`** includes that balance as an opening component. For that statement only: `computedTotalCents = anchorBalanceCents + Σ charges with effectiveDate > anchorDate in (periodStart..closingDate]`. All other statements: `computedTotalCents = Σ charges in (periodStart..closingDate]`. Ensures pre-existing fatura enters the projection on the next due date. → *§8.6*
+- **Opening debt seeding:** when a card is created or re-anchored with `anchorBalanceCents > 0`, the **first statement with `dueDate >= anchorDate`** includes that balance as an opening component. For that statement only: period charges = `anchorBalanceCents + Σ charges with effectiveDate > anchorDate in (periodStart..closingDate]`. All other statements: period charges = `Σ charges in (periodStart..closingDate]`. Ensures pre-existing fatura enters the projection on the next due date. → *§8.6*
+- **Carryover (after closingDate):** once a statement's `closingDate` has passed (`closingDate < asOfDate`), any unpaid remainder is added to the **next** statement's `computedTotalCents` as an explicit **carryover** line. Remainder = `computedTotalCents − (paidAmountCents ?? plannedPaymentCents ?? computedTotalCents)`. Full payment clears carryover; partial actual payment sets `status = partially_paid` and does **not** suppress the remainder. → *US-6.5*
 - A charge (actual `Transaction` or projected `PlannedItem`/`Installment` occurrence) whose `accountId` is a credit card is assigned to the statement whose `(periodStart..closingDate]` window contains its `effectiveDate`.
-- The statement creates a **projected working-account outflow** of `plannedPaymentCents ?? computedTotalCents` on `dueDate`, drawn from `payFromAccountId ?? card.defaultPayFromAccountId`.
+- The statement creates a **projected working-account outflow** of `plannedPaymentCents ?? computedTotalCents` on `dueDate`, drawn from `payFromAccountId ?? card.defaultPayFromAccountId`. Settled statements (`paid` / `partially_paid` / linked payment) suppress that projection; unpaid remainder already sits on the next fatura via carryover.
 - This outflow is what affects aggregate working balance — individual card charges never do.
 
 ### 3.8 InstallmentPlan (finite debt — replaces part of *Estudo de Contas parceladas*)
@@ -361,7 +363,7 @@ This is the structural replacement for the manual sync between *Estudo de Gastos
 | `TxType` | `income`, `expense`, `transfer` |
 | `Recurrence` | `once`, `weekly`, `monthly`, `yearly` |
 | `OverrideStatus` | `modified`, `skipped` |
-| `StatementStatus` | `open`, `closed`, `paid` |
+| `StatementStatus` | `open`, `closed`, `paid`, `partially_paid` |
 | `InstallmentStatus` | `scheduled`, `paid` |
 | `Language` | `pt-BR`, `en` |
 

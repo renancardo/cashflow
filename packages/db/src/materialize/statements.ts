@@ -79,15 +79,56 @@ function dayAfter(iso: string): string {
   return toIso(date);
 }
 
-function isPaidStatement(statement: CreditCardStatement): boolean {
-  return statement.status === "paid" || Boolean(statement.paymentTransactionId);
+/** Statement has a recorded payment (full or partial). */
+export function isSettledStatement(statement: CreditCardStatement): boolean {
+  return (
+    statement.status === "paid" ||
+    statement.status === "partially_paid" ||
+    Boolean(statement.paymentTransactionId)
+  );
+}
+
+function isFullyPaidStatement(statement: CreditCardStatement): boolean {
+  return statement.status === "paid";
+}
+
+/**
+ * Amount applied toward the statement for remainder/carryover math.
+ * After a real payment uses `paidAmountCents`; otherwise uses planned override or full total.
+ */
+export function appliedPaymentCents(statement: CreditCardStatement): number {
+  if (statement.paidAmountCents != null) return statement.paidAmountCents;
+  if (isFullyPaidStatement(statement)) return statement.computedTotalCents;
+  return statement.plannedPaymentCents ?? statement.computedTotalCents;
+}
+
+/**
+ * Unpaid remainder that rolls to the next statement after `closingDate` (US-6.5 option A/D).
+ * Returns 0 until the prior statement has closed.
+ * Uses applied payment (actual or planned), never trusts `status === "paid"` alone —
+ * an underpaid row that was incorrectly marked paid must still carry the shortfall.
+ */
+export function unpaidRemainderCents(statement: CreditCardStatement, asOfDate: string): number {
+  if (compareIso(statement.closingDate, asOfDate) >= 0) return 0;
+  return Math.max(0, statement.computedTotalCents - appliedPaymentCents(statement));
 }
 
 function resolveStatementStatus(
   statement: CreditCardStatement,
   asOfDate: string,
 ): CreditCardStatement["status"] {
-  if (isPaidStatement(statement)) return "paid";
+  const paidAmount = statement.paidAmountCents ?? 0;
+  if (statement.paymentTransactionId || paidAmount > 0) {
+    if (paidAmount >= statement.computedTotalCents && statement.computedTotalCents > 0) {
+      return "paid";
+    }
+    if (paidAmount > 0 && paidAmount < statement.computedTotalCents) {
+      return "partially_paid";
+    }
+    if (isFullyPaidStatement(statement) || statement.paymentTransactionId) {
+      return statement.status === "partially_paid" ? "partially_paid" : "paid";
+    }
+  }
   if (compareIso(statement.closingDate, asOfDate) < 0) return "closed";
   return "open";
 }
@@ -108,6 +149,15 @@ function findOpeningDebtStatement(
     .sort((a, b) => compareIso(a.dueDate, b.dueDate))[0];
 }
 
+function findPriorStatement(
+  statements: CreditCardStatement[],
+  statement: CreditCardStatement,
+): CreditCardStatement | undefined {
+  return [...statements]
+    .filter((row) => compareIso(row.closingDate, statement.closingDate) < 0)
+    .sort((a, b) => compareIso(b.closingDate, a.closingDate))[0];
+}
+
 function chargeFromTransaction(tx: Transaction, cardAccountId: string): number | null {
   if (tx.accountId === cardAccountId && tx.type === "expense") {
     return tx.amountCents;
@@ -115,7 +165,13 @@ function chargeFromTransaction(tx: Transaction, cardAccountId: string): number |
   return null;
 }
 
-export type StatementChargeSource = "transaction" | "planned" | "installment" | "opening_debt";
+export type StatementChargeSource =
+  | "transaction"
+  | "planned"
+  | "installment"
+  | "opening_debt"
+  | "carryover"
+  | "payment";
 
 export type StatementCharge = {
   id: string;
@@ -126,6 +182,8 @@ export type StatementCharge = {
   amountCents: number;
   categoryId?: string;
   isProjected: boolean;
+  /** Installment plan id when source is installment (for edit navigation). */
+  planId?: string;
 };
 
 function collectChargesInPeriod(
@@ -147,7 +205,7 @@ function collectChargesInPeriod(
 
   for (const tx of db.transactions) {
     const amountCents = chargeFromTransaction(tx, card.id);
-    if (amountCents !== null && includeDate(tx.effectiveDate)) {
+    if (amountCents !== null && amountCents > 0 && includeDate(tx.effectiveDate)) {
       charges.push({
         id: `tx-${tx.id}`,
         source: "transaction",
@@ -175,6 +233,7 @@ function collectChargesInPeriod(
 
     for (const occurrence of occurrences) {
       if (!includeDate(occurrence.effectiveDate)) continue;
+      if (occurrence.amountCents <= 0) continue;
       charges.push({
         id: `planned-${item.id}-${occurrence.effectiveDate}`,
         source: "planned",
@@ -195,13 +254,17 @@ function collectChargesInPeriod(
     if (!plan || plan.archivedAt || !plan.isActive || plan.accountId !== card.id) continue;
     if (!includeDate(installment.dueDate)) continue;
 
+    const amountCents = installment.amountCentsOverride ?? plan.installmentAmountCents;
+    if (amountCents <= 0) continue;
+
     charges.push({
       id: `installment-${installment.id}`,
       source: "installment",
       refId: installment.id,
+      planId: plan.id,
       description: plan.description,
       effectiveDate: installment.dueDate,
-      amountCents: installment.amountCentsOverride ?? plan.installmentAmountCents,
+      amountCents,
       categoryId: plan.categoryId,
       isProjected: compareIso(installment.dueDate, asOfDate) > 0,
     });
@@ -226,7 +289,9 @@ export function listStatementCharges(
   }
 
   const horizonEnd = horizonEndDate(asOfDate, db.settings.horizonMonths);
-  const statements = db.creditCardStatements.filter((row) => row.cardAccountId === card.id);
+  const statements = db.creditCardStatements
+    .filter((row) => row.cardAccountId === card.id)
+    .sort((a, b) => compareIso(a.closingDate, b.closingDate));
   const openingDebtStatement = findOpeningDebtStatement(statements, card.anchorDate);
   const isOpeningDebt = statement.id === openingDebtStatement?.id && card.anchorBalanceCents > 0;
 
@@ -239,6 +304,22 @@ export function listStatementCharges(
     isOpeningDebt ? card.anchorDate : undefined,
   );
 
+  const prior = findPriorStatement(statements, statement);
+  if (prior) {
+    const carryoverCents = unpaidRemainderCents(prior, asOfDate);
+    if (carryoverCents > 0) {
+      charges.unshift({
+        id: `carryover-${prior.id}`,
+        source: "carryover",
+        refId: prior.id,
+        description: "Carryover from prior statement",
+        effectiveDate: dayAfter(prior.closingDate),
+        amountCents: carryoverCents,
+        isProjected: false,
+      });
+    }
+  }
+
   if (isOpeningDebt) {
     charges.unshift({
       id: `opening-debt-${statement.id}`,
@@ -247,6 +328,20 @@ export function listStatementCharges(
       description: "Opening balance",
       effectiveDate: card.anchorDate,
       amountCents: card.anchorBalanceCents,
+      isProjected: false,
+    });
+  }
+
+  for (const tx of db.transactions) {
+    if (tx.paysStatementId !== statement.id || tx.amountCents <= 0) continue;
+    charges.push({
+      id: `payment-${tx.id}`,
+      source: "payment",
+      refId: tx.id,
+      description: tx.description || "Statement payment",
+      effectiveDate: tx.effectiveDate,
+      // Credit against the fatura (display as positive income / reducing balance).
+      amountCents: -tx.amountCents,
       isProjected: false,
     });
   }
@@ -263,6 +358,7 @@ function sumChargesInPeriod(
   periodStart: string,
   closingDate: string,
   horizonEnd: string,
+  asOfDate: string,
   afterDate?: string,
 ): number {
   return collectChargesInPeriod(
@@ -270,19 +366,26 @@ function sumChargesInPeriod(
     periodStart,
     closingDate,
     horizonEnd,
-    todayIso(),
+    asOfDate,
     afterDate,
   ).reduce((sum, charge) => sum + charge.amountCents, 0);
 }
 
-function computeStatementTotal(
+function periodChargesTotal(
   card: Account,
   statement: CreditCardStatement,
   openingDebtStatementId: string | undefined,
   horizonEnd: string,
+  asOfDate: string,
 ): number {
   if (statement.id !== openingDebtStatementId || card.anchorBalanceCents <= 0) {
-    return sumChargesInPeriod(card, statement.periodStart, statement.closingDate, horizonEnd);
+    return sumChargesInPeriod(
+      card,
+      statement.periodStart,
+      statement.closingDate,
+      horizonEnd,
+      asOfDate,
+    );
   }
 
   return (
@@ -292,6 +395,7 @@ function computeStatementTotal(
       statement.periodStart,
       statement.closingDate,
       horizonEnd,
+      asOfDate,
       card.anchorDate,
     )
   );
@@ -306,21 +410,23 @@ export function recomputeStatementTotalsForCard(
   if (!card || card.type !== "credit_card") return;
 
   const horizonEnd = horizonEndDate(asOfDate, db.settings.horizonMonths);
-  const statements = db.creditCardStatements.filter((row) => row.cardAccountId === cardAccountId);
+  const statements = db.creditCardStatements
+    .filter((row) => row.cardAccountId === cardAccountId)
+    .sort((a, b) => compareIso(a.closingDate, b.closingDate));
   const openingDebtStatement = findOpeningDebtStatement(statements, card.anchorDate);
 
   for (const statement of statements) {
-    if (isPaidStatement(statement)) {
-      statement.status = "paid";
-      continue;
-    }
-
-    statement.computedTotalCents = computeStatementTotal(
+    const prior = findPriorStatement(statements, statement);
+    const carryoverCents = prior ? unpaidRemainderCents(prior, asOfDate) : 0;
+    const periodTotal = periodChargesTotal(
       card,
       statement,
       openingDebtStatement?.id,
       horizonEnd,
+      asOfDate,
     );
+
+    statement.computedTotalCents = periodTotal + carryoverCents;
     statement.status = resolveStatementStatus(statement, asOfDate);
   }
 }
@@ -347,22 +453,27 @@ export function materializeStatementsForCard(
   const rangeStart = card.anchorDate;
   const rangeEnd = addMonths(card.anchorDate, db.settings.horizonMonths);
   const existing = db.creditCardStatements.filter((row) => row.cardAccountId === cardAccountId);
-  const paidStatements = existing.filter(isPaidStatement);
+  const settledStatements = existing.filter(isSettledStatement);
   const preservedOverrides = new Map(
     existing
-      .filter((row) => row.plannedPaymentCents != null || row.payFromAccountId != null)
+      .filter(
+        (row) =>
+          row.plannedPaymentCents != null ||
+          row.payFromAccountId != null ||
+          row.paidAmountCents != null,
+      )
       .map((row) => [row.closingDate, row]),
   );
 
   db.creditCardStatements = db.creditCardStatements.filter(
-    (row) => row.cardAccountId !== cardAccountId || isPaidStatement(row),
+    (row) => row.cardAccountId !== cardAccountId || isSettledStatement(row),
   );
 
   const cycles = generateStatementCycles(card.closingDay, card.dueDay, rangeStart, rangeEnd);
-  const paidClosingDates = new Set(paidStatements.map((row) => row.closingDate));
+  const settledClosingDates = new Set(settledStatements.map((row) => row.closingDate));
 
   for (const cycle of cycles) {
-    if (paidClosingDates.has(cycle.closingDate)) continue;
+    if (settledClosingDates.has(cycle.closingDate)) continue;
 
     const preserved = preservedOverrides.get(cycle.closingDate);
     db.creditCardStatements.push({
@@ -373,8 +484,10 @@ export function materializeStatementsForCard(
       dueDate: cycle.dueDate,
       computedTotalCents: 0,
       plannedPaymentCents: preserved?.plannedPaymentCents,
+      paidAmountCents: preserved?.paidAmountCents,
       payFromAccountId: preserved?.payFromAccountId ?? card.defaultPayFromAccountId,
       status: "open",
+      paymentTransactionId: preserved?.paymentTransactionId,
     });
   }
 

@@ -196,4 +196,99 @@ describe("statement materialization", () => {
     expect(preserved?.status).toBe("paid");
     expect(preserved?.paymentTransactionId).toBe("tx-paid");
   });
+
+  it("rolls unpaid remainder into the next statement after closingDate", async () => {
+    resetDatabase(createEmptyState());
+
+    const checking = await accountsRepo.create({
+      name: "Checking",
+      type: "checking",
+      currency: "BRL",
+      isWorking: true,
+      anchorBalanceCents: 1_000_000,
+      anchorDate: "2026-06-01",
+    });
+
+    const card = await accountsRepo.create({
+      name: "Main Credit Card",
+      type: "credit_card",
+      currency: "BRL",
+      isWorking: false,
+      anchorBalanceCents: 150_000,
+      anchorDate: "2026-06-01",
+      closingDay: 26,
+      dueDay: 1,
+      defaultPayFromAccountId: checking.id,
+    });
+
+    await transactionsRepo.create({
+      type: "expense",
+      amountCents: 8_990,
+      accountId: card.id,
+      description: "Online purchase",
+      effectiveDate: "2026-06-27",
+    });
+
+    materializeStatementsForCard(card.id, "2026-06-20");
+    const first = statementsForCard(card.id).find((row) => row.dueDate === "2026-07-01");
+    const secondBeforeClose = statementsForCard(card.id).find(
+      (row) => row.dueDate === "2026-08-01",
+    );
+    expect(first?.computedTotalCents).toBe(150_000);
+    // Prior statement has not closed yet — no carryover on next fatura
+    expect(secondBeforeClose?.computedTotalCents).toBe(8_990);
+
+    getDatabase().creditCardStatements = getDatabase().creditCardStatements.map((row) =>
+      row.id === first!.id ? { ...row, plannedPaymentCents: 100_000 } : row,
+    );
+    materializeStatementsForCard(card.id, "2026-06-27");
+
+    const secondAfterClose = statementsForCard(card.id).find((row) => row.dueDate === "2026-08-01");
+    expect(secondAfterClose?.computedTotalCents).toBe(8_990 + 50_000);
+  });
+
+  it("carries underpayment even when status was incorrectly marked paid", async () => {
+    resetDatabase(createEmptyState());
+
+    const checking = await accountsRepo.create({
+      name: "Checking",
+      type: "checking",
+      currency: "BRL",
+      isWorking: true,
+      anchorBalanceCents: 1_000_000,
+      anchorDate: "2026-06-01",
+    });
+
+    const card = await accountsRepo.create({
+      name: "Main Credit Card",
+      type: "credit_card",
+      currency: "BRL",
+      isWorking: false,
+      anchorBalanceCents: 150_000,
+      anchorDate: "2026-06-01",
+      closingDay: 26,
+      dueDay: 1,
+      defaultPayFromAccountId: checking.id,
+    });
+
+    materializeStatementsForCard(card.id, "2026-06-28");
+    const first = statementsForCard(card.id).find((row) => row.dueDate === "2026-07-01");
+    expect(first?.computedTotalCents).toBe(150_000);
+
+    // Mimic the old seed bug: force status=paid while paidAmount underpays.
+    getDatabase().creditCardStatements = getDatabase().creditCardStatements.map((row) =>
+      row.id === first!.id
+        ? {
+            ...row,
+            status: "paid",
+            paymentTransactionId: "tx-underpay",
+            paidAmountCents: 100_000,
+          }
+        : row,
+    );
+
+    materializeStatementsForCard(card.id, "2026-06-28");
+    const second = statementsForCard(card.id).find((row) => row.dueDate === "2026-08-01");
+    expect(second?.computedTotalCents).toBe(50_000);
+  });
 });

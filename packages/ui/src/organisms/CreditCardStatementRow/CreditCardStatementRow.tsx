@@ -15,8 +15,9 @@ export type StatementScheduleRow = {
   closingDate: string;
   dueDate: string;
   computedTotalCents: number;
+  remainingCents: number;
   plannedPaymentCents?: number;
-  payAmountCents: number;
+  paidAmountCents?: number;
   status: StatementStatus;
   hasOverride: boolean;
 };
@@ -42,11 +43,12 @@ function statusLabel(
   m: ReturnType<typeof useMessages>,
   status: StatementStatus,
   hasOverride: boolean,
-  payAmountCents: number,
+  remainingCents: number,
   computedTotalCents: number,
 ): string {
   if (status === "paid") return m.common.paid;
-  if (hasOverride && payAmountCents < computedTotalCents) return m.common.partial;
+  if (status === "partially_paid") return m.common.partial;
+  if (hasOverride && remainingCents < computedTotalCents) return m.common.partial;
   if (status === "closed") return m.common.closed;
   return m.common.open;
 }
@@ -117,14 +119,15 @@ export function CreditCardStatementRow({ row, onEdit, onMarkPaid, onViewItems }:
         <div className={styles.schedule}>
           <div className={styles.scheduleHeader}>
             <span>{h.period}</span>
+            <span>{h.close}</span>
             <span>{h.due}</span>
-            <span>{h.total}</span>
-            <span>{h.pay}</span>
+            <span>{h.remaining}</span>
             <span>{h.status}</span>
             <span />
           </div>
           {row.statements.map((stmt) => {
             const paid = stmt.status === "paid";
+            const isPartial = stmt.status === "partially_paid";
             return (
               <div
                 key={stmt.id}
@@ -135,27 +138,35 @@ export function CreditCardStatementRow({ row, onEdit, onMarkPaid, onViewItems }:
                 <span className={styles.schedulePeriod}>
                   {formatStatementPeriod(stmt.periodStart, stmt.closingDate)}
                 </span>
+                <span className={styles.scheduleClose}>
+                  <FormattedDate isoDate={stmt.closingDate} />
+                </span>
                 <span className={styles.scheduleDue}>
                   <FormattedDate isoDate={stmt.dueDate} />
                 </span>
-                <span className={styles.scheduleTotal}>
-                  <MoneyAmount cents={stmt.computedTotalCents} />
-                </span>
-                <span className={styles.schedulePay}>
-                  <MoneyAmount cents={stmt.payAmountCents} />
-                  {stmt.hasOverride && !paid && (
+                <span className={styles.scheduleRemaining}>
+                  <MoneyAmount cents={stmt.remainingCents} />
+                  {stmt.hasOverride && !paid && !isPartial && (
                     <Chip variant="statement">{m.common.override}</Chip>
                   )}
                 </span>
                 <span className={styles.scheduleStatus}>
                   <Chip
-                    variant={paid ? "actual" : stmt.status === "open" ? "statement" : "default"}
+                    variant={
+                      paid
+                        ? "actual"
+                        : isPartial
+                          ? "statement"
+                          : stmt.status === "open"
+                            ? "statement"
+                            : "default"
+                    }
                   >
                     {statusLabel(
                       m,
                       stmt.status,
                       stmt.hasOverride,
-                      stmt.payAmountCents,
+                      stmt.remainingCents,
                       stmt.computedTotalCents,
                     )}
                   </Chip>

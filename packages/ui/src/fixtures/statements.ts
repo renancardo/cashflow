@@ -8,6 +8,7 @@ export const DEMO_STATEMENT_ROWS: StatementListRow[] = [
     closingDate: "2026-06-26",
     dueDate: "2026-07-01",
     computedTotalCents: 150_000,
+    paidAmountCents: 150_000,
     status: "paid",
     paymentTransactionId: "tx-card-payment",
   },

@@ -128,14 +128,13 @@
     minmax(3.25rem, auto)
     minmax(3.25rem, auto)
     minmax(5.5rem, auto)
-    minmax(6rem, auto)
     minmax(4.75rem, auto)
     minmax(3rem, auto);
   gap: var(--space-3);
   padding: var(--space-2) var(--space-3);
   align-items: center;
   font-size: 0.8125rem;
-  min-width: 36rem;
+  min-width: 32rem;
 }
 
 .tableHeader {
@@ -172,8 +171,7 @@
 .colPeriod,
 .colClose,
 .colDue,
-.colTotal,
-.colPay,
+.colRemaining,
 .colStatus,
 .colActions {
   min-width: 0;
@@ -183,7 +181,7 @@
   color: var(--color-text-muted);
 }
 
-.payCell {
+.remainingCell {
   display: flex;
   align-items: center;
   gap: var(--space-1);
@@ -248,7 +246,7 @@
     grid-template-areas:
       "period status"
       "due due"
-      "total pay"
+      "remaining remaining"
       "actions actions";
     gap: var(--space-1) var(--space-3);
     padding: var(--space-3);
@@ -267,13 +265,8 @@
     color: var(--color-text-muted);
   }
 
-  .colTotal {
-    grid-area: total;
-  }
-
-  .colPay {
-    grid-area: pay;
-    justify-self: end;
+  .colRemaining {
+    grid-area: remaining;
   }
 
   .colStatus {

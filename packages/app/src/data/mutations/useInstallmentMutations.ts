@@ -1,6 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { InstallmentPlan } from "@cashflow/core";
-import { installmentPlansRepo, settleInstallment, type InstallmentPlanInput } from "@cashflow/db";
+import {
+  installmentPlansRepo,
+  installmentsRepo,
+  settleInstallment,
+  type InstallmentPlanInput,
+} from "@cashflow/db";
 import { queryKeys } from "../keys";
 import { useAppClock } from "../../dev/useAppClock";
 
@@ -40,6 +45,8 @@ export function useInstallmentMutations() {
     queryClient.invalidateQueries({ queryKey: queryKeys.accounts });
     queryClient.invalidateQueries({ queryKey: ["transactions"] });
     queryClient.invalidateQueries({ queryKey: ["projection"] });
+    queryClient.invalidateQueries({ queryKey: ["creditCardStatements"] });
+    queryClient.invalidateQueries({ queryKey: ["statementDetail"] });
   };
 
   const create = useMutation({
@@ -66,11 +73,23 @@ export function useInstallmentMutations() {
   });
 
   const markPaid = useMutation({
-    mutationFn: (installmentId: string) => settleInstallment(installmentId, today),
+    mutationFn: ({
+      installmentId,
+      effectiveDate,
+    }: {
+      installmentId: string;
+      effectiveDate?: string;
+    }) => settleInstallment(installmentId, effectiveDate ?? today),
     onSuccess: invalidate,
   });
 
-  return { create, update, setActive, remove, markPaid };
+  /** Zero out an installment so it no longer contributes to statement totals. */
+  const removeCharge = useMutation({
+    mutationFn: (installmentId: string) => installmentsRepo.setAmountOverride(installmentId, 0),
+    onSuccess: invalidate,
+  });
+
+  return { create, update, setActive, remove, markPaid, removeCharge };
 }
 
 export function createEmptyInstallmentPlanInput(

@@ -1,4 +1,9 @@
-import { getDatabase, materializeAllCreditCardStatements, seedDatabase } from "@cashflow/db";
+import {
+  getDatabase,
+  materializeAllCreditCardStatements,
+  recomputeAllStatementTotals,
+  seedDatabase,
+} from "@cashflow/db";
 import { SEED_ACCOUNTS } from "./accounts";
 import { SEED_CATEGORIES, SEED_CATEGORY_BUDGETS } from "./categories";
 import { SEED_INSTALLMENTS, SEED_INSTALLMENT_PLANS } from "./installmentPlans";
@@ -26,8 +31,15 @@ export function bootstrapSeed(asOfDate: string = SEED_ANCHOR_DATE): void {
   );
   const cardPayment = db.transactions.find((row) => row.id === "tx-card-payment");
   if (openingStatement && cardPayment && !cardPayment.paysStatementId) {
+    // Seed payment was authored as the opening-debt amount only; the June fatura also
+    // includes Netflix + Spotify. Pay the full computed total so the next statement
+    // does not silently carry an underpayment that only appears after a recompute.
+    const paidCents = openingStatement.computedTotalCents;
     cardPayment.paysStatementId = openingStatement.id;
+    cardPayment.amountCents = paidCents;
     openingStatement.status = "paid";
     openingStatement.paymentTransactionId = cardPayment.id;
+    openingStatement.paidAmountCents = paidCents;
+    recomputeAllStatementTotals(asOfDate);
   }
 }

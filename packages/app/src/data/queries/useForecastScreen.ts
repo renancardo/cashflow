@@ -88,9 +88,10 @@ export type CreditCardStatementRowData = {
     closingDate: string;
     dueDate: string;
     computedTotalCents: number;
+    remainingCents: number;
     plannedPaymentCents?: number;
-    payAmountCents: number;
-    status: "open" | "closed" | "paid";
+    paidAmountCents?: number;
+    status: "open" | "closed" | "paid" | "partially_paid";
     hasOverride: boolean;
   }[];
 };
@@ -235,11 +236,11 @@ export function useForecastScreen(filter: ForecastFilter = "all") {
           const cardStatements = creditCardStatements
             .filter((row) => row.cardAccountId === card.id)
             .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
-          const nextUnpaid = cardStatements.find(
-            (row) => row.status !== "paid" && !row.paymentTransactionId && row.dueDate >= asOfDate,
+          const nextActionable = cardStatements.find(
+            (row) => row.status !== "paid" && row.dueDate >= asOfDate,
           );
           const defaultPayFromId =
-            nextUnpaid?.payFromAccountId ??
+            nextActionable?.payFromAccountId ??
             cardStatements.find((row) => row.payFromAccountId)?.payFromAccountId ??
             card.defaultPayFromAccountId;
 
@@ -250,21 +251,33 @@ export function useForecastScreen(filter: ForecastFilter = "all") {
               ? (accountNames.get(defaultPayFromId) ?? "Unknown")
               : "—",
             lastDueDate: cardStatements.at(-1)?.dueDate,
-            nextDueDate: nextUnpaid?.dueDate,
-            nextPayAmountCents: nextUnpaid
-              ? (nextUnpaid.plannedPaymentCents ?? nextUnpaid.computedTotalCents)
+            nextDueDate: nextActionable?.dueDate,
+            nextPayAmountCents: nextActionable
+              ? nextActionable.status === "partially_paid"
+                ? Math.max(
+                    0,
+                    nextActionable.computedTotalCents - (nextActionable.paidAmountCents ?? 0),
+                  )
+                : (nextActionable.plannedPaymentCents ?? nextActionable.computedTotalCents)
               : undefined,
-            statements: cardStatements.map((row) => ({
-              id: row.id,
-              periodStart: row.periodStart,
-              closingDate: row.closingDate,
-              dueDate: row.dueDate,
-              computedTotalCents: row.computedTotalCents,
-              plannedPaymentCents: row.plannedPaymentCents,
-              payAmountCents: row.plannedPaymentCents ?? row.computedTotalCents,
-              status: row.status,
-              hasOverride: row.plannedPaymentCents != null,
-            })),
+            statements: cardStatements.map((row) => {
+              const remainingCents = Math.max(
+                0,
+                row.computedTotalCents - (row.paidAmountCents ?? 0),
+              );
+              return {
+                id: row.id,
+                periodStart: row.periodStart,
+                closingDate: row.closingDate,
+                dueDate: row.dueDate,
+                computedTotalCents: row.computedTotalCents,
+                remainingCents,
+                plannedPaymentCents: row.plannedPaymentCents,
+                paidAmountCents: row.paidAmountCents,
+                status: row.status,
+                hasOverride: row.plannedPaymentCents != null,
+              };
+            }),
           };
         })
         .filter((row) => row.statements.length > 0);

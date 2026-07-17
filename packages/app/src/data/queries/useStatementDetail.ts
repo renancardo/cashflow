@@ -28,11 +28,13 @@ export function useStatementDetail(statementId: string | null) {
       const charges = listStatementCharges(statementId!, today).map((charge) => ({
         id: charge.id,
         source: charge.source,
+        refId: charge.refId,
         description: charge.description,
         effectiveDate: charge.effectiveDate,
         amountCents: charge.amountCents,
         categoryName: charge.categoryId ? categoryNames.get(charge.categoryId) : undefined,
         isProjected: charge.isProjected,
+        planId: charge.planId,
       }));
 
       return {
