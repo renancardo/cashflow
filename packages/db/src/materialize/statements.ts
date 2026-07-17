@@ -166,12 +166,7 @@ function chargeFromTransaction(tx: Transaction, cardAccountId: string): number |
 }
 
 export type StatementChargeSource =
-  | "transaction"
-  | "planned"
-  | "installment"
-  | "opening_debt"
-  | "carryover"
-  | "payment";
+  "transaction" | "planned" | "installment" | "opening_debt" | "carryover" | "payment";
 
 export type StatementCharge = {
   id: string;

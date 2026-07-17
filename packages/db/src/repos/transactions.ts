@@ -165,7 +165,9 @@ export const transactionsRepo = {
     db.transactions.splice(index, 1);
 
     if (statementId) {
-      const remainingPayments = db.transactions.filter((row) => row.paysStatementId === statementId);
+      const remainingPayments = db.transactions.filter(
+        (row) => row.paysStatementId === statementId,
+      );
       const paidAmountCents = remainingPayments.reduce((sum, row) => sum + row.amountCents, 0);
       const latestPayment = remainingPayments.sort((a, b) =>
         b.effectiveDate.localeCompare(a.effectiveDate),

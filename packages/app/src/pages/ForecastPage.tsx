@@ -130,9 +130,7 @@ export function ForecastPage({ editorSearch = {}, onEditorSearchChange }: Props)
         );
         setStatementValues({
           plannedPaymentCents:
-            statement.status === "partially_paid"
-              ? remainingCents
-              : statement.plannedPaymentCents,
+            statement.status === "partially_paid" ? remainingCents : statement.plannedPaymentCents,
           payFromAccountId: statement.payFromAccountId,
         });
       }

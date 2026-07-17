@@ -75,7 +75,11 @@ export async function settleStatement(
   const updated =
     newPaidCents >= statement.computedTotalCents
       ? await creditCardStatementsRepo.markPaid(statement.id, transaction.id, newPaidCents)
-      : await creditCardStatementsRepo.markPartiallyPaid(statement.id, transaction.id, newPaidCents);
+      : await creditCardStatementsRepo.markPartiallyPaid(
+          statement.id,
+          transaction.id,
+          newPaidCents,
+        );
 
   recomputeStatementTotalsForCard(statement.cardAccountId, effectiveDate);
 
